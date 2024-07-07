@@ -37,6 +37,7 @@ public sealed class XlsxDataProvider : IDisposable
     {
         List<IExcelDataSource> dataSources = [];
         var excelPackage = excelPackagesDict[xlsxFileInfo];
+        xlsxFileInfo.Callback?.Invoke(excelPackage);
         HashSet<string>? workSheetNames = config.WorksheetNames is not null ? new(config.WorksheetNames, excelDataSourceConfig.StringComparer) : null;
         var xlsxFileDataSourceConfig = excelDataSourceConfig;
         if (config.DocumentNameColumnName is not null)
@@ -44,14 +45,21 @@ public sealed class XlsxDataProvider : IDisposable
             xlsxFileDataSourceConfig = excelDataSourceConfig with
             {
                 CustomColumnName = config.DocumentNameColumnName,
-                CustomColumnValue = xlsxFileInfo.FileInfo.Name
+                CustomColumnValue = xlsxFileInfo.DocumentName ?? xlsxFileInfo.FileInfo.Name
             };
         }
+        var wsInfoDict = xlsxFileInfo.WorksheetInfos.ToDictionary(x => x.Name, excelDataSourceConfig.StringComparer);
         foreach (var excelWorksheet in excelPackage.Workbook.Worksheets)
         {
             if (workSheetNames is not null && !workSheetNames.Contains(excelWorksheet.Name)) { continue; }
             ExcelAddress excelAddress = excelWorksheet.Dimension;
-            if (xlsxFileInfo.FromRow != 1 || xlsxFileInfo.FromColumn != 1 || xlsxFileInfo.ToRow != null || xlsxFileInfo.ToColumn != null)
+            if (wsInfoDict.TryGetValue(excelWorksheet.Name, out var xlsxWorksheetInfo))
+            {
+                excelAddress = new(xlsxWorksheetInfo.FromRow, xlsxWorksheetInfo.FromColumn,
+                    xlsxWorksheetInfo.ToRow ?? excelAddress.End.Row,
+                    xlsxWorksheetInfo.ToColumn ?? excelAddress.End.Column);
+            }
+            else if (xlsxFileInfo.FromRow != 1 || xlsxFileInfo.FromColumn != 1 || xlsxFileInfo.ToRow != null || xlsxFileInfo.ToColumn != null)
             {
                 excelAddress = new(xlsxFileInfo.FromRow, xlsxFileInfo.FromColumn,
                     xlsxFileInfo.ToRow ?? excelAddress.End.Row,
@@ -77,10 +85,11 @@ public sealed class XlsxDataProvider : IDisposable
         if (config.MergeDocuments)
         {
             dataSources = dataSources.GroupBy(x => x.Name)
-                .Select(x => new MergedExcelDataSource(x.Key, x.ToList(), excelDataSourceConfig))
+                .Select(x => new MergedExcelDataSource(x.Key, x.ToList(), excelDataSourceConfig with { RowNumberColumnName = null }))
                 .ToList<IExcelDataSource>();
+            if (!config.MergeWorkSheets) { return dataSources; }
             return [new MergedExcelDataSource(config.MergedDocumentName ?? "MergedDocument", dataSources,
-                        excelDataSourceConfig with { MergedWorksheetNameColumnName = null })];
+                        excelDataSourceConfig with { MergedWorksheetNameColumnName = null, RowNumberColumnName = null })];
         }
         return dataSources;
     }

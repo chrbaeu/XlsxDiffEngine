@@ -1,6 +1,4 @@
 ﻿using OfficeOpenXml;
-using OfficeOpenXml.Style;
-using System.Drawing;
 
 namespace ExcelDiffEngine;
 
@@ -43,6 +41,11 @@ public sealed class ExcelDiffWriter
                 if (config.ShowOldDataColumn) { column++; } else { oldDstCell = null; }
                 var newDstCell = worksheet.Cells[row, column];
                 var newValue = SetCell(newDstCell, columnName, newRow, ruleHandler, DataKind.New);
+                if (config.AddOldValueAsComment && oldValue?.ToString() != newValue?.ToString())
+                {
+                    var comment = config.OldValueCommentPrefix is { } prefix ? prefix + oldValue?.ToString() : oldValue?.ToString();
+                    newDstCell.AddComment(comment ?? "");
+                }
                 column++;
                 isChanged |= GetAndHandleChangedState(columnName, oldDstCell, oldValue, newDstCell, newValue);
                 if (config.KeyColumns.Contains(columnName, stringComparer))
@@ -123,21 +126,6 @@ public sealed class ExcelDiffWriter
             return dstCell.Value;
         }
         return value;
-    }
-
-    private static void HighlightAddedAndRemovedRows(ExcelWorksheet worksheet, int row, List<object?>? oldRowData, List<object?>? newRowData)
-    {
-        if (oldRowData is null)
-        {
-            worksheet.Row(row).Style.Fill.PatternType = ExcelFillStyle.Solid;
-            worksheet.Row(row).Style.Fill.BackgroundColor.SetColor(Color.FromArgb(173, 254, 173));
-        }
-        if (newRowData is null)
-        {
-            worksheet.Row(row).Style.Fill.PatternType = ExcelFillStyle.Solid;
-            worksheet.Row(row).Style.Fill.BackgroundColor.SetColor(Color.LightGray);
-            worksheet.Row(row).Style.Font.Color.SetColor(Color.DarkGray);
-        }
     }
 
     private int WriteHeader(ExcelWorksheet worksheet, int startRow, int startColumn)

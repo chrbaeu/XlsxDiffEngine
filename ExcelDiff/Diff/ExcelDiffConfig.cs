@@ -20,6 +20,8 @@ public record class ExcelDiffConfig
     public bool CopyCellFormat { get; init; } = true;
     public bool CopyCellStyle { get; init; }
     public bool ShowOldDataColumn { get; set; } = true;
+    public bool AddOldValueAsComment { get; set; } = false;
+    public string? OldValueCommentPrefix { get; init; }
     public string? OldHeaderColumnComment { get; init; }
     public string? NewHeaderColumnComment { get; init; }
     public CellStyle HeaderStyle { get; init; } = DefaultCellStyles.Header;

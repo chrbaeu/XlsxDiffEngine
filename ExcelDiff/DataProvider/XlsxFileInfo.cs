@@ -1,4 +1,6 @@
-﻿namespace ExcelDiffEngine;
+﻿using OfficeOpenXml;
+
+namespace ExcelDiffEngine;
 
 public record XlsxWorksheetInfo
 {
@@ -28,7 +30,11 @@ public record class XlsxFileInfo
     public int? ToRow { get; init; }
     public int? ToColumn { get; init; }
 
+    public string? DocumentName { get; init; }
+
     public string? MergedWorksheetName { get; init; }
 
     public IReadOnlyList<XlsxWorksheetInfo> WorksheetInfos { get; init; } = [];
+
+    public Action<ExcelPackage>? Callback { get; init; }
 }
