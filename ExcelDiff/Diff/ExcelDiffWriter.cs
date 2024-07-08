@@ -135,14 +135,14 @@ public sealed class ExcelDiffWriter
         {
             if (config.ShowOldDataColumn)
             {
-                worksheet.Cells[startRow, column].Value = columnName;
+                worksheet.Cells[startRow, column].Value = config.OldHeaderColumnPostfix is { } oldPostfix ? columnName + oldPostfix : columnName;
                 if (config.OldHeaderColumnComment is not null)
                 {
                     worksheet.Cells[startRow, column].AddComment(config.OldHeaderColumnComment);
                 }
                 column++;
             }
-            worksheet.Cells[startRow, column].Value = columnName;
+            worksheet.Cells[startRow, column].Value = config.NewHeaderColumnComment is { } newPostfix ? columnName + newPostfix : columnName;
             if (config.NewHeaderColumnComment is not null)
             {
                 worksheet.Cells[startRow, column].AddComment(config.NewHeaderColumnComment);

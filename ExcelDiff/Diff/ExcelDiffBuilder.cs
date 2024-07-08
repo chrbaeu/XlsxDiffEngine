@@ -79,6 +79,7 @@ public class ExcelDiffBuilder
     private readonly List<XlsxFileInfo> newFiles = [];
     private bool hideOldColumns;
     private string[] columnsToHide = [];
+    private string[] header = [];
 
     public ExcelDiffBuilder AddFiles(Action<XlsxFileConfigurationBuilder> builderAction)
     {
@@ -190,6 +191,36 @@ public class ExcelDiffBuilder
         return this;
     }
 
+    public ExcelDiffBuilder SetHeader(params string[] header)
+    {
+        this.header = header;
+        return this;
+    }
+
+    public ExcelDiffBuilder SetOldHeaderColumnPostfix(string oldHeaderColumnPostfix)
+    {
+        diffConfig = diffConfig with { OldHeaderColumnPostfix = oldHeaderColumnPostfix };
+        return this;
+    }
+
+    public ExcelDiffBuilder SetNewHeaderColumnPostfix(string newHeaderColumnPostfix)
+    {
+        diffConfig = diffConfig with { NewHeaderColumnPostfix = newHeaderColumnPostfix };
+        return this;
+    }
+
+    public ExcelDiffBuilder SetOldColumnHeaderComment(string oldHeaderColumnComment)
+    {
+        diffConfig = diffConfig with { OldHeaderColumnComment = oldHeaderColumnComment };
+        return this;
+    }
+
+    public ExcelDiffBuilder SetNewHeaderColumnComment(string newHeaderColumnComment)
+    {
+        diffConfig = diffConfig with { NewHeaderColumnComment = newHeaderColumnComment };
+        return this;
+    }
+
     public void Build(string outputFilePath)
     {
         using var oldDataProvider = new XlsxDataProvider(oldFiles, xlsxConfig);
@@ -203,14 +234,21 @@ public class ExcelDiffBuilder
             {
                 var diffEngine = new ExcelDiffWriter(oldDataSource, newDataSource, diffConfig);
                 var worksheet = excelPackage.Workbook.Worksheets.Add(newDataSource.Name);
-                diffEngine.WriteDiff(worksheet);
+                var row = 1;
+                var column = hideOldColumns ? 2 : 1;
+                foreach (var headerRow in header)
+                {
+                    worksheet.Cells[row, column].Value = headerRow;
+                    row++;
+                }
+                diffEngine.WriteDiff(worksheet, row);
                 worksheet.Cells.AutoFitColumns();
-                worksheet.Cells[worksheet.Dimension.Address].AutoFilter = true;
-                worksheet.View.FreezePanes(2, 1);
+                worksheet.Cells[row, column, worksheet.Dimension.End.Row, worksheet.Dimension.End.Column].AutoFilter = true;
+                worksheet.View.FreezePanes(row + 1, 1);
                 if (hideOldColumns || columnsToHide.Length > 0)
                 {
                     var stringComparer = diffConfig.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
-                    for (int column = 1; column <= worksheet.Dimension.End.Column; column++)
+                    for (column = 1; column <= worksheet.Dimension.End.Column; column++)
                     {
                         if (hideOldColumns && column % 2 != 0) { worksheet.Column(column).Hidden = true; }
                         if (columnsToHide.Contains(worksheet.Cells[1, column].Text, stringComparer))

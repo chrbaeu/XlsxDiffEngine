@@ -24,6 +24,8 @@ public record class ExcelDiffConfig
     public string? OldValueCommentPrefix { get; init; }
     public string? OldHeaderColumnComment { get; init; }
     public string? NewHeaderColumnComment { get; init; }
+    public string? OldHeaderColumnPostfix { get; init; }
+    public string? NewHeaderColumnPostfix { get; init; }
     public CellStyle HeaderStyle { get; init; } = DefaultCellStyles.Header;
     public CellStyle RemovedRowStyle { get; init; } = DefaultCellStyles.RemovedRow;
     public CellStyle AddedRowStyle { get; init; } = DefaultCellStyles.AddedRow;
