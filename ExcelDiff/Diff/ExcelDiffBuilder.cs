@@ -79,6 +79,7 @@ public class ExcelDiffBuilder
     private readonly List<XlsxFileInfo> newFiles = [];
     private bool hideOldColumns;
     private string[] columnsToHide = [];
+    private string[] columnsToShow = [];
     private string[] header = [];
 
     public ExcelDiffBuilder AddFiles(Action<XlsxFileConfigurationBuilder> builderAction)
@@ -112,6 +113,12 @@ public class ExcelDiffBuilder
     public ExcelDiffBuilder SetColumsToIgnore(params string[] columnsToIgnore)
     {
         diffConfig = diffConfig with { ColumnsToIgnore = columnsToIgnore };
+        return this;
+    }
+
+    public ExcelDiffBuilder SetColumnsToOmit(params string[] columnsToOmit)
+    {
+        diffConfig = diffConfig with { ColumnsToOmit = columnsToOmit };
         return this;
     }
 
@@ -191,6 +198,12 @@ public class ExcelDiffBuilder
         return this;
     }
 
+    public ExcelDiffBuilder ShowColumns(params string[] columnsToShow)
+    {
+        this.columnsToShow = columnsToShow;
+        return this;
+    }
+
     public ExcelDiffBuilder SetHeader(params string[] header)
     {
         this.header = header;
@@ -218,6 +231,12 @@ public class ExcelDiffBuilder
     public ExcelDiffBuilder SetNewHeaderColumnComment(string newHeaderColumnComment)
     {
         diffConfig = diffConfig with { NewHeaderColumnComment = newHeaderColumnComment };
+        return this;
+    }
+
+    public ExcelDiffBuilder IgnoreUnchangedRows()
+    {
+        diffConfig = diffConfig with { IgnoreUnchangedColumns = true };
         return this;
     }
 
@@ -250,8 +269,9 @@ public class ExcelDiffBuilder
                     var stringComparer = diffConfig.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
                     for (column = 1; column <= worksheet.Dimension.End.Column; column++)
                     {
+                        if (columnsToShow.Contains(worksheet.Cells[row, column].Text, stringComparer)) { continue; }
                         if (hideOldColumns && column % 2 != 0) { worksheet.Column(column).Hidden = true; }
-                        if (columnsToHide.Contains(worksheet.Cells[1, column].Text, stringComparer))
+                        if (columnsToHide.Contains(worksheet.Cells[row, column].Text, stringComparer))
                         {
                             worksheet.Column(column).Hidden = true;
                         }

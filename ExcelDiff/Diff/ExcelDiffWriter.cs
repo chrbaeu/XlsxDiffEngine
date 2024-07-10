@@ -36,6 +36,10 @@ public sealed class ExcelDiffWriter
             List<ExcelRange> keyCells = [];
             foreach (var columnName in excelDiffOp.MergedColumnNames)
             {
+                if (config.ColumnsToOmit.Contains(columnName, stringComparer))
+                {
+                    continue;
+                }
                 var oldDstCell = worksheet.Cells[row, column];
                 var oldValue = SetCell(oldDstCell, columnName, oldRow, ruleHandler, DataKind.Old);
                 if (config.ShowOldDataColumn) { column++; } else { oldDstCell = null; }
@@ -63,6 +67,11 @@ public sealed class ExcelDiffWriter
             }
             if (oldRow is null) { ExcelHelper.SetCellStyle(worksheet.Cells[row, startColumn, row, column - 1], config.AddedRowStyle); }
             if (newRow is null) { ExcelHelper.SetCellStyle(worksheet.Cells[row, startColumn, row, column - 1], config.RemovedRowStyle); }
+            if (config.IgnoreUnchangedColumns && !isChanged)
+            {
+                worksheet.Cells[row, startColumn, row, column - 1].Clear();
+                continue;
+            }
             row++;
         }
         return row - 1;
@@ -133,6 +142,10 @@ public sealed class ExcelDiffWriter
         int column = startColumn;
         foreach (var columnName in excelDiffOp.MergedColumnNames)
         {
+            if (config.ColumnsToOmit.Contains(columnName, stringComparer))
+            {
+                continue;
+            }
             if (config.ShowOldDataColumn)
             {
                 worksheet.Cells[startRow, column].Value = config.OldHeaderColumnPostfix is { } oldPostfix ? columnName + oldPostfix : columnName;
