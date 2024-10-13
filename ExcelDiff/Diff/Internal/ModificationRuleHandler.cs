@@ -54,6 +54,9 @@ internal sealed class ModificationRuleHandler
                 excelCell.Formula = rule.Value.Replace("{#}", (((double?)excelCell.Value) ?? 0).ToString(CultureInfo.InvariantCulture));
                 excelCell.Calculate();
                 break;
+            //case '@':
+            //    excelCell.Value = Regex.Replace(excelCell.Text, rule.Value, "");
+            //    break;
             default:
                 break;
         }

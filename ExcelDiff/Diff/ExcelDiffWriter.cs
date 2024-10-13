@@ -131,7 +131,7 @@ public sealed class ExcelDiffWriter
             dstCell.Value = value;
             if (config.CopyCellStyle) { ExcelHelper.CopyCellStyle(dstCell, srcCell); }
             if (config.CopyCellFormat) { ExcelHelper.CopyCellFormat(dstCell, srcCell); }
-            ruleHandler.ApplyRules(dstCell, columnName, DataKind.Old);
+            ruleHandler.ApplyRules(dstCell, columnName, dataKind);
             return dstCell.Value;
         }
         return value;
@@ -155,7 +155,7 @@ public sealed class ExcelDiffWriter
                 }
                 column++;
             }
-            worksheet.Cells[startRow, column].Value = config.NewHeaderColumnComment is { } newPostfix ? columnName + newPostfix : columnName;
+            worksheet.Cells[startRow, column].Value = config.NewHeaderColumnPostfix is { } newPostfix ? columnName + newPostfix : columnName;
             if (config.NewHeaderColumnComment is not null)
             {
                 worksheet.Cells[startRow, column].AddComment(config.NewHeaderColumnComment);

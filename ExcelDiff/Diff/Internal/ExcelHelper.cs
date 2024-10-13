@@ -65,7 +65,7 @@ internal static class ExcelHelper
             dstExcelColor.SetColor(srcExcelColor.Theme.Value);
             dstExcelColor.Tint = srcExcelColor.Tint;
         }
-        else
+        else if (srcExcelColor.Indexed != int.MinValue)
         {
             dstExcelColor.SetColor((ExcelIndexedColor)srcExcelColor.Indexed);
         }

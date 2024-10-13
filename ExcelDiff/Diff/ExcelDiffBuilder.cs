@@ -98,6 +98,12 @@ public class ExcelDiffBuilder
         return this;
     }
 
+    public ExcelDiffBuilder SetSecondaryKeyColumns(params string[] secondaryKeyColumns)
+    {
+        diffConfig = diffConfig with { SecondaryKeyColumns = secondaryKeyColumns };
+        return this;
+    }
+
     public ExcelDiffBuilder SetGroupKeyColumns(params string[] groupKeyColumns)
     {
         diffConfig = diffConfig with { GroupKeyColumns = groupKeyColumns };
@@ -222,7 +228,7 @@ public class ExcelDiffBuilder
         return this;
     }
 
-    public ExcelDiffBuilder SetOldColumnHeaderComment(string oldHeaderColumnComment)
+    public ExcelDiffBuilder SetOldHeaderColumnComment(string oldHeaderColumnComment)
     {
         diffConfig = diffConfig with { OldHeaderColumnComment = oldHeaderColumnComment };
         return this;
@@ -237,6 +243,11 @@ public class ExcelDiffBuilder
     public ExcelDiffBuilder IgnoreUnchangedRows()
     {
         diffConfig = diffConfig with { IgnoreUnchangedColumns = true };
+        return this;
+    }
+    public ExcelDiffBuilder CopyCellStyle()
+    {
+        diffConfig = diffConfig with { CopyCellStyle = true };
         return this;
     }
 

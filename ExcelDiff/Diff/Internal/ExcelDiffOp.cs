@@ -82,7 +82,7 @@ internal sealed class ExcelDiffOp
             dataKeys.Add(new DataKey(
                 GetKey(dataSource, row, config.KeyColumns),
                 GetKey(dataSource, row, config.SecondaryKeyColumns),
-                config.GroupKeyColumns.Count == 0 ? GetKey(dataSource, row, config.GroupKeyColumns) : "",
+                config.GroupKeyColumns.Count > 0 ? GetKey(dataSource, row, config.GroupKeyColumns) : "",
                 row));
         }
         return dataKeys;
