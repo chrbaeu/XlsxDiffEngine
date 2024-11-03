@@ -8,6 +8,7 @@ public sealed class XlsxDataProvider : IDisposable
     private readonly Dictionary<XlsxFileInfo, ExcelPackage> excelPackagesDict = [];
     private readonly XlsxDataProviderConfig config;
     private readonly ExcelDataSourceConfig excelDataSourceConfig;
+
     private List<IExcelDataSource> dataSources = [];
 
     public XlsxDataProvider(string xlsxFile, int headerRow = 1, XlsxDataProviderConfig? config = null)
@@ -31,6 +32,33 @@ public sealed class XlsxDataProvider : IDisposable
             MergedWorksheetNameColumnName = this.config.MergedWorksheetNameColumnName,
             ColumnsToIgnore = this.config.ColumnsToIgnore
         };
+    }
+
+    public IReadOnlyList<IExcelDataSource> GetDataSources()
+    {
+        if (dataSources.Count > 0) { return dataSources; }
+        foreach (XlsxFileInfo xlsxFileInfo in xlsxFileInfos)
+        {
+            dataSources.AddRange(GetExcelDataSources(xlsxFileInfo));
+        }
+        if (config.MergeDocuments)
+        {
+            dataSources = dataSources.GroupBy(x => x.Name)
+                .Select(x => new MergedExcelDataSource(x.Key, [.. x], excelDataSourceConfig with { RowNumberColumnName = null }))
+                .ToList<IExcelDataSource>();
+            if (!config.MergeWorksheets) { return dataSources; }
+            return [new MergedExcelDataSource(config.MergedDocumentName ?? "MergedDocument", dataSources,
+                        excelDataSourceConfig with { MergedWorksheetNameColumnName = null, RowNumberColumnName = null })];
+        }
+        return dataSources;
+    }
+
+    public void Dispose()
+    {
+        foreach (ExcelPackage excelPackage in excelPackagesDict.Values)
+        {
+            excelPackage.Dispose();
+        }
     }
 
     private List<IExcelDataSource> GetExcelDataSources(XlsxFileInfo xlsxFileInfo)
@@ -67,7 +95,7 @@ public sealed class XlsxDataProvider : IDisposable
             }
             dataSources.Add(new ExcelDataSource(excelWorksheet, xlsxFileDataSourceConfig, excelAddress));
         }
-        if (config.MergeWorkSheets)
+        if (config.MergeWorksheets)
         {
             string name = xlsxFileInfo.MergedWorksheetName ?? xlsxFileInfo.FileInfo.Name;
             return [new MergedExcelDataSource(name, dataSources, excelDataSourceConfig)];
@@ -75,30 +103,4 @@ public sealed class XlsxDataProvider : IDisposable
         return dataSources;
     }
 
-    public IReadOnlyList<IExcelDataSource> GetDataSources()
-    {
-        if (dataSources.Count > 0) { return dataSources; }
-        foreach (XlsxFileInfo xlsxFileInfo in xlsxFileInfos)
-        {
-            dataSources.AddRange(GetExcelDataSources(xlsxFileInfo));
-        }
-        if (config.MergeDocuments)
-        {
-            dataSources = dataSources.GroupBy(x => x.Name)
-                .Select(x => new MergedExcelDataSource(x.Key, [.. x], excelDataSourceConfig with { RowNumberColumnName = null }))
-                .ToList<IExcelDataSource>();
-            if (!config.MergeWorkSheets) { return dataSources; }
-            return [new MergedExcelDataSource(config.MergedDocumentName ?? "MergedDocument", dataSources,
-                        excelDataSourceConfig with { MergedWorksheetNameColumnName = null, RowNumberColumnName = null })];
-        }
-        return dataSources;
-    }
-
-    public void Dispose()
-    {
-        foreach (ExcelPackage excelPackage in excelPackagesDict.Values)
-        {
-            excelPackage.Dispose();
-        }
-    }
 }

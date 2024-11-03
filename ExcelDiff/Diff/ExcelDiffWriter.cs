@@ -73,7 +73,7 @@ public sealed class ExcelDiffWriter
             }
             if (oldRow is null) { ExcelHelper.SetCellStyle(worksheet.Cells[row, startColumn, row, column - 1], config.AddedRowStyle); }
             if (newRow is null) { ExcelHelper.SetCellStyle(worksheet.Cells[row, startColumn, row, column - 1], config.RemovedRowStyle); }
-            if (config.IgnoreUnchangedColumns && !isChanged)
+            if (config.IgnoreUnchangedRows && !isChanged)
             {
                 worksheet.Cells[row, startColumn, row, column - 1].Clear();
                 continue;

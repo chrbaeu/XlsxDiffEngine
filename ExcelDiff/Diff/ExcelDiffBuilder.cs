@@ -2,75 +2,6 @@
 
 namespace ExcelDiffEngine;
 
-public class XlsxFileConfigurationBuilder
-{
-    private XlsxFileInfo oldFile = new("Unspecified.xlsx");
-    private XlsxFileInfo newFile = new("Unspecified.xlsx");
-
-    public XlsxFileConfigurationBuilder SetOldFile(string filePath, Action<ExcelPackage>? callback = null)
-    {
-        oldFile = oldFile with { FileInfo = new(filePath), Callback = callback };
-        return this;
-    }
-
-    public XlsxFileConfigurationBuilder SetNewFile(string filePath, Action<ExcelPackage>? callback = null)
-    {
-        newFile = newFile with { FileInfo = new(filePath), Callback = callback };
-        return this;
-    }
-
-    public XlsxFileConfigurationBuilder SetDocumentName(string documentName)
-    {
-        oldFile = oldFile with { DocumentName = documentName };
-        newFile = newFile with { DocumentName = documentName };
-        return this;
-    }
-
-    public XlsxFileConfigurationBuilder SetMergedWorksheetName(string mergedWorksheetName)
-    {
-        oldFile = oldFile with { MergedWorksheetName = mergedWorksheetName };
-        newFile = newFile with { MergedWorksheetName = mergedWorksheetName };
-        return this;
-    }
-
-    public XlsxFileConfigurationBuilder AddWorksheetInfo(string worksheetName, int fromRow = 1, int fromColumn = 1, int? toRow = null, int? toColumn = null)
-    {
-        oldFile = oldFile with
-        {
-            WorksheetInfos = [.. oldFile.WorksheetInfos, new() { Name = worksheetName, FromRow = fromRow, FromColumn = fromColumn, ToRow = toRow, ToColumn = toColumn }]
-        };
-        newFile = newFile with
-        {
-            WorksheetInfos = [.. newFile.WorksheetInfos, new() { Name = worksheetName, FromRow = fromRow, FromColumn = fromColumn, ToRow = toRow, ToColumn = toColumn }]
-        };
-        return this;
-    }
-
-    public XlsxFileConfigurationBuilder SetDataArea(int fromRow = 1, int fromColumn = 1, int? toRow = null, int? toColumn = null)
-    {
-        oldFile = oldFile with { FromRow = fromRow, FromColumn = fromColumn, ToRow = toRow, ToColumn = toColumn };
-        newFile = newFile with { FromRow = fromRow, FromColumn = fromColumn, ToRow = toRow, ToColumn = toColumn };
-        return this;
-    }
-
-    public XlsxFileConfigurationBuilder SetWorksheet(string worksheetName, int fromRow = 1, int fromColumn = 1, int? toRow = null, int? toColumn = null)
-    {
-        oldFile = oldFile with { WorksheetInfos = [new() { Name = worksheetName, FromRow = fromRow, FromColumn = fromColumn, ToRow = toRow, ToColumn = toColumn }] };
-        newFile = newFile with { WorksheetInfos = [new() { Name = worksheetName, FromRow = fromRow, FromColumn = fromColumn, ToRow = toRow, ToColumn = toColumn }] };
-        return this;
-    }
-
-    internal (XlsxFileInfo oldFile, XlsxFileInfo newFile) Build()
-    {
-        if (oldFile.MergedWorksheetName is null && newFile.MergedWorksheetName is null)
-        {
-            oldFile = oldFile with { MergedWorksheetName = Path.GetFileNameWithoutExtension(newFile.FileInfo.Name) };
-            newFile = newFile with { MergedWorksheetName = Path.GetFileNameWithoutExtension(newFile.FileInfo.Name) };
-        }
-        return (oldFile, newFile);
-    }
-}
-
 public class ExcelDiffBuilder
 {
     private ExcelDiffConfig diffConfig = new();
@@ -111,51 +42,37 @@ public class ExcelDiffBuilder
         return this;
     }
 
-    public ExcelDiffBuilder SetColumnsToTextCompareOnly(params string[] columnsToTextCompareOnly)
+    public ExcelDiffBuilder SetColumnsToCompare(params string[] columnsToCompare)
     {
-        diffConfig = diffConfig with { ColumnsToTextCompareOnly = columnsToTextCompareOnly };
+        diffConfig = diffConfig with { ColumnsToCompare = columnsToCompare };
         return this;
     }
-
     public ExcelDiffBuilder SetColumnsToIgnore(params string[] columnsToIgnore)
     {
         diffConfig = diffConfig with { ColumnsToIgnore = columnsToIgnore };
         return this;
     }
-
     public ExcelDiffBuilder SetColumnsToOmit(params string[] columnsToOmit)
     {
         diffConfig = diffConfig with { ColumnsToOmit = columnsToOmit };
         return this;
     }
 
-    public ExcelDiffBuilder AddModificationRules(params ModificationRule[] modificationRules)
+    public ExcelDiffBuilder SetColumnsToTextCompareOnly(params string[] columnsToTextCompareOnly)
+    {
+        diffConfig = diffConfig with { ColumnsToTextCompareOnly = columnsToTextCompareOnly };
+        return this;
+    }
+
+    public ExcelDiffBuilder SetModificationRules(params ModificationRule[] modificationRules)
     {
         diffConfig = diffConfig with { ModificationRules = modificationRules };
         return this;
     }
 
-    public ExcelDiffBuilder MergeWorkSheets()
+    public ExcelDiffBuilder AddModificationRules(params ModificationRule[] modificationRules)
     {
-        xlsxConfig = xlsxConfig with { MergeWorkSheets = true };
-        return this;
-    }
-
-    public ExcelDiffBuilder MergeDocuments()
-    {
-        xlsxConfig = xlsxConfig with { MergeDocuments = true };
-        return this;
-    }
-
-    public ExcelDiffBuilder SetMergedDocumentName(string mergedDocumentName)
-    {
-        xlsxConfig = xlsxConfig with { MergedDocumentName = mergedDocumentName };
-        return this;
-    }
-
-    public ExcelDiffBuilder AddOldValueAsComment(string? prefix = null)
-    {
-        diffConfig = diffConfig with { AddOldValueAsComment = true, OldValueCommentPrefix = prefix };
+        diffConfig = diffConfig with { ModificationRules = [.. diffConfig.ModificationRules, .. modificationRules] };
         return this;
     }
 
@@ -165,6 +82,78 @@ public class ExcelDiffBuilder
         {
             ValueChangedMarkers = [.. diffConfig.ValueChangedMarkers, new(minDeviationInPercent, minDeviationAbsolute, cellStyle)]
         };
+        return this;
+    }
+
+    public ExcelDiffBuilder CopyCellFormat(bool copyCellFormat = true)
+    {
+        diffConfig = diffConfig with { CopyCellFormat = copyCellFormat };
+        return this;
+    }
+
+    public ExcelDiffBuilder CopyCellStyle(bool copyCellStyle = true)
+    {
+        diffConfig = diffConfig with { CopyCellStyle = copyCellStyle };
+        return this;
+    }
+
+    public ExcelDiffBuilder AddOldValueAsComment(string? prefix = null)
+    {
+        diffConfig = diffConfig with { AddOldValueAsComment = true, OldValueCommentPrefix = prefix };
+        return this;
+    }
+
+    public ExcelDiffBuilder SetOldHeaderColumnComment(string oldHeaderColumnComment)
+    {
+        diffConfig = diffConfig with { OldHeaderColumnComment = oldHeaderColumnComment };
+        return this;
+    }
+
+    public ExcelDiffBuilder SetNewHeaderColumnComment(string newHeaderColumnComment)
+    {
+        diffConfig = diffConfig with { NewHeaderColumnComment = newHeaderColumnComment };
+        return this;
+    }
+
+    public ExcelDiffBuilder SetOldHeaderColumnPostfix(string oldHeaderColumnPostfix)
+    {
+        diffConfig = diffConfig with { OldHeaderColumnPostfix = oldHeaderColumnPostfix };
+        return this;
+    }
+
+    public ExcelDiffBuilder SetNewHeaderColumnPostfix(string newHeaderColumnPostfix)
+    {
+        diffConfig = diffConfig with { NewHeaderColumnPostfix = newHeaderColumnPostfix };
+        return this;
+    }
+
+    public ExcelDiffBuilder IgnoreUnchangedRows()
+    {
+        diffConfig = diffConfig with { IgnoreUnchangedRows = true };
+        return this;
+    }
+
+    public ExcelDiffBuilder IgnoreCase(bool ignoreCase = true)
+    {
+        xlsxConfig = xlsxConfig with { IgnoreCase = ignoreCase };
+        return this;
+    }
+
+    public ExcelDiffBuilder MergeWorkSheets(bool mergeWorksheets = true)
+    {
+        xlsxConfig = xlsxConfig with { MergeWorksheets = mergeWorksheets };
+        return this;
+    }
+
+    public ExcelDiffBuilder MergeDocuments(bool mergeDocuments = true)
+    {
+        xlsxConfig = xlsxConfig with { MergeDocuments = mergeDocuments };
+        return this;
+    }
+
+    public ExcelDiffBuilder AddRowNumberAsColumn(string rowNumberColumnName = "RowNumber")
+    {
+        xlsxConfig = xlsxConfig with { RowNumberColumnName = rowNumberColumnName };
         return this;
     }
 
@@ -186,9 +175,9 @@ public class ExcelDiffBuilder
         return this;
     }
 
-    public ExcelDiffBuilder AddRowNumberAsColumn(string rowNumberColumnName = "RowNumber")
+    public ExcelDiffBuilder SetMergedDocumentName(string mergedDocumentName)
     {
-        xlsxConfig = xlsxConfig with { RowNumberColumnName = rowNumberColumnName };
+        xlsxConfig = xlsxConfig with { MergedDocumentName = mergedDocumentName };
         return this;
     }
 
@@ -213,41 +202,6 @@ public class ExcelDiffBuilder
     public ExcelDiffBuilder SetHeader(params string[] header)
     {
         this.header = header;
-        return this;
-    }
-
-    public ExcelDiffBuilder SetOldHeaderColumnPostfix(string oldHeaderColumnPostfix)
-    {
-        diffConfig = diffConfig with { OldHeaderColumnPostfix = oldHeaderColumnPostfix };
-        return this;
-    }
-
-    public ExcelDiffBuilder SetNewHeaderColumnPostfix(string newHeaderColumnPostfix)
-    {
-        diffConfig = diffConfig with { NewHeaderColumnPostfix = newHeaderColumnPostfix };
-        return this;
-    }
-
-    public ExcelDiffBuilder SetOldHeaderColumnComment(string oldHeaderColumnComment)
-    {
-        diffConfig = diffConfig with { OldHeaderColumnComment = oldHeaderColumnComment };
-        return this;
-    }
-
-    public ExcelDiffBuilder SetNewHeaderColumnComment(string newHeaderColumnComment)
-    {
-        diffConfig = diffConfig with { NewHeaderColumnComment = newHeaderColumnComment };
-        return this;
-    }
-
-    public ExcelDiffBuilder IgnoreUnchangedRows()
-    {
-        diffConfig = diffConfig with { IgnoreUnchangedColumns = true };
-        return this;
-    }
-    public ExcelDiffBuilder CopyCellStyle()
-    {
-        diffConfig = diffConfig with { CopyCellStyle = true };
         return this;
     }
 
