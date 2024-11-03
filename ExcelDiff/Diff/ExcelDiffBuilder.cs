@@ -12,13 +12,17 @@ public class ExcelDiffBuilder
     private string[] columnsToHide = [];
     private string[] columnsToShow = [];
     private string[] header = [];
+    private bool autoFitColumns = true;
+    private bool autoFilter = true;
+    private bool freezePanes = true;
+    private readonly Dictionary<int, double> columnSizeDict = [];
 
-    public ExcelDiffBuilder AddFiles(Action<XlsxFileConfigurationBuilder> builderAction)
+    public ExcelDiffBuilder AddFiles(Action<ExcelDiffXlsxFileConfigBuilder> builderAction)
     {
         ArgumentNullException.ThrowIfNull(builderAction);
-        XlsxFileConfigurationBuilder xlsxFileConfigurationBuilder = new();
-        builderAction.Invoke(xlsxFileConfigurationBuilder);
-        (XlsxFileInfo oldFile, XlsxFileInfo newFile) = xlsxFileConfigurationBuilder.Build();
+        ExcelDiffXlsxFileConfigBuilder excelDiffXlsxFileConfigBuilder = new();
+        builderAction.Invoke(excelDiffXlsxFileConfigBuilder);
+        (XlsxFileInfo oldFile, XlsxFileInfo newFile) = excelDiffXlsxFileConfigBuilder.Build();
         oldFiles.Add(oldFile);
         newFiles.Add(newFile);
         return this;
@@ -205,6 +209,40 @@ public class ExcelDiffBuilder
         return this;
     }
 
+    public ExcelDiffBuilder SetAutoFitColumns(bool autoFitColumns = true)
+    {
+        this.autoFitColumns = autoFitColumns;
+        return this;
+    }
+
+    public ExcelDiffBuilder SetAutoFilter(bool autoFilter = true)
+    {
+        this.autoFilter = autoFilter;
+        return this;
+    }
+
+    public ExcelDiffBuilder SetFreezePanes(bool freezePanes = true)
+    {
+        this.freezePanes = freezePanes;
+        return this;
+    }
+
+    public ExcelDiffBuilder SetColumnSize(int column, double size)
+    {
+        columnSizeDict[column] = size;
+        return this;
+    }
+
+    public ExcelDiffBuilder SetColumnSizes(double[] sizes)
+    {
+        sizes ??= [];
+        for (int i = 0; i < sizes.Length; i++)
+        {
+            columnSizeDict[i + 1] = sizes[i];
+        }
+        return this;
+    }
+
     public void Build(string outputFilePath)
     {
         using var oldDataProvider = new XlsxDataProvider(oldFiles, xlsxConfig);
@@ -226,9 +264,13 @@ public class ExcelDiffBuilder
                     row++;
                 }
                 _ = diffEngine.WriteDiff(worksheet, row);
-                worksheet.Cells.AutoFitColumns();
-                worksheet.Cells[row, column, worksheet.Dimension.End.Row, worksheet.Dimension.End.Column].AutoFilter = true;
-                worksheet.View.FreezePanes(row + 1, 1);
+                if (autoFitColumns) { worksheet.Cells.AutoFitColumns(); }
+                foreach (KeyValuePair<int, double> item in columnSizeDict)
+                {
+                    worksheet.Column(item.Key).Width = item.Value;
+                }
+                if (autoFilter) { worksheet.Cells[row, column, worksheet.Dimension.End.Row, worksheet.Dimension.End.Column].AutoFilter = true; }
+                if (freezePanes) { worksheet.View.FreezePanes(row + 1, 1); }
                 if (hideOldColumns || columnsToHide.Length > 0)
                 {
                     StringComparer stringComparer = diffConfig.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
