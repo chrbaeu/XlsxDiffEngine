@@ -12,6 +12,9 @@ public sealed class ExcelDiffWriter
 
     public ExcelDiffWriter(IExcelDataSource oldDataSource, IExcelDataSource newDataSource, ExcelDiffConfig config)
     {
+        ArgumentNullException.ThrowIfNull(oldDataSource, nameof(oldDataSource));
+        ArgumentNullException.ThrowIfNull(newDataSource, nameof(newDataSource));
+        ArgumentNullException.ThrowIfNull(config, nameof(config));
         this.oldDataSource = oldDataSource;
         this.newDataSource = newDataSource;
         this.config = config;
@@ -21,6 +24,9 @@ public sealed class ExcelDiffWriter
 
     public (int endRow, int endColumn) WriteDiff(ExcelWorksheet worksheet, int row = 1, int column = 1)
     {
+        ArgumentNullException.ThrowIfNull(worksheet, nameof(worksheet));
+        ArgumentOutOfRangeException.ThrowIfLessThan(row, 1);
+        ArgumentOutOfRangeException.ThrowIfLessThan(column, 1);
         int headerEndColumns = WriteHeader(worksheet, row, column);
         int dataEndRow = WriteData(worksheet, row + 1, column);
         return (dataEndRow, headerEndColumns);
@@ -29,26 +35,26 @@ public sealed class ExcelDiffWriter
     private int WriteData(ExcelWorksheet worksheet, int row, int startColumn)
     {
         ModificationRuleHandler ruleHandler = new(config.ModificationRules, config.IgnoreCase);
-        foreach ((var oldRow, var newRow) in excelDiffOp.GetMergedRows())
+        foreach ((int? oldRow, int? newRow) in excelDiffOp.GetMergedRows())
         {
-            var column = startColumn;
-            var isChanged = false;
+            int column = startColumn;
+            bool isChanged = false;
             List<ExcelRange> keyCells = [];
-            foreach (var columnName in excelDiffOp.MergedColumnNames)
+            foreach (string columnName in excelDiffOp.MergedColumnNames)
             {
                 if (config.ColumnsToOmit.Contains(columnName, stringComparer))
                 {
                     continue;
                 }
-                var oldDstCell = worksheet.Cells[row, column];
-                var oldValue = SetCell(oldDstCell, columnName, oldRow, ruleHandler, DataKind.Old);
+                ExcelRange? oldDstCell = worksheet.Cells[row, column];
+                object? oldValue = SetCell(oldDstCell, columnName, oldRow, ruleHandler, DataKind.Old);
                 if (config.ShowOldDataColumn) { column++; } else { oldDstCell = null; }
-                var newDstCell = worksheet.Cells[row, column];
-                var newValue = SetCell(newDstCell, columnName, newRow, ruleHandler, DataKind.New);
+                ExcelRange newDstCell = worksheet.Cells[row, column];
+                object? newValue = SetCell(newDstCell, columnName, newRow, ruleHandler, DataKind.New);
                 if (config.AddOldValueAsComment && oldValue?.ToString() != newValue?.ToString())
                 {
-                    var comment = config.OldValueCommentPrefix is { } prefix ? prefix + oldValue?.ToString() : oldValue?.ToString();
-                    newDstCell.AddComment(comment ?? "");
+                    string? comment = config.OldValueCommentPrefix is { } prefix ? prefix + oldValue?.ToString() : oldValue?.ToString();
+                    _ = newDstCell.AddComment(comment ?? "");
                 }
                 column++;
                 isChanged |= GetAndHandleChangedState(columnName, oldDstCell, oldValue, newDstCell, newValue);
@@ -58,11 +64,11 @@ public sealed class ExcelDiffWriter
                     keyCells.Add(newDstCell);
                 }
             }
-            if (isChanged && config.ChangedRowKeyColumsStyle is not null)
+            if (isChanged && config.ChangedRowKeyColumnsStyle is not null)
             {
-                foreach (var keyCell in keyCells)
+                foreach (ExcelRange keyCell in keyCells)
                 {
-                    ExcelHelper.SetCellStyle(keyCell, config.ChangedRowKeyColumsStyle);
+                    ExcelHelper.SetCellStyle(keyCell, config.ChangedRowKeyColumnsStyle);
                 }
             }
             if (oldRow is null) { ExcelHelper.SetCellStyle(worksheet.Cells[row, startColumn, row, column - 1], config.AddedRowStyle); }
@@ -92,9 +98,9 @@ public sealed class ExcelDiffWriter
             && !config.ColumnsToTextCompareOnly.Contains(columnName, stringComparer)
             && config.ValueChangedMarkers.Count > 0)
         {
-            var pDiff = Math.Abs((oldNumber - newNumber) / ((oldNumber + newNumber) / 2.0));
-            var aDiff = Math.Abs(oldNumber - newNumber);
-            foreach (var valueChangedMarker in config.ValueChangedMarkers)
+            double pDiff = Math.Abs((oldNumber - newNumber) / ((oldNumber + newNumber) / 2.0));
+            double aDiff = Math.Abs(oldNumber - newNumber);
+            foreach (ValueChangedMarker valueChangedMarker in config.ValueChangedMarkers)
             {
                 if (pDiff > valueChangedMarker.MinDeviationInPercent && aDiff > valueChangedMarker.MinDeviationAbsolute)
                 {
@@ -115,17 +121,17 @@ public sealed class ExcelDiffWriter
         return false;
     }
 
-    private (object? Value, ExcelRange? SrcCell) GetValueAndCell(string columnName, int? oldRow, IExcelDataSource excelDataSource)
+    private static (object? Value, ExcelRange? SrcCell) GetValueAndCell(string columnName, int? oldRow, IExcelDataSource excelDataSource)
     {
         if (oldRow is null) { return (null, null); }
-        var srcCell = excelDataSource.GetExcelRange(columnName, oldRow.Value);
-        var value = srcCell?.Value ?? excelDataSource.GetCellValue(columnName, oldRow.Value);
+        ExcelRange? srcCell = excelDataSource.GetExcelRange(columnName, oldRow.Value);
+        object? value = srcCell?.Value ?? excelDataSource.GetCellValue(columnName, oldRow.Value);
         return (value, srcCell);
     }
 
     private object? SetCell(ExcelRange dstCell, string columnName, int? oldRow, ModificationRuleHandler ruleHandler, DataKind dataKind)
     {
-        var (value, srcCell) = GetValueAndCell(columnName, oldRow, dataKind == DataKind.Old ? oldDataSource : newDataSource);
+        (object? value, ExcelRange? srcCell) = GetValueAndCell(columnName, oldRow, dataKind == DataKind.Old ? oldDataSource : newDataSource);
         if (dataKind != DataKind.Old || config.ShowOldDataColumn)
         {
             dstCell.Value = value;
@@ -140,7 +146,7 @@ public sealed class ExcelDiffWriter
     private int WriteHeader(ExcelWorksheet worksheet, int startRow, int startColumn)
     {
         int column = startColumn;
-        foreach (var columnName in excelDiffOp.MergedColumnNames)
+        foreach (string columnName in excelDiffOp.MergedColumnNames)
         {
             if (config.ColumnsToOmit.Contains(columnName, stringComparer))
             {
@@ -151,14 +157,14 @@ public sealed class ExcelDiffWriter
                 worksheet.Cells[startRow, column].Value = config.OldHeaderColumnPostfix is { } oldPostfix ? columnName + oldPostfix : columnName;
                 if (config.OldHeaderColumnComment is not null)
                 {
-                    worksheet.Cells[startRow, column].AddComment(config.OldHeaderColumnComment);
+                    _ = worksheet.Cells[startRow, column].AddComment(config.OldHeaderColumnComment);
                 }
                 column++;
             }
             worksheet.Cells[startRow, column].Value = config.NewHeaderColumnPostfix is { } newPostfix ? columnName + newPostfix : columnName;
             if (config.NewHeaderColumnComment is not null)
             {
-                worksheet.Cells[startRow, column].AddComment(config.NewHeaderColumnComment);
+                _ = worksheet.Cells[startRow, column].AddComment(config.NewHeaderColumnComment);
             }
             column++;
         }

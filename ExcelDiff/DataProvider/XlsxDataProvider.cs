@@ -36,10 +36,10 @@ public sealed class XlsxDataProvider : IDisposable
     private List<IExcelDataSource> GetExcelDataSources(XlsxFileInfo xlsxFileInfo)
     {
         List<IExcelDataSource> dataSources = [];
-        var excelPackage = excelPackagesDict[xlsxFileInfo];
+        ExcelPackage excelPackage = excelPackagesDict[xlsxFileInfo];
         xlsxFileInfo.Callback?.Invoke(excelPackage);
         HashSet<string>? workSheetNames = config.WorksheetNames is not null ? new(config.WorksheetNames, excelDataSourceConfig.StringComparer) : null;
-        var xlsxFileDataSourceConfig = excelDataSourceConfig;
+        ExcelDataSourceConfig xlsxFileDataSourceConfig = excelDataSourceConfig;
         if (config.DocumentNameColumnName is not null)
         {
             xlsxFileDataSourceConfig = excelDataSourceConfig with
@@ -48,12 +48,12 @@ public sealed class XlsxDataProvider : IDisposable
                 CustomColumnValue = xlsxFileInfo.DocumentName ?? xlsxFileInfo.FileInfo.Name
             };
         }
-        var wsInfoDict = xlsxFileInfo.WorksheetInfos.ToDictionary(x => x.Name, excelDataSourceConfig.StringComparer);
-        foreach (var excelWorksheet in excelPackage.Workbook.Worksheets)
+        Dictionary<string, XlsxWorksheetInfo> wsInfoDict = xlsxFileInfo.WorksheetInfos.ToDictionary(x => x.Name, excelDataSourceConfig.StringComparer);
+        foreach (ExcelWorksheet excelWorksheet in excelPackage.Workbook.Worksheets)
         {
             if (workSheetNames is not null && !workSheetNames.Contains(excelWorksheet.Name)) { continue; }
             ExcelAddress excelAddress = excelWorksheet.Dimension;
-            if (wsInfoDict.TryGetValue(excelWorksheet.Name, out var xlsxWorksheetInfo))
+            if (wsInfoDict.TryGetValue(excelWorksheet.Name, out XlsxWorksheetInfo? xlsxWorksheetInfo))
             {
                 excelAddress = new(xlsxWorksheetInfo.FromRow, xlsxWorksheetInfo.FromColumn,
                     xlsxWorksheetInfo.ToRow ?? excelAddress.End.Row,
@@ -69,23 +69,23 @@ public sealed class XlsxDataProvider : IDisposable
         }
         if (config.MergeWorkSheets)
         {
-            var name = xlsxFileInfo.MergedWorksheetName ?? xlsxFileInfo.FileInfo.Name;
+            string name = xlsxFileInfo.MergedWorksheetName ?? xlsxFileInfo.FileInfo.Name;
             return [new MergedExcelDataSource(name, dataSources, excelDataSourceConfig)];
         }
         return dataSources;
     }
 
-    public List<IExcelDataSource> GetDataSources()
+    public IReadOnlyList<IExcelDataSource> GetDataSources()
     {
         if (dataSources.Count > 0) { return dataSources; }
-        foreach (var xlsxFileInfo in xlsxFileInfos)
+        foreach (XlsxFileInfo xlsxFileInfo in xlsxFileInfos)
         {
             dataSources.AddRange(GetExcelDataSources(xlsxFileInfo));
         }
         if (config.MergeDocuments)
         {
             dataSources = dataSources.GroupBy(x => x.Name)
-                .Select(x => new MergedExcelDataSource(x.Key, x.ToList(), excelDataSourceConfig with { RowNumberColumnName = null }))
+                .Select(x => new MergedExcelDataSource(x.Key, [.. x], excelDataSourceConfig with { RowNumberColumnName = null }))
                 .ToList<IExcelDataSource>();
             if (!config.MergeWorkSheets) { return dataSources; }
             return [new MergedExcelDataSource(config.MergedDocumentName ?? "MergedDocument", dataSources,
@@ -96,7 +96,7 @@ public sealed class XlsxDataProvider : IDisposable
 
     public void Dispose()
     {
-        foreach (var excelPackage in excelPackagesDict.Values)
+        foreach (ExcelPackage excelPackage in excelPackagesDict.Values)
         {
             excelPackage.Dispose();
         }

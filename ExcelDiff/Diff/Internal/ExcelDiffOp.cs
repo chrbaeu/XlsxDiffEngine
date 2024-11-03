@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Text;
 
 namespace ExcelDiffEngine;
 
@@ -30,10 +31,10 @@ internal sealed class ExcelDiffOp
         var newKeyDict = newDataKeys.ToDictionary(x => x.PrimaryKey, stringComparer);
         var usedDataKeys = newDataKeys.Select(x => x.PrimaryKey).ToHashSet(stringComparer);
         List<(int? oldRow, int? newRow)> diff = [];
-        foreach (var dataKey in GetCombinedKeyList(oldDataKeys, newDataKeys))
+        foreach (string dataKey in GetCombinedKeyList(oldDataKeys, newDataKeys))
         {
-            oldKeyDict.TryGetValue(dataKey, out var oldRow);
-            newKeyDict.TryGetValue(dataKey, out var newRow);
+            _ = oldKeyDict.TryGetValue(dataKey, out DataKey? oldRow);
+            _ = newKeyDict.TryGetValue(dataKey, out DataKey? newRow);
             if (newRow is null)
             {
                 if (oldRow is not null && !usedDataKeys.Contains(dataKey))
@@ -48,7 +49,7 @@ internal sealed class ExcelDiffOp
             else if (!usedDataKeys.Contains(dataKey) && oldSecondaryKeyDict.TryGetValue(newRow.SecondaryKey, out oldRow))
             {
                 diff.Add((oldRow.RowNumber, newRow.RowNumber));
-                usedDataKeys.Add(oldRow.PrimaryKey);
+                _ = usedDataKeys.Add(oldRow.PrimaryKey);
             }
             else
             {
@@ -90,18 +91,19 @@ internal sealed class ExcelDiffOp
 
     private string GetKey(IExcelDataSource dataSource, int row, IReadOnlyCollection<string> keyColumnNames)
     {
-        if (keyColumnNames.Count == 0) { return row.ToString(); }
+        if (keyColumnNames.Count == 0) { return row.ToString(CultureInfo.InvariantCulture); }
         if (keyColumnNames.Count == 1) { return dataSource.GetCellText(keyColumnNames.First(), row); }
-        stringBuilder.Clear();
-        foreach (var columnName in keyColumnNames)
+        _ = stringBuilder.Clear();
+        foreach (string columnName in keyColumnNames)
         {
-            stringBuilder.Append('@');
-            stringBuilder.Append(columnName);
-            stringBuilder.Append(':');
-            stringBuilder.Append(dataSource.GetCellText(columnName, row));
+            _ = stringBuilder
+                .Append('@')
+                .Append(columnName)
+                .Append(':')
+                .Append(dataSource.GetCellText(columnName, row));
         }
         return stringBuilder.ToString();
     }
 
-    private record DataKey(string PrimaryKey, string SecondaryKey, string GroupKey, int RowNumber);
+    private sealed record DataKey(string PrimaryKey, string SecondaryKey, string GroupKey, int RowNumber);
 }

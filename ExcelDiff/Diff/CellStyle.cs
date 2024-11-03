@@ -2,7 +2,7 @@
 
 namespace ExcelDiffEngine;
 
-public record class CellStyle
+public sealed record class CellStyle
 {
     public Color? FontColor { get; init; }
     public Color? BackgroundColor { get; init; }

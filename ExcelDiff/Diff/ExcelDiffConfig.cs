@@ -20,8 +20,8 @@ public record class ExcelDiffConfig
     public IReadOnlyList<ValueChangedMarker> ValueChangedMarkers { get; init; } = [];
     public bool CopyCellFormat { get; init; } = true;
     public bool CopyCellStyle { get; init; }
-    public bool ShowOldDataColumn { get; set; } = true;
-    public bool AddOldValueAsComment { get; set; } = false;
+    public bool ShowOldDataColumn { get; init; } = true;
+    public bool AddOldValueAsComment { get; init; }
     public string? OldValueCommentPrefix { get; init; }
     public string? OldHeaderColumnComment { get; init; }
     public string? NewHeaderColumnComment { get; init; }
@@ -32,5 +32,5 @@ public record class ExcelDiffConfig
     public CellStyle RemovedRowStyle { get; init; } = DefaultCellStyles.RemovedRow;
     public CellStyle AddedRowStyle { get; init; } = DefaultCellStyles.AddedRow;
     public CellStyle ChangedCellStyle { get; init; } = DefaultCellStyles.ChangedCell;
-    public CellStyle ChangedRowKeyColumsStyle { get; init; } = DefaultCellStyles.ChangedRowKeyColumns;
+    public CellStyle ChangedRowKeyColumnsStyle { get; init; } = DefaultCellStyles.ChangedRowKeyColumns;
 }

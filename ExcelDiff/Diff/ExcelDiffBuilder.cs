@@ -84,9 +84,10 @@ public class ExcelDiffBuilder
 
     public ExcelDiffBuilder AddFiles(Action<XlsxFileConfigurationBuilder> builderAction)
     {
+        ArgumentNullException.ThrowIfNull(builderAction);
         XlsxFileConfigurationBuilder xlsxFileConfigurationBuilder = new();
         builderAction.Invoke(xlsxFileConfigurationBuilder);
-        var (oldFile, newFile) = xlsxFileConfigurationBuilder.Build();
+        (XlsxFileInfo oldFile, XlsxFileInfo newFile) = xlsxFileConfigurationBuilder.Build();
         oldFiles.Add(oldFile);
         newFiles.Add(newFile);
         return this;
@@ -116,7 +117,7 @@ public class ExcelDiffBuilder
         return this;
     }
 
-    public ExcelDiffBuilder SetColumsToIgnore(params string[] columnsToIgnore)
+    public ExcelDiffBuilder SetColumnsToIgnore(params string[] columnsToIgnore)
     {
         diffConfig = diffConfig with { ColumnsToIgnore = columnsToIgnore };
         return this;
@@ -184,7 +185,6 @@ public class ExcelDiffBuilder
         xlsxConfig = xlsxConfig with { DocumentNameColumnName = documentNameColumnName };
         return this;
     }
-
 
     public ExcelDiffBuilder AddRowNumberAsColumn(string rowNumberColumnName = "RowNumber")
     {
@@ -257,27 +257,27 @@ public class ExcelDiffBuilder
         using var newDataProvider = new XlsxDataProvider(newFiles, xlsxConfig);
         var oldDataSourcesDict = oldDataProvider.GetDataSources().ToDictionary(x => x.Name);
         using var excelPackage = new ExcelPackage();
-        var newDataSources = newDataProvider.GetDataSources();
-        foreach (var newDataSource in newDataSources)
+        IReadOnlyList<IExcelDataSource> newDataSources = newDataProvider.GetDataSources();
+        foreach (IExcelDataSource newDataSource in newDataSources)
         {
-            if (oldDataSourcesDict.TryGetValue(newDataSource.Name, out var oldDataSource))
+            if (oldDataSourcesDict.TryGetValue(newDataSource.Name, out IExcelDataSource? oldDataSource))
             {
                 var diffEngine = new ExcelDiffWriter(oldDataSource, newDataSource, diffConfig);
-                var worksheet = excelPackage.Workbook.Worksheets.Add(newDataSource.Name);
-                var row = 1;
-                var column = hideOldColumns ? 2 : 1;
-                foreach (var headerRow in header)
+                ExcelWorksheet worksheet = excelPackage.Workbook.Worksheets.Add(newDataSource.Name);
+                int row = 1;
+                int column = hideOldColumns ? 2 : 1;
+                foreach (string headerRow in header)
                 {
                     worksheet.Cells[row, column].Value = headerRow;
                     row++;
                 }
-                diffEngine.WriteDiff(worksheet, row);
+                _ = diffEngine.WriteDiff(worksheet, row);
                 worksheet.Cells.AutoFitColumns();
                 worksheet.Cells[row, column, worksheet.Dimension.End.Row, worksheet.Dimension.End.Column].AutoFilter = true;
                 worksheet.View.FreezePanes(row + 1, 1);
                 if (hideOldColumns || columnsToHide.Length > 0)
                 {
-                    var stringComparer = diffConfig.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+                    StringComparer stringComparer = diffConfig.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
                     for (column = 1; column <= worksheet.Dimension.End.Column; column++)
                     {
                         if (columnsToShow.Contains(worksheet.Cells[row, column].Text, stringComparer)) { continue; }

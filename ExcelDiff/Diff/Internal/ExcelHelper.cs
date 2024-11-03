@@ -58,7 +58,7 @@ internal static class ExcelHelper
     {
         if (!string.IsNullOrEmpty(srcExcelColor.Rgb))
         {
-            dstExcelColor.SetColor(Color.FromArgb(int.Parse(srcExcelColor.Rgb, NumberStyles.HexNumber)));
+            dstExcelColor.SetColor(Color.FromArgb(int.Parse(srcExcelColor.Rgb, NumberStyles.HexNumber, CultureInfo.InvariantCulture)));
         }
         else if (srcExcelColor.Theme != null)
         {

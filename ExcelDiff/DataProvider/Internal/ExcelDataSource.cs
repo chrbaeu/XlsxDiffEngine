@@ -1,4 +1,5 @@
 ﻿using OfficeOpenXml;
+using System.Globalization;
 
 namespace ExcelDiffEngine;
 
@@ -25,7 +26,7 @@ internal sealed class ExcelDataSource : IExcelDataSource
         dataRowsOffset = this.section.Start.Row;
     }
 
-    public List<string> GetColumnNames()
+    public IReadOnlyCollection<string> GetColumnNames()
     {
         if (columnNames.Count > 0)
         {
@@ -49,7 +50,7 @@ internal sealed class ExcelDataSource : IExcelDataSource
         HashSet<string> columnsToIgnore = new(config.ColumnsToIgnore, config.StringComparer);
         for (int columnIndex = section.Start.Column; columnIndex <= section.End.Column; columnIndex++)
         {
-            var columnName = worksheet.Cells[section.Start.Row, columnIndex].Text;
+            string columnName = worksheet.Cells[section.Start.Row, columnIndex].Text;
             if (columnDict.ContainsKey(columnName)) { continue; }
             if (columnsToIgnore.Contains(columnName)) { continue; }
             columnNames.Add(columnName);
@@ -63,11 +64,7 @@ internal sealed class ExcelDataSource : IExcelDataSource
         if (row < 1 || row > DataRows) { return null; }
         if (columnDict.TryGetValue(columnName, out int column))
         {
-            if (column < 0)
-            {
-                return null;
-            }
-            return worksheet.Cells[dataRowsOffset + row, column];
+            return column < 0 ? null : worksheet.Cells[dataRowsOffset + row, column];
         }
         return null;
     }
@@ -101,7 +98,7 @@ internal sealed class ExcelDataSource : IExcelDataSource
         {
             if (column == -3)
             {
-                return row.ToString();
+                return row.ToString(CultureInfo.InvariantCulture);
             }
             else if (column == -2)
             {
@@ -116,10 +113,10 @@ internal sealed class ExcelDataSource : IExcelDataSource
         return "";
     }
 
-    public Dictionary<string, object?> GetRow(int row)
+    public IReadOnlyDictionary<string, object?> GetRow(int row)
     {
-        Dictionary<string, object?> rowValues = new();
-        foreach (var columnName in GetColumnNames())
+        Dictionary<string, object?> rowValues = [];
+        foreach (string columnName in GetColumnNames())
         {
             rowValues[columnName] = GetCellValue(columnName, row);
         }
@@ -142,7 +139,7 @@ internal sealed class ExcelDataSource : IExcelDataSource
             {
                 return Enumerable.Range(1, DataRows).Select(x => config.CustomColumnValue).ToArray();
             }
-            var cellValues = worksheet.Cells[section.Start.Row + 1, column, section.End.Row, column].GetValue<object?[]>();
+            object?[] cellValues = worksheet.Cells[section.Start.Row + 1, column, section.End.Row, column].GetValue<object?[]>();
             return cellValues;
         }
         return Enumerable.Range(1, DataRows).Select(x => (object?)null).ToArray(); ;

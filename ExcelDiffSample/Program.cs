@@ -1,16 +1,16 @@
-﻿using ExcelDiffEngine;
-using OfficeOpenXml;
+﻿using OfficeOpenXml;
 
 namespace ExcelDiffSample;
 
 internal class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
         Console.WriteLine("ExcelDiff Sample");
 
         ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-
+        var list = new List<string>();
+        list.Clear();
     }
 }

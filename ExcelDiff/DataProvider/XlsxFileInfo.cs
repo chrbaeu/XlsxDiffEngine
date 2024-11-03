@@ -2,7 +2,7 @@
 
 namespace ExcelDiffEngine;
 
-public record XlsxWorksheetInfo
+public sealed record XlsxWorksheetInfo
 {
     public string Name { get; set; } = "";
     public int FromRow { get; init; } = 1;
@@ -11,7 +11,7 @@ public record XlsxWorksheetInfo
     public int? ToColumn { get; init; }
 }
 
-public record class XlsxFileInfo
+public sealed record class XlsxFileInfo
 {
     public XlsxFileInfo(string fileName)
     {

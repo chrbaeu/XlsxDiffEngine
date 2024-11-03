@@ -13,7 +13,7 @@ internal sealed class ModificationRuleHandler
     internal ModificationRuleHandler(IReadOnlyList<ModificationRule> rules, bool ignoreCase)
     {
         RegexOptions options = ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None;
-        foreach (var rule in rules)
+        foreach (ModificationRule rule in rules)
         {
             if (rule.Match[0] == '@')
             {
@@ -29,17 +29,17 @@ internal sealed class ModificationRuleHandler
 
     internal void ApplyRules(ExcelRange excelCell, string columnName, DataKind dataKind)
     {
-        foreach (var (regex, rule) in regexRules)
+        foreach ((Regex regex, ModificationRule rule) in regexRules)
         {
             if (regex.IsMatch(columnName)) { ApplyRule(excelCell, rule, dataKind); }
         }
-        foreach (var rule in columnNameRules)
+        foreach (ModificationRule rule in columnNameRules)
         {
             if (stringComparer.Equals(rule.Match, columnName)) { ApplyRule(excelCell, rule, dataKind); }
         }
     }
 
-    private void ApplyRule(ExcelRange excelCell, ModificationRule rule, DataKind dataKind)
+    private static void ApplyRule(ExcelRange excelCell, ModificationRule rule, DataKind dataKind)
     {
         if (rule.Target != DataKind.All && rule.Target != dataKind) { return; }
         switch (rule.Type)
@@ -51,7 +51,7 @@ internal sealed class ModificationRuleHandler
                 excelCell.Value = (double?)excelCell.Value * double.Parse(rule.Value, CultureInfo.InvariantCulture);
                 break;
             case '=':
-                excelCell.Formula = rule.Value.Replace("{#}", (((double?)excelCell.Value) ?? 0).ToString(CultureInfo.InvariantCulture));
+                excelCell.Formula = rule.Value.Replace("{#}", (((double?)excelCell.Value) ?? 0).ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal);
                 excelCell.Calculate();
                 break;
             //case '@':

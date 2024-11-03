@@ -12,6 +12,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="TUnit" VersionOverride="$(TUnitVersion)" Version="0.2.15" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\SimpleDoc\" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\ExcelDiff\ExcelDiffEngine.csproj" />
   </ItemGroup>
 

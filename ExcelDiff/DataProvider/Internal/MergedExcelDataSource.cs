@@ -1,4 +1,5 @@
 ﻿using OfficeOpenXml;
+using System.Globalization;
 
 namespace ExcelDiffEngine;
 
@@ -20,7 +21,7 @@ internal sealed class MergedExcelDataSource : IExcelDataSource
         columnDict = new(this.config.StringComparer);
     }
 
-    public List<string> GetColumnNames()
+    public IReadOnlyCollection<string> GetColumnNames()
     {
         if (columnNames.Count > 0)
         {
@@ -42,7 +43,7 @@ internal sealed class MergedExcelDataSource : IExcelDataSource
             columnDict.Add(config.CustomColumnName, -1);
         }
         HashSet<string> columnsToIgnore = new(config.ColumnsToIgnore, config.StringComparer);
-        foreach (var columnName in excelDataSources.SelectMany(x => x.GetColumnNames()))
+        foreach (string columnName in excelDataSources.SelectMany(x => x.GetColumnNames()))
         {
             if (columnDict.ContainsKey(columnName)) { continue; }
             if (columnsToIgnore.Contains(columnName)) { continue; }
@@ -61,7 +62,7 @@ internal sealed class MergedExcelDataSource : IExcelDataSource
             {
                 return null;
             }
-            foreach (var dataSource in excelDataSources)
+            foreach (IExcelDataSource dataSource in excelDataSources)
             {
                 if (row <= dataSource.DataRows)
                 {
@@ -90,7 +91,7 @@ internal sealed class MergedExcelDataSource : IExcelDataSource
             {
                 return config.CustomColumnValue;
             }
-            foreach (var dataSource in excelDataSources)
+            foreach (IExcelDataSource dataSource in excelDataSources)
             {
                 if (row <= dataSource.DataRows)
                 {
@@ -109,7 +110,7 @@ internal sealed class MergedExcelDataSource : IExcelDataSource
         {
             if (column == -3)
             {
-                return row.ToString();
+                return row.ToString(CultureInfo.InvariantCulture);
             }
             else if (column == -2)
             {
@@ -119,7 +120,7 @@ internal sealed class MergedExcelDataSource : IExcelDataSource
             {
                 return config.CustomColumnValue?.ToString() ?? "";
             }
-            foreach (var dataSource in excelDataSources)
+            foreach (IExcelDataSource dataSource in excelDataSources)
             {
                 if (row <= dataSource.DataRows)
                 {
@@ -131,10 +132,10 @@ internal sealed class MergedExcelDataSource : IExcelDataSource
         return "";
     }
 
-    public Dictionary<string, object?> GetRow(int row)
+    public IReadOnlyDictionary<string, object?> GetRow(int row)
     {
-        Dictionary<string, object?> rowValues = new();
-        foreach (var columnName in GetColumnNames())
+        Dictionary<string, object?> rowValues = [];
+        foreach (string columnName in GetColumnNames())
         {
             rowValues[columnName] = GetCellValue(columnName, row);
         }
@@ -157,7 +158,7 @@ internal sealed class MergedExcelDataSource : IExcelDataSource
             {
                 return Enumerable.Range(1, DataRows).Select(x => config.CustomColumnValue).ToArray();
             }
-            var cellValues = excelDataSources.SelectMany(x => x.GetColumn(columnName)).ToArray();
+            object?[] cellValues = excelDataSources.SelectMany(x => x.GetColumn(columnName)).ToArray();
             return cellValues;
         }
         return Enumerable.Range(1, DataRows).Select(x => (object?)null).ToArray(); ;

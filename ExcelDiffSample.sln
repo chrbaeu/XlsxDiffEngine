@@ -7,6 +7,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelDiffSample", "ExcelDif
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelDiffEngine", "ExcelDiff\ExcelDiffEngine.csproj", "{2D957CA4-8782-48B5-89D3-37617DEECF33}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelDiffTest", "ExcelDiffTest\ExcelDiffTest.csproj", "{B33DA943-72A4-436F-9C43-77D7CFBBAC3C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D6134A59-7A01-4379-A669-AA1A3BF207A9}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +28,10 @@ Global
 		{2D957CA4-8782-48B5-89D3-37617DEECF33}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2D957CA4-8782-48B5-89D3-37617DEECF33}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2D957CA4-8782-48B5-89D3-37617DEECF33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B33DA943-72A4-436F-9C43-77D7CFBBAC3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B33DA943-72A4-436F-9C43-77D7CFBBAC3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B33DA943-72A4-436F-9C43-77D7CFBBAC3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B33DA943-72A4-436F-9C43-77D7CFBBAC3C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
