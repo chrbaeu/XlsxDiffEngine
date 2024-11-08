@@ -32,12 +32,16 @@ public record class ExcelDiffConfig
 
     public bool IgnoreUnchangedRows { get; init; }
 
+    public SkipRowPredicate? SkipRowRule { get; init; }
+
     public CellStyle HeaderStyle { get; init; } = DefaultCellStyles.Header;
     public CellStyle RemovedRowStyle { get; init; } = DefaultCellStyles.RemovedRow;
     public CellStyle AddedRowStyle { get; init; } = DefaultCellStyles.AddedRow;
     public CellStyle ChangedCellStyle { get; init; } = DefaultCellStyles.ChangedCell;
     public CellStyle ChangedRowKeyColumnsStyle { get; init; } = DefaultCellStyles.ChangedRowKeyColumns;
 }
+
+public delegate bool SkipRowPredicate(IExcelDataSource excelDataSource, int row);
 
 public enum DataKind { All, Old, New }
 

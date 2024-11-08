@@ -80,6 +80,7 @@ internal sealed class ExcelDiffOp
         List<DataKey> dataKeys = [];
         for (int row = 1; row <= dataSource.DataRows; row++)
         {
+            if (config.SkipRowRule is not null && config.SkipRowRule(dataSource, row)) { continue; }
             dataKeys.Add(new DataKey(
                 GetKey(dataSource, row, config.KeyColumns),
                 GetKey(dataSource, row, config.SecondaryKeyColumns),

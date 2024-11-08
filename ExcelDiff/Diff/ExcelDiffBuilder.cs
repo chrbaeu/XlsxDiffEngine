@@ -131,9 +131,15 @@ public class ExcelDiffBuilder
         return this;
     }
 
-    public ExcelDiffBuilder IgnoreUnchangedRows()
+    public ExcelDiffBuilder IgnoreUnchangedRows(bool ignoreUnchangedRows)
     {
-        diffConfig = diffConfig with { IgnoreUnchangedRows = true };
+        diffConfig = diffConfig with { IgnoreUnchangedRows = ignoreUnchangedRows };
+        return this;
+    }
+
+    public ExcelDiffBuilder SetSkipRowRule(SkipRowPredicate? skipRowRule)
+    {
+        diffConfig = diffConfig with { SkipRowRule = skipRowRule };
         return this;
     }
 
@@ -243,7 +249,9 @@ public class ExcelDiffBuilder
         return this;
     }
 
-    public void Build(string outputFilePath)
+    public void Build(string outputFilePath) => Build(outputFilePath, null);
+
+    public void Build(string outputFilePath, Action<ExcelPackage>? postProcessingAction)
     {
         using var oldDataProvider = new XlsxDataProvider(oldFiles, xlsxConfig);
         using var newDataProvider = new XlsxDataProvider(newFiles, xlsxConfig);
@@ -286,6 +294,7 @@ public class ExcelDiffBuilder
                 }
             }
         }
+        postProcessingAction?.Invoke(excelPackage);
         excelPackage.SaveAs(new FileInfo(outputFilePath));
     }
 

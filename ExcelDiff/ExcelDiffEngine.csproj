@@ -3,8 +3,28 @@
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <AnalysisMode>all</AnalysisMode>
+    <Version>0.0.1</Version>
+    <Title>ExcelDiffEngine</Title>
+    <Description>A simple library to generate excel documents representing the diff of excel documents baed on EPPlus.</Description>
+    <PackageId>Chriffizient.ExcelDiffEngine</PackageId>
+    <PackageTags>Excel Diff</PackageTags>
+    <PackageIcon>icon.png</PackageIcon>
+    <Authors>Christian Bäumlisberger</Authors>
+    <Copyright>Christian Bäumlisberger</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/chrbaeu/ExcelDiffEngine</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/chrbaeu/ExcelDiffEngine</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Deterministic>true</Deterministic>
+    <PathMap>$(MSBuildProjectDirectory)=C:\</PathMap>
+    <EmbedAllSources>true</EmbedAllSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
