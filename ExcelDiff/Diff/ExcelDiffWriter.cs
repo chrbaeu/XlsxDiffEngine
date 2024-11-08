@@ -2,6 +2,10 @@
 
 namespace ExcelDiffEngine;
 
+/// <summary>
+/// A class for writing the differences between two <see cref="IExcelDataSource"/> into an <see cref="ExcelWorksheet"/>,
+/// including options for comparing, styling, and marking changes.
+/// </summary>
 public sealed class ExcelDiffWriter
 {
     private readonly IExcelDataSource oldDataSource;
@@ -10,6 +14,12 @@ public sealed class ExcelDiffWriter
     private readonly StringComparer stringComparer;
     private readonly ExcelDiffOp excelDiffOp;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ExcelDiffWriter"/> class with the specified data sources and configuration.
+    /// </summary>
+    /// <param name="oldDataSource">The data source representing the old state of the data.</param>
+    /// <param name="newDataSource">The data source representing the new state of the data.</param>
+    /// <param name="config">Configuration options for comparing and styling differences.</param>
     public ExcelDiffWriter(IExcelDataSource oldDataSource, IExcelDataSource newDataSource, ExcelDiffConfig config)
     {
         ArgumentNullException.ThrowIfNull(oldDataSource, nameof(oldDataSource));
@@ -22,6 +32,13 @@ public sealed class ExcelDiffWriter
         excelDiffOp = new(oldDataSource, newDataSource, config);
     }
 
+    /// <summary>
+    /// Writes the differences between the old and new data sources into the specified worksheet, starting at the specified row and column.
+    /// </summary>
+    /// <param name="worksheet">The worksheet where differences will be written.</param>
+    /// <param name="row">The starting row for writing data. Default is 1.</param>
+    /// <param name="column">The starting column for writing data. Default is 1.</param>
+    /// <returns>A tuple indicating the end row and column where data was written.</returns>
     public (int endRow, int endColumn) WriteDiff(ExcelWorksheet worksheet, int row = 1, int column = 1)
     {
         ArgumentNullException.ThrowIfNull(worksheet, nameof(worksheet));
@@ -83,7 +100,7 @@ public sealed class ExcelDiffWriter
         return row - 1;
     }
 
-    public bool GetAndHandleChangedState(string columnName, ExcelRange? oldDstCell, object? oldValue, ExcelRange newDstCell, object? newValue)
+    private bool GetAndHandleChangedState(string columnName, ExcelRange? oldDstCell, object? oldValue, ExcelRange newDstCell, object? newValue)
     {
         if (config.ColumnsToCompare is not null && !config.ColumnsToCompare.Contains(columnName, stringComparer))
         {

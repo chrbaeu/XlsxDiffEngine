@@ -2,6 +2,10 @@
 
 namespace ExcelDiffEngine;
 
+/// <summary>
+/// Provides an unified interface to read data from one or multiple Excel (.xlsx) files, supporting 
+/// advanced options like merging worksheets or documents and applying custom configurations.
+/// </summary>
 public sealed class XlsxDataProvider : IDisposable
 {
     private readonly ICollection<XlsxFileInfo> xlsxFileInfos;
@@ -11,14 +15,30 @@ public sealed class XlsxDataProvider : IDisposable
 
     private List<IExcelDataSource> dataSources = [];
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XlsxDataProvider"/> class for a single Excel file.
+    /// </summary>
+    /// <param name="xlsxFile">The path to the Excel file.</param>
+    /// <param name="headerRow">The header row number for the data. Default is 1.</param>
+    /// <param name="config">Optional configuration for data processing.</param>
     public XlsxDataProvider(string xlsxFile, int headerRow = 1, XlsxDataProviderConfig? config = null)
         : this([new(xlsxFile) { FromRow = headerRow }], config)
     { }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XlsxDataProvider"/> class for a single <see cref="XlsxFileInfo"/> object.
+    /// </summary>
+    /// <param name="xlsxFile">The file information for the Excel file.</param>
+    /// <param name="config">Optional configuration for data processing.</param>
     public XlsxDataProvider(XlsxFileInfo xlsxFile, XlsxDataProviderConfig? config = null)
         : this([xlsxFile], config)
     { }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XlsxDataProvider"/> class for multiple Excel files.
+    /// </summary>
+    /// <param name="xlsxFiles">A collection of file information for the Excel files.</param>
+    /// <param name="config">Optional configuration for data processing.</param>
     public XlsxDataProvider(ICollection<XlsxFileInfo> xlsxFiles, XlsxDataProviderConfig? config = null)
     {
         xlsxFileInfos = xlsxFiles;
@@ -34,6 +54,10 @@ public sealed class XlsxDataProvider : IDisposable
         };
     }
 
+    /// <summary>
+    /// Retrieves a list of data sources representing virtual worksheets that are build based on the files and configurations.
+    /// </summary>
+    /// <returns>A read-only list of <see cref="IExcelDataSource"/> instances.</returns>
     public IReadOnlyList<IExcelDataSource> GetDataSources()
     {
         if (dataSources.Count > 0) { return dataSources; }
@@ -53,6 +77,9 @@ public sealed class XlsxDataProvider : IDisposable
         return dataSources;
     }
 
+    /// <summary>
+    /// Disposes of the resources used by the <see cref="XlsxDataProvider"/> instance, including closing any open Excel packages.
+    /// </summary>
     public void Dispose()
     {
         foreach (ExcelPackage excelPackage in excelPackagesDict.Values)
@@ -65,7 +92,7 @@ public sealed class XlsxDataProvider : IDisposable
     {
         List<IExcelDataSource> dataSources = [];
         ExcelPackage excelPackage = excelPackagesDict[xlsxFileInfo];
-        xlsxFileInfo.Callback?.Invoke(excelPackage);
+        xlsxFileInfo.PrepareExcelPackageCallback?.Invoke(excelPackage);
         HashSet<string>? workSheetNames = config.WorksheetNames is not null ? new(config.WorksheetNames, excelDataSourceConfig.StringComparer) : null;
         ExcelDataSourceConfig xlsxFileDataSourceConfig = excelDataSourceConfig;
         if (config.DocumentNameColumnName is not null)
@@ -102,5 +129,4 @@ public sealed class XlsxDataProvider : IDisposable
         }
         return dataSources;
     }
-
 }
