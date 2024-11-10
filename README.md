@@ -6,10 +6,10 @@ ExcelDiffEngine is a simple C# library for comparing Excel (.xlsx) files. It pro
 
 ## Features
 
-- **Flexible Comparison Options**: Configure key columns, secondary key columns, ignored columns, group columns, text-only comparison columns, and more.
-- **Customizable Data Handling**: Define data ranges, set merging options, add skip rules, apply modification rules, or manage individual requirements with callbacks.
-- **Visual Change Indicators**: Highlight changes, additions, and deletions in the output using different cell styling and comment options.
-- **Configurable Output**: Customize headers, auto-fit columns, freeze panes, and apply auto-filters for enhanced readability.
+- **Flexible comparison options**: Configure key columns, secondary key columns, ignored columns, group columns, text-only comparison columns, and more.
+- **Customizable data handling**: Define data ranges, set merging options, add skip rules, apply modification rules, or manage individual requirements with callbacks.
+- **Visual change indicators**: Highlight changes, additions, and deletions in the output using different cell styling and comment options.
+- **Configurable output**: Customize headers, auto-fit columns, freeze panes, and apply auto-filters for enhanced readability.
 
 ## Installation
 

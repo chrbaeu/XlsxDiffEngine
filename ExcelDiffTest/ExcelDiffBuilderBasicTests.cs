@@ -11,14 +11,14 @@ internal class ExcelDiffBuilderBasicTests
         ["Title", "Value"],
         ["A", 1],
         ["B", 2],
-        ["C", 3]
+        ["C", 3],
     ];
 
     private readonly object[][] newFileContent = [
         ["Title", "Value"],
         ["A", 1],
         ["B", 4],
-        ["C", 3]
+        ["C", 3],
     ];
 
     [Test]
@@ -43,7 +43,7 @@ internal class ExcelDiffBuilderBasicTests
             ["Title", "Title", "Value", "Value"],
             ["A", "A", 1, 1],
             ["B", "B", 2, 4],
-            ["C", "C", 3, 3]
+            ["C", "C", 3, 3],
             ]);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[3, 3, 3, 4], DefaultCellStyles.ChangedCell);
         await Assert.That(ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true)).IsTrue();
@@ -72,7 +72,7 @@ internal class ExcelDiffBuilderBasicTests
             ["Title", "Title", "Value", "Value"],
             ["A", "A", 1, 1],
             ["B", "B", 2, 4],
-            ["C", "C", 3, 3]
+            ["C", "C", 3, 3],
             ]);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[3, 1, 3, 2], DefaultCellStyles.ChangedRowKeyColumns);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[3, 3, 3, 4], DefaultCellStyles.ChangedCell);
@@ -106,7 +106,7 @@ internal class ExcelDiffBuilderBasicTests
             ["Title", "Title", "Value", "Value"],
             ["A", "A", 1, 1],
             ["B", "B", 2, 4],
-            ["C", "C", 3, 3]
+            ["C", "C", 3, 3],
             ]);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[3, 3, 3, 4], DefaultCellStyles.ChangedCell);
         await Assert.That(ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true)).IsTrue();
@@ -196,7 +196,7 @@ internal class ExcelDiffBuilderBasicTests
             ["TitleOld", "TitleNew", "ValueOld", "ValueNew"],
             ["A", "A", 1, 1],
             ["B", "B", 2, 4],
-            ["C", "C", 3, 3]
+            ["C", "C", 3, 3],
             ]);
         await Assert.That(ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult)).IsTrue();
     }
@@ -224,7 +224,7 @@ internal class ExcelDiffBuilderBasicTests
             ["Value", "Value"],
             [1, 1],
             [2, 4],
-            [3, 3]
+            [3, 3],
             ]);
         await Assert.That(ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult)).IsTrue();
     }
@@ -253,7 +253,7 @@ internal class ExcelDiffBuilderBasicTests
             ["Row", "Row", "Title", "Title", "Value", "Value"],
             [1, 1, "A", "A", 1, 1],
             [2, 2, "B", "B", 2, 4],
-            [3, 3, "C", "C", 3, 3]
+            [3, 3, "C", "C", 3, 3],
             ]);
         await Assert.That(ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult)).IsTrue();
     }
@@ -283,7 +283,7 @@ internal class ExcelDiffBuilderBasicTests
             ["Row", "Row", "Worksheet", "Worksheet", "Document", "Document", "Title", "Title", "Value", "Value"],
             [1, 1, "Table", "Table", "OldFile.xlsx", "NewFile.xlsx", "A", "A", 1, 1],
             [2, 2, "Table", "Table", "OldFile.xlsx", "NewFile.xlsx", "B", "B", 2, 4],
-            [3, 3, "Table", "Table", "OldFile.xlsx", "NewFile.xlsx", "C", "C", 3, 3]
+            [3, 3, "Table", "Table", "OldFile.xlsx", "NewFile.xlsx", "C", "C", 3, 3],
             ]);
         await Assert.That(ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult)).IsTrue();
     }
@@ -312,7 +312,7 @@ internal class ExcelDiffBuilderBasicTests
             ["Document", "Document", "Title", "Title", "Value", "Value"],
             ["ChangedDocumentName", "ChangedDocumentName", "A", "A", 1, 1],
             ["ChangedDocumentName", "ChangedDocumentName", "B", "B", 2, 4],
-            ["ChangedDocumentName", "ChangedDocumentName", "C", "C", 3, 3]
+            ["ChangedDocumentName", "ChangedDocumentName", "C", "C", 3, 3],
             ]);
         await Assert.That(ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult)).IsTrue();
     }
@@ -342,7 +342,7 @@ internal class ExcelDiffBuilderBasicTests
             ["MergedWorksheet", "MergedWorksheet", "Title", "Title", "Value", "Value"],
             ["Test", "Test", "A", "A", 1, 1],
             ["Test", "Test", "B", "B", 2, 4],
-            ["Test", "Test", "C", "C", 3, 3]
+            ["Test", "Test", "C", "C", 3, 3],
             ], "Test");
         await Assert.That(ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult)).IsTrue();
     }
@@ -372,7 +372,7 @@ internal class ExcelDiffBuilderBasicTests
             ["Title", "Title", "Value", "Value"],
             ["A", "A", 1, 1],
             ["B", "B", 2, 4],
-            ["C", "C", 3, 3]
+            ["C", "C", 3, 3],
             ]);
         expectedResult.Workbook.Worksheets[0].Cells[2, 3, 4, 4].Style.Numberformat.Format = "0.00";
         await Assert.That(ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult)).IsTrue();
@@ -403,7 +403,7 @@ internal class ExcelDiffBuilderBasicTests
             ["Title", "Title", "Value", "Value"],
             ["A", "A", 1, 1],
             ["B", "B", 2, 4],
-            ["C", "C", 3, 3]
+            ["C", "C", 3, 3],
             ]);
         await Assert.That(ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult)).IsTrue();
     }
@@ -441,7 +441,7 @@ internal class ExcelDiffBuilderBasicTests
             ["Title", "Title", "Value", "Value"],
             ["A", "A", 1, 1],
             ["B", "B", 2, 4],
-            ["C", "C", 3, 3]
+            ["C", "C", 3, 3],
             ]);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[2, 1, 4, 4], cellStyle);
         await Assert.That(ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult)).IsTrue();
@@ -480,7 +480,7 @@ internal class ExcelDiffBuilderBasicTests
             ["Title", "Title", "Value", "Value"],
             ["A", "A", 1, 1],
             ["B", "B", 2, 4],
-            ["C", "C", 3, 3]
+            ["C", "C", 3, 3],
             ]);
         await Assert.That(ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult)).IsTrue();
     }
@@ -507,7 +507,7 @@ internal class ExcelDiffBuilderBasicTests
         var expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Title", "Title", "Value", "Value"],
             ["B", "B", 2, 4],
-            ["C", "C", 3, 3]
+            ["C", "C", 3, 3],
             ]);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[2, 3, 2, 4], DefaultCellStyles.ChangedCell);
         await Assert.That(ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true)).IsTrue();

@@ -6,7 +6,7 @@
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <AnalysisMode>all</AnalysisMode>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <Title>ExcelDiffEngine</Title>
     <Description>A simple library to generate excel documents representing the diff of excel documents baed on EPPlus.</Description>
     <PackageId>Chriffizient.ExcelDiffEngine</PackageId>

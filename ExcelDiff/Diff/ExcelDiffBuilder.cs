@@ -246,6 +246,7 @@ public class ExcelDiffBuilder
     /// </summary>
     public ExcelDiffBuilder IgnoreCase(bool ignoreCase = true)
     {
+        diffConfig = diffConfig with { IgnoreCase = ignoreCase };
         xlsxConfig = xlsxConfig with { IgnoreCase = ignoreCase };
         return this;
     }
@@ -404,55 +405,71 @@ public class ExcelDiffBuilder
     /// <param name="postProcessingAction">An optional action to perform additional processing on the <see cref="ExcelPackage"/>.</param>
     public ExcelPackage Build(Action<ExcelPackage>? postProcessingAction = null)
     {
+        StringComparer stringComparer = diffConfig.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
         using var oldDataProvider = new XlsxDataProvider(oldFiles, xlsxConfig);
         using var newDataProvider = new XlsxDataProvider(newFiles, xlsxConfig);
-        var oldDataSourcesDict = oldDataProvider.GetDataSources().ToDictionary(x => x.Name);
-#pragma warning disable CA2000 // Object is retured and disposed by the caller
-        var excelPackage = new ExcelPackage();
-#pragma warning restore CA2000
+        IReadOnlyList<IExcelDataSource> oldDataSources = oldDataProvider.GetDataSources();
+        if (oldDataSources.Select(x => x.Name).ToHashSet(stringComparer).Count != oldDataSources.Count)
+        {
+            throw new InvalidOperationException("The old excel files to compare must contain unique worksheet names!");
+        }
+        var oldDataSourcesDict = oldDataSources.ToDictionary(x => x.Name, stringComparer);
         IReadOnlyList<IExcelDataSource> newDataSources = newDataProvider.GetDataSources();
+        if (newDataSources.Select(x => x.Name).ToHashSet(stringComparer).Count != newDataSources.Count)
+        {
+            throw new InvalidOperationException("The new excel files to compare must contain unique worksheet names!");
+        }
         if (!newDataSources.Any(x => oldDataSourcesDict.ContainsKey(x.Name)))
         {
             throw new InvalidOperationException("The excel files to compare must contain worksheets with the same name!");
         }
-        foreach (IExcelDataSource newDataSource in newDataSources)
+        ExcelPackage? excelPackage = null;
+        try
         {
-            if (oldDataSourcesDict.TryGetValue(newDataSource.Name, out IExcelDataSource? oldDataSource))
+            excelPackage = new();
+            foreach (IExcelDataSource newDataSource in newDataSources)
             {
-                var diffEngine = new ExcelDiffWriter(oldDataSource, newDataSource, diffConfig);
-                ExcelWorksheet worksheet = excelPackage.Workbook.Worksheets.Add(newDataSource.Name);
-                int row = 1;
-                int column = hideOldColumns ? 2 : 1;
-                foreach (string headerRow in header)
+                if (oldDataSourcesDict.TryGetValue(newDataSource.Name, out IExcelDataSource? oldDataSource))
                 {
-                    worksheet.Cells[row, column].Value = headerRow;
-                    row++;
-                }
-                _ = diffEngine.WriteDiff(worksheet, row);
-                if (autoFitColumns) { worksheet.Cells.AutoFitColumns(); }
-                foreach (KeyValuePair<int, double> item in columnSizeDict)
-                {
-                    worksheet.Column(item.Key).Width = item.Value;
-                }
-                if (autoFilter) { worksheet.Cells[row, column, worksheet.Dimension.End.Row, worksheet.Dimension.End.Column].AutoFilter = true; }
-                if (freezePanes) { worksheet.View.FreezePanes(row + 1, 1); }
-                if (hideOldColumns || columnsToHide.Length > 0)
-                {
-                    StringComparer stringComparer = diffConfig.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
-                    for (column = 1; column <= worksheet.Dimension.End.Column; column++)
+                    var diffEngine = new ExcelDiffWriter(oldDataSource, newDataSource, diffConfig);
+                    ExcelWorksheet worksheet = excelPackage.Workbook.Worksheets.Add(newDataSource.Name);
+                    int row = 1;
+                    int column = hideOldColumns ? 2 : 1;
+                    foreach (string headerRow in header)
                     {
-                        if (columnsToShow.Contains(worksheet.Cells[row, column].Text, stringComparer)) { continue; }
-                        if (hideOldColumns && column % 2 != 0) { worksheet.Column(column).Hidden = true; }
-                        if (columnsToHide.Contains(worksheet.Cells[row, column].Text, stringComparer))
+                        worksheet.Cells[row, column].Value = headerRow;
+                        row++;
+                    }
+                    _ = diffEngine.WriteDiff(worksheet, row);
+                    if (autoFitColumns) { worksheet.Cells.AutoFitColumns(); }
+                    foreach (KeyValuePair<int, double> item in columnSizeDict)
+                    {
+                        worksheet.Column(item.Key).Width = item.Value;
+                    }
+                    if (autoFilter) { worksheet.Cells[row, column, worksheet.Dimension.End.Row, worksheet.Dimension.End.Column].AutoFilter = true; }
+                    if (freezePanes) { worksheet.View.FreezePanes(row + 1, 1); }
+                    if (hideOldColumns || columnsToHide.Length > 0)
+                    {
+                        for (column = 1; column <= worksheet.Dimension.End.Column; column++)
                         {
-                            worksheet.Column(column).Hidden = true;
+                            if (columnsToShow.Contains(worksheet.Cells[row, column].Text, stringComparer)) { continue; }
+                            if (hideOldColumns && column % 2 != 0) { worksheet.Column(column).Hidden = true; }
+                            if (columnsToHide.Contains(worksheet.Cells[row, column].Text, stringComparer))
+                            {
+                                worksheet.Column(column).Hidden = true;
+                            }
                         }
                     }
                 }
             }
+            postProcessingAction?.Invoke(excelPackage);
+            return excelPackage;
         }
-        postProcessingAction?.Invoke(excelPackage);
-        return excelPackage;
+        catch
+        {
+            excelPackage?.Dispose();
+            throw;
+        }
     }
 
     /// <summary>
