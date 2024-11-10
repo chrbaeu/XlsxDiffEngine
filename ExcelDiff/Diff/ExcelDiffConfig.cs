@@ -150,6 +150,32 @@ public record class ExcelDiffConfig
 public delegate bool SkipRowPredicate(IExcelDataSource excelDataSource, int row);
 
 /// <summary>
+/// Specifies the type of modification to apply to a cell.
+/// </summary>
+public enum ModificationKind
+{
+    /// <summary>
+    /// Sets the number format of the cell.
+    /// </summary>
+    NumberFormat,
+
+    /// <summary>
+    /// Multiplies the cell value by a specified factor.
+    /// </summary>
+    Multiply,
+
+    /// <summary>
+    /// Sets the cell formula to a specified value.
+    /// </summary>
+    Formula,
+
+    /// <summary>
+    /// Replaces text in the cell using a regular expression pattern.
+    /// </summary>
+    RegexReplace
+}
+
+/// <summary>
 /// Specifies the target data set for a modification rule, indicating if it applies to all data, only the old data, or only the new data.
 /// </summary>
 public enum DataKind
@@ -158,10 +184,12 @@ public enum DataKind
     /// The modification rule applies to all data.
     /// </summary>
     All,
+
     /// <summary>
     /// The modification rule applies to the old data only.
     /// </summary>
     Old,
+
     /// <summary>
     /// The modification rule applies to the new data only.
     /// </summary>
@@ -169,14 +197,14 @@ public enum DataKind
 }
 
 /// <summary>
-/// Defines a modification rule for handling specific data changes, specifying matching criteria,
-/// modification type, and target data.
+/// Defines a modification rule for handling specific data changes.
 /// </summary>
-/// <param name="Match">The pattern or criteria used to match values for modification.</param>
-/// <param name="Type">The type of modification to apply.</param>
+/// <param name="RegexPattern">The regex used to match the column names for which the modification is applied.</param>
+/// <param name="ModificationKind">The type of modification to apply.</param>
 /// <param name="Value">The value to use for the modification.</param>
 /// <param name="Target">The target data for the rule (all, old, or new).</param>
-public record class ModificationRule(string Match, char Type, string Value, DataKind Target = DataKind.All);
+/// <param name="AdditionalValue">An additional value used for the modification rule.</param>
+public record class ModificationRule(string RegexPattern, ModificationKind ModificationKind, string Value, DataKind Target = DataKind.All, string? AdditionalValue = null);
 
 /// <summary>
 /// Defines a marker for highlighting cells where values have changed, based on a minimum deviation threshold.

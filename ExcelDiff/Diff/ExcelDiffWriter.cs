@@ -111,8 +111,15 @@ public sealed class ExcelDiffWriter
             return false;
         }
         CellStyle? cellStyle = null;
-        if (oldValue is double oldNumber && newValue is double newNumber
-            && !config.ColumnsToTextCompareOnly.Contains(columnName, stringComparer)
+        if (config.ColumnsToTextCompareOnly.Contains(columnName, stringComparer))
+        {
+            if ((oldDstCell is null && oldValue?.ToString() != newValue?.ToString())
+                || (oldDstCell is not null && oldDstCell.Text != newDstCell.Text))
+            {
+                cellStyle = config.ChangedCellStyle;
+            }
+        }
+        else if (oldValue is double oldNumber && newValue is double newNumber
             && config.ValueChangedMarkers.Count > 0)
         {
             double pDiff = Math.Abs((oldNumber - newNumber) / ((oldNumber + newNumber) / 2.0));

@@ -6,25 +6,15 @@ namespace ExcelDiffEngine;
 
 internal sealed class ModificationRuleHandler
 {
-    private readonly List<ModificationRule> columnNameRules = [];
     private readonly List<(Regex regex, ModificationRule)> regexRules = [];
-    private readonly StringComparer stringComparer;
 
     internal ModificationRuleHandler(IReadOnlyList<ModificationRule> rules, bool ignoreCase)
     {
         RegexOptions options = ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None;
         foreach (ModificationRule rule in rules)
         {
-            if (rule.Match[0] == '@')
-            {
-                regexRules.Add((new Regex(rule.Match[1..], options), rule));
-            }
-            else
-            {
-                columnNameRules.Add(rule);
-            }
+            regexRules.Add((new Regex(rule.RegexPattern, options), rule));
         }
-        stringComparer = ignoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
     }
 
     internal void ApplyRules(ExcelRange excelCell, string columnName, DataKind dataKind)
@@ -33,30 +23,40 @@ internal sealed class ModificationRuleHandler
         {
             if (regex.IsMatch(columnName)) { ApplyRule(excelCell, rule, dataKind); }
         }
-        foreach (ModificationRule rule in columnNameRules)
-        {
-            if (stringComparer.Equals(rule.Match, columnName)) { ApplyRule(excelCell, rule, dataKind); }
-        }
     }
 
     private static void ApplyRule(ExcelRange excelCell, ModificationRule rule, DataKind dataKind)
     {
         if (rule.Target != DataKind.All && rule.Target != dataKind) { return; }
-        switch (rule.Type)
+        switch (rule.ModificationKind)
         {
-            case ':':
+            case ModificationKind.NumberFormat:
                 excelCell.Style.Numberformat.Format = rule.Value;
                 break;
-            case '*':
+            case ModificationKind.Multiply:
                 excelCell.Value = (double?)excelCell.Value * double.Parse(rule.Value, CultureInfo.InvariantCulture);
                 break;
-            case '=':
-                excelCell.Formula = rule.Value.Replace("{#}", (((double?)excelCell.Value) ?? 0).ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal);
+            case ModificationKind.Formula:
+                if (rule.Value.Contains("{#}", StringComparison.Ordinal))
+                {
+                    if (excelCell.Value is string)
+                    {
+                        excelCell.Formula = rule.Value.Replace("{#}", excelCell.Text, StringComparison.Ordinal);
+                    }
+                    else
+                    {
+                        excelCell.Formula = rule.Value.Replace("{#}", (((double?)excelCell.Value) ?? 0).ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal);
+                    }
+                }
+                else
+                {
+                    excelCell.Formula = rule.Value;
+                }
                 excelCell.Calculate();
                 break;
-            //case '@':
-            //    excelCell.Value = Regex.Replace(excelCell.Text, rule.Value, "");
-            //    break;
+            case ModificationKind.RegexReplace:
+                excelCell.Value = Regex.Replace(excelCell.Text, rule.Value, rule.AdditionalValue ?? "");
+                break;
             default:
                 break;
         }
