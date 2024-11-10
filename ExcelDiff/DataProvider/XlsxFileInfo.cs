@@ -1,4 +1,5 @@
 ﻿using OfficeOpenXml;
+using System.Diagnostics;
 
 namespace ExcelDiffEngine;
 
@@ -8,13 +9,18 @@ namespace ExcelDiffEngine;
 /// </summary>
 public sealed record class XlsxFileInfo
 {
+    private readonly FileInfo? fileInfo;
+    private readonly Stream? excelFileDataStream;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="XlsxFileInfo"/> class with the specified file name.
     /// </summary>
     /// <param name="fileName">The name or path of the Excel file.</param>
     public XlsxFileInfo(string fileName)
     {
-        FileInfo = new(fileName);
+        ArgumentNullException.ThrowIfNull(fileName);
+        fileInfo = new(fileName);
+        DocumentName = fileInfo.Name;
     }
 
     /// <summary>
@@ -23,13 +29,28 @@ public sealed record class XlsxFileInfo
     /// <param name="fileInfo">The <see cref="FileInfo"/> object representing the Excel file.</param>
     public XlsxFileInfo(FileInfo fileInfo)
     {
-        FileInfo = fileInfo;
+        ArgumentNullException.ThrowIfNull(fileInfo);
+        this.fileInfo = fileInfo;
+        DocumentName = fileInfo.Name;
     }
 
     /// <summary>
-    /// The <see cref="FileInfo"/> object representing the Excel file.
+    /// Initializes a new instance of the <see cref="XlsxFileInfo"/> class with the specified <see cref="Stream"/> and file name.
     /// </summary>
-    public FileInfo FileInfo { get; init; }
+    /// <param name="excelFileDataStream">The stream containing the Excel file data.</param>
+    /// <param name="documentName">The name of the Excel file.</param>
+    public XlsxFileInfo(Stream excelFileDataStream, string documentName = "StreamedDocument.xlsx")
+    {
+        ArgumentNullException.ThrowIfNull(excelFileDataStream);
+        ArgumentNullException.ThrowIfNull(documentName);
+        this.excelFileDataStream = excelFileDataStream;
+        DocumentName = documentName;
+    }
+
+    /// <summary>
+    /// The name of the Excel file.
+    /// </summary>
+    public string DocumentName { get; init; }
 
     /// <summary>
     /// The starting row for data extraction. Default is 1.
@@ -52,11 +73,6 @@ public sealed record class XlsxFileInfo
     public int? ToColumn { get; init; }
 
     /// <summary>
-    /// The name of the document, if specified.
-    /// </summary>
-    public string? DocumentName { get; init; }
-
-    /// <summary>
     /// The name used for the merged worksheet, if worksheets are merged.
     /// </summary>
     public string? MergedWorksheetName { get; init; }
@@ -70,6 +86,28 @@ public sealed record class XlsxFileInfo
     /// An optional callback action to configure or modify the <see cref="ExcelPackage"/> before processing.
     /// </summary>
     public Action<ExcelPackage>? PrepareExcelPackageCallback { get; init; }
+
+    /// <summary>
+    /// Indicates whether to recalculate formulas in the Excel file before processing.
+    /// </summary>
+    public bool RecalculateFormulas { get; init; }
+
+    /// <summary>
+    /// Retrieves a new <see cref="ExcelPackage"/> instance based on the file information or data stream.
+    /// </summary>
+    /// <returns>A new <see cref="ExcelPackage"/> instance.</returns>
+    public ExcelPackage CreateExcelPackage()
+    {
+        if (fileInfo is not null)
+        {
+            return new(fileInfo);
+        }
+        else if (excelFileDataStream is not null)
+        {
+            return new(excelFileDataStream);
+        }
+        throw new UnreachableException("No file information or data is available.");
+    }
 }
 
 /// <summary>

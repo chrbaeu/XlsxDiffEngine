@@ -226,7 +226,7 @@ public class ExcelDiffBuilder
     /// <summary>
     /// Configures whether to ignore unchanged rows in the output.
     /// </summary>
-    public ExcelDiffBuilder IgnoreUnchangedRows(bool ignoreUnchangedRows)
+    public ExcelDiffBuilder IgnoreUnchangedRows(bool ignoreUnchangedRows = true)
     {
         diffConfig = diffConfig with { IgnoreUnchangedRows = ignoreUnchangedRows };
         return this;
@@ -399,17 +399,22 @@ public class ExcelDiffBuilder
     }
 
     /// <summary>
-    /// Builds and saves the Excel comparison output to the specified file path, with an optional post-processing action.
+    /// Builds the Excel comparison output, with an optional post-processing action.
     /// </summary>
-    /// <param name="outputFilePath">The path where the output file should be saved.</param>
     /// <param name="postProcessingAction">An optional action to perform additional processing on the <see cref="ExcelPackage"/>.</param>
-    public void Build(string outputFilePath, Action<ExcelPackage>? postProcessingAction = null)
+    public ExcelPackage Build(Action<ExcelPackage>? postProcessingAction = null)
     {
         using var oldDataProvider = new XlsxDataProvider(oldFiles, xlsxConfig);
         using var newDataProvider = new XlsxDataProvider(newFiles, xlsxConfig);
         var oldDataSourcesDict = oldDataProvider.GetDataSources().ToDictionary(x => x.Name);
-        using var excelPackage = new ExcelPackage();
+#pragma warning disable CA2000 // Object is retured and disposed by the caller
+        var excelPackage = new ExcelPackage();
+#pragma warning restore CA2000
         IReadOnlyList<IExcelDataSource> newDataSources = newDataProvider.GetDataSources();
+        if (!newDataSources.Any(x => oldDataSourcesDict.ContainsKey(x.Name)))
+        {
+            throw new InvalidOperationException("The excel files to compare must contain worksheets with the same name!");
+        }
         foreach (IExcelDataSource newDataSource in newDataSources)
         {
             if (oldDataSourcesDict.TryGetValue(newDataSource.Name, out IExcelDataSource? oldDataSource))
@@ -447,6 +452,17 @@ public class ExcelDiffBuilder
             }
         }
         postProcessingAction?.Invoke(excelPackage);
+        return excelPackage;
+    }
+
+    /// <summary>
+    /// Builds and saves the Excel comparison output to the specified file path, with an optional post-processing action.
+    /// </summary>
+    /// <param name="outputFilePath">The path where the output file should be saved.</param>
+    /// <param name="postProcessingAction">An optional action to perform additional processing on the <see cref="ExcelPackage"/>.</param>
+    public void Build(string outputFilePath, Action<ExcelPackage>? postProcessingAction = null)
+    {
+        using ExcelPackage excelPackage = Build(postProcessingAction);
         excelPackage.SaveAs(new FileInfo(outputFilePath));
     }
 }

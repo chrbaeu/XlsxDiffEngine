@@ -1,10 +1,12 @@
-﻿//namespace ExcelDiffTest;
+﻿using OfficeOpenXml;
 
-//public class Setup
-//{
-//    [Before(Assembly)]
-//    public static async Task Initialize()
-//    {
+namespace ExcelDiffTest;
 
-//    }
-//}
+public class Setup
+{
+    [Before(Assembly)]
+    public static async Task Initialize()
+    {
+        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+    }
+}

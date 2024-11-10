@@ -8,15 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EPPlus" Version="7.4.1" />
+    <PackageReference Include="EPPlus" Version="7.4.*" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="TUnit" VersionOverride="$(TUnitVersion)" Version="0.2.15" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Data\SimpleDoc\" />
   </ItemGroup>
 
   <ItemGroup>

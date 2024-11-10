@@ -19,7 +19,7 @@ public class ExcelDiffXlsxFileConfigBuilder
     /// <returns>The current builder instance, allowing for method chaining.</returns>
     public ExcelDiffXlsxFileConfigBuilder SetOldFile(string filePath, Action<ExcelPackage>? callback = null)
     {
-        oldFile = oldFile with { FileInfo = new(filePath), PrepareExcelPackageCallback = callback };
+        oldFile = new(filePath) { PrepareExcelPackageCallback = callback };
         return this;
     }
 
@@ -31,7 +31,33 @@ public class ExcelDiffXlsxFileConfigBuilder
     /// <returns>The current builder instance, allowing for method chaining.</returns>
     public ExcelDiffXlsxFileConfigBuilder SetNewFile(string filePath, Action<ExcelPackage>? callback = null)
     {
-        newFile = newFile with { FileInfo = new(filePath), PrepareExcelPackageCallback = callback };
+        newFile = new(filePath) { PrepareExcelPackageCallback = callback };
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the file path and optional callback for the "old" file in the comparison.
+    /// </summary>
+    /// <param name="stream">The stream containing the new Excel file data.</param>
+    /// <param name="fileName">The name of the new Excel file.</param>
+    /// <param name="callback">An optional callback to execute with the <see cref="ExcelPackage"/> for additional configuration.</param>
+    /// <returns>The current builder instance, allowing for method chaining.</returns>
+    public ExcelDiffXlsxFileConfigBuilder SetOldFile(Stream stream, string fileName, Action<ExcelPackage>? callback = null)
+    {
+        oldFile = new(stream, fileName) { PrepareExcelPackageCallback = callback };
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the file path and optional callback for the "new" file in the comparison.
+    /// </summary>
+    /// <param name="stream">The stream containing the new Excel file data.</param>
+    /// <param name="fileName">The name of the new Excel file.</param>
+    /// <param name="callback">An optional callback to execute with the <see cref="ExcelPackage"/> for additional configuration.</param>
+    /// <returns>The current builder instance, allowing for method chaining.</returns>
+    public ExcelDiffXlsxFileConfigBuilder SetNewFile(Stream stream, string fileName, Action<ExcelPackage>? callback = null)
+    {
+        newFile = new(stream, fileName) { PrepareExcelPackageCallback = callback };
         return this;
     }
 
@@ -127,16 +153,31 @@ public class ExcelDiffXlsxFileConfigBuilder
     }
 
     /// <summary>
+    /// Indicates whether to recalculate formulas in the Excel files before comparison.
+    /// </summary>
+    /// <param name="recalculateFormulas">True to recalculate formulas; false otherwise.</param>
+    /// <returns>The current builder instance, allowing for method chaining.</returns>
+    public ExcelDiffXlsxFileConfigBuilder RecalculateFormulas(bool recalculateFormulas = true)
+    {
+        oldFile = oldFile with { RecalculateFormulas = recalculateFormulas };
+        newFile = newFile with { RecalculateFormulas = recalculateFormulas };
+        return this;
+    }
+
+    /// <summary>
     /// Builds and returns the configured <see cref="XlsxFileInfo"/> instances for the old and new files.
     /// If no merged worksheet name has been set, it defaults to the file name of the new file (without extension).
     /// </summary>
     /// <returns>A tuple containing the configured old and new <see cref="XlsxFileInfo"/> instances.</returns>
     internal (XlsxFileInfo oldFile, XlsxFileInfo newFile) Build()
     {
-        if (oldFile.MergedWorksheetName is null && newFile.MergedWorksheetName is null)
+        if (oldFile.MergedWorksheetName is null)
         {
-            oldFile = oldFile with { MergedWorksheetName = Path.GetFileNameWithoutExtension(newFile.FileInfo.Name) };
-            newFile = newFile with { MergedWorksheetName = Path.GetFileNameWithoutExtension(newFile.FileInfo.Name) };
+            oldFile = oldFile with { MergedWorksheetName = Path.GetFileNameWithoutExtension(oldFile.DocumentName) };
+        }
+        if (newFile.MergedWorksheetName is null)
+        {
+            newFile = newFile with { MergedWorksheetName = Path.GetFileNameWithoutExtension(newFile.DocumentName) };
         }
         return (oldFile, newFile);
     }

@@ -1,11 +1,8 @@
-Coming soon ...
-
 # ExcelDiffEngine
 
-ExcelDiffEngine is a simple C# library for  comparing Excel (.xlsx) files. It provides powerful configuration options to customize data comparisons, allowing you to generate annotated output files that highlight all changes, additions, and removals.
+ExcelDiffEngine is a simple C# library for comparing Excel (.xlsx) files. It provides powerful configuration options to customize data comparisons, allowing you to generate annotated output files that highlight all changes, additions, and removals. (For reading and writing Excel files, the [EPPlus](https://github.com/EPPlusSoftware/EPPlus) library is used.)
 
-
-![Logo](https://github.com/chrbaeu/ExcelDiffEngine/blob/main/ExcelDiff/Icon.png?raw=true)
+![Logo](https://raw.githubusercontent.com/chrbaeu/ExcelDiffEngine/refs/heads/main/ExcelDiff/Icon.png)
 
 ## Features
 
@@ -19,7 +16,7 @@ ExcelDiffEngine is a simple C# library for  comparing Excel (.xlsx) files. It pr
 Add ExcelDiffEngine to your project via NuGet:
 
 ```bash
-dotnet add package ExcelDiffEngine
+dotnet add package Chriffizient.ExcelDiffEngine
 ```
 
 ## Getting Started
@@ -36,17 +33,17 @@ Use the `Build` method to save an annotated comparison Excel output file.
 using ExcelDiffEngine;  
 using OfficeOpenXml;  
   
-var builder = new ExcelDiffBuilder()  
-    .AddFiles(config =>  
-    {  
-        config  
-            .SetOldFile("OldFile.xlsx")  
-            .SetNewFile("NewFile.xlsx");  
-    })  
-    .SetKeyColumns("ID") // Set key column(s) to identify rows  
-    .Build("ComparisonOutput.xlsx");  
+new ExcelDiffBuilder()
+    .AddFiles(x => x
+        .SetOldFile(oldFileStream, "OldFile.xlsx")
+        .SetNewFile(newFileStream, "NewFile.xlsx")
+        )
+    .SetKeyColumns("ID") // Optional
+    .Build("ComparisonOutput.xlsx");
 ```
+
+For more examples, take a look at the tests.
 
 ## Dependencies
 
-- [EPPlus](https://github.com/EPPlusSoftware/EPPlus) - for Excel file handling in .NET.
+- [EPPlus](https://github.com/EPPlusSoftware/EPPlus) - for Excel file handling in .NET (Depending on the usage, a license can be required)

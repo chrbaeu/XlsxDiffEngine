@@ -42,7 +42,7 @@ public sealed class XlsxDataProvider : IDisposable
     public XlsxDataProvider(ICollection<XlsxFileInfo> xlsxFiles, XlsxDataProviderConfig? config = null)
     {
         xlsxFileInfos = xlsxFiles;
-        excelPackagesDict = xlsxFiles.ToDictionary(x => x, x => new ExcelPackage(x.FileInfo));
+        excelPackagesDict = xlsxFiles.ToDictionary(x => x, x => x.CreateExcelPackage());
         this.config = config ?? new XlsxDataProviderConfig();
         excelDataSourceConfig = new()
         {
@@ -93,6 +93,10 @@ public sealed class XlsxDataProvider : IDisposable
         List<IExcelDataSource> dataSources = [];
         ExcelPackage excelPackage = excelPackagesDict[xlsxFileInfo];
         xlsxFileInfo.PrepareExcelPackageCallback?.Invoke(excelPackage);
+        if (xlsxFileInfo.RecalculateFormulas)
+        {
+            excelPackage.Workbook.Calculate();
+        }
         HashSet<string>? workSheetNames = config.WorksheetNames is not null ? new(config.WorksheetNames, excelDataSourceConfig.StringComparer) : null;
         ExcelDataSourceConfig xlsxFileDataSourceConfig = excelDataSourceConfig;
         if (config.DocumentNameColumnName is not null)
@@ -100,7 +104,7 @@ public sealed class XlsxDataProvider : IDisposable
             xlsxFileDataSourceConfig = excelDataSourceConfig with
             {
                 CustomColumnName = config.DocumentNameColumnName,
-                CustomColumnValue = xlsxFileInfo.DocumentName ?? xlsxFileInfo.FileInfo.Name
+                CustomColumnValue = xlsxFileInfo.DocumentName
             };
         }
         Dictionary<string, XlsxWorksheetInfo> wsInfoDict = xlsxFileInfo.WorksheetInfos.ToDictionary(x => x.Name, excelDataSourceConfig.StringComparer);
@@ -124,7 +128,7 @@ public sealed class XlsxDataProvider : IDisposable
         }
         if (config.MergeWorksheets)
         {
-            string name = xlsxFileInfo.MergedWorksheetName ?? xlsxFileInfo.FileInfo.Name;
+            string name = xlsxFileInfo.MergedWorksheetName ?? xlsxFileInfo.DocumentName;
             return [new MergedExcelDataSource(name, dataSources, excelDataSourceConfig)];
         }
         return dataSources;

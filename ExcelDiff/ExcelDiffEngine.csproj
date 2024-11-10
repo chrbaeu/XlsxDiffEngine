@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <AnalysisMode>all</AnalysisMode>
-    <Version>0.0.1</Version>
+    <Version>0.1.0</Version>
     <Title>ExcelDiffEngine</Title>
     <Description>A simple library to generate excel documents representing the diff of excel documents baed on EPPlus.</Description>
     <PackageId>Chriffizient.ExcelDiffEngine</PackageId>
@@ -20,22 +20,25 @@
     <RepositoryType>git</RepositoryType>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Deterministic>true</Deterministic>
-    <Optimize>true</Optimize>
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     <EmbedAllSources>true</EmbedAllSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <PackageReadmeFile>Readme.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EPPlus" Version="7.4.1" />
+    <InternalsVisibleTo Include="ExcelDiffTest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EPPlus" Version="7.4.*" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="Icon.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-      <Pack>True</Pack>
+      <Pack>true</Pack>
       <PackagePath>\</PackagePath>
     </None>
     <Content Include="..\Readme.md">
