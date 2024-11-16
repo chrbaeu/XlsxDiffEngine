@@ -36,6 +36,7 @@ internal static class ExcelTestHelper
                                              $"{worksheetB.Dimension?.Rows}x{worksheetB.Dimension?.Columns}.");
             }
 
+            if (worksheetA.Dimension is null) { return; }
             for (int row = 1; row <= worksheetA.Dimension.Rows; row++)
             {
                 for (int col = 1; col <= worksheetA.Dimension.Columns; col++)

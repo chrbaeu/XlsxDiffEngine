@@ -28,7 +28,7 @@ public class ExcelDiffBuilder
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder AddFiles(Action<ExcelDiffXlsxFileConfigBuilder> builderAction)
     {
-        ArgumentNullException.ThrowIfNull(builderAction);
+        ArgumentNullThrowHelper.ThrowIfNull(builderAction);
         ExcelDiffXlsxFileConfigBuilder configBuilder = new();
         builderAction.Invoke(configBuilder);
         (XlsxFileInfo oldFile, XlsxFileInfo newFile) = configBuilder.Build();
