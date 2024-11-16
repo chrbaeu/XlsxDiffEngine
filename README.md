@@ -15,6 +15,8 @@ ExcelDiffEngine is a simple C# library for comparing Excel (.xlsx) files. It pro
 
 Add ExcelDiffEngine to your project via NuGet:
 
+[Chriffizient.ExcelDiffEngine on NuGet](https://www.nuget.org/packages/Chriffizient.ExcelDiffEngine)
+
 ```bash
 dotnet add package Chriffizient.ExcelDiffEngine
 ```

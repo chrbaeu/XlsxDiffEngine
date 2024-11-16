@@ -1,12 +1,10 @@
-﻿using ExcelDiffEngine;
-
-namespace ExcelDiffTest;
+﻿namespace ExcelDiffTest;
 
 internal class ExcelDiffBuilderRulesTests
 {
     private readonly ExcelDiffBuilder excelDiffBuilder = new();
 
-    private readonly object[][] content1 = [
+    private readonly object?[][] content1 = [
         ["Title", "Value"],
         ["A", 100.00],
         ["B", 100.00],
@@ -14,7 +12,7 @@ internal class ExcelDiffBuilderRulesTests
         ["D", 100.00],
     ];
 
-    private readonly object[][] content2 = [
+    private readonly object?[][] content2 = [
         ["Title", "Value"],
         ["A", 120.00],
         ["B", 120.00],
@@ -23,18 +21,18 @@ internal class ExcelDiffBuilderRulesTests
     ];
 
     [Test]
-    public async Task Diff_WithNumberFormatRule()
+    public void Diff_WithNumberFormatRule()
     {
         // Arrange
-        using var oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content1);
-        using var newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content1);
+        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content1);
+        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content1);
         newExcelPackage.Workbook.Worksheets[0].Cells[3, 2].Value = 100.04;
         newExcelPackage.Workbook.Worksheets[0].Cells[4, 2].Value = 100.06;
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
         // Act
-        var result = excelDiffBuilder
+        using ExcelPackage result = excelDiffBuilder
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
                 .SetNewFile(newFileStream, "NewFile.xlsx")
@@ -45,7 +43,7 @@ internal class ExcelDiffBuilderRulesTests
             .Build();
 
         // Assert
-        var expectedResult = ExcelTestHelper.ConvertToExcelPackage([
+        using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Title", "Title", "Value", "Value"],
             ["A", "A", 100.0, 100.0],
             ["B", "B", 100.0, 100.0],
@@ -54,22 +52,23 @@ internal class ExcelDiffBuilderRulesTests
             ]);
         expectedResult.Workbook.Worksheets[0].Cells[2, 3, 5, 4].Style.Numberformat.Format = "0.0";
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[3, 3, 4, 4], DefaultCellStyles.ChangedCell);
-        await Assert.That(ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true)).IsTrue();
+
+        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public async Task Diff_WithNumberFormatRuleAndTextCompare()
+    public void Diff_WithNumberFormatRuleAndTextCompare()
     {
         // Arrange
-        using var oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content1);
-        using var newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content1);
+        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content1);
+        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content1);
         newExcelPackage.Workbook.Worksheets[0].Cells[3, 2].Value = 100.04;
         newExcelPackage.Workbook.Worksheets[0].Cells[4, 2].Value = 100.06;
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
         // Act
-        var result = excelDiffBuilder
+        using ExcelPackage result = excelDiffBuilder
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
                 .SetNewFile(newFileStream, "NewFile.xlsx")
@@ -81,7 +80,7 @@ internal class ExcelDiffBuilderRulesTests
             .Build();
 
         // Assert
-        var expectedResult = ExcelTestHelper.ConvertToExcelPackage([
+        using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Title", "Title", "Value", "Value"],
             ["A", "A", 100.0, 100.0],
             ["B", "B", 100.0, 100.0],
@@ -90,20 +89,21 @@ internal class ExcelDiffBuilderRulesTests
             ]);
         expectedResult.Workbook.Worksheets[0].Cells[2, 3, 5, 4].Style.Numberformat.Format = "0.0";
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[4, 3, 4, 4], DefaultCellStyles.ChangedCell);
-        await Assert.That(ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true)).IsTrue();
+
+        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public async Task Diff_WithMultiplyRule()
+    public void Diff_WithMultiplyRule()
     {
         // Arrange
-        using var oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content1);
-        using var newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content2);
+        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content1);
+        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content2);
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
         // Act
-        var result = excelDiffBuilder
+        using ExcelPackage result = excelDiffBuilder
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
                 .SetNewFile(newFileStream, "NewFile.xlsx")
@@ -114,7 +114,7 @@ internal class ExcelDiffBuilderRulesTests
             .Build();
 
         // Assert
-        var expectedResult = ExcelTestHelper.ConvertToExcelPackage([
+        using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Title", "Title", "Value", "Value"],
             ["A", "A", 120.00, 120.00],
             ["B", "B", 120.00, 120.00],
@@ -122,20 +122,21 @@ internal class ExcelDiffBuilderRulesTests
             ["D", "D", 120.00, 120.00],
             ]);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[4, 3, 4, 4], DefaultCellStyles.ChangedCell);
-        await Assert.That(ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true)).IsTrue();
+
+        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public async Task Diff_WithFormulaRule()
+    public void Diff_WithFormulaRule()
     {
         // Arrange
-        using var oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content1);
-        using var newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content2);
+        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content1);
+        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content2);
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
         // Act
-        var result = excelDiffBuilder
+        using ExcelPackage result = excelDiffBuilder
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
                 .SetNewFile(newFileStream, "NewFile.xlsx")
@@ -146,7 +147,7 @@ internal class ExcelDiffBuilderRulesTests
             .Build();
 
         // Assert
-        var expectedResult = ExcelTestHelper.ConvertToExcelPackage([
+        using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Title", "Title", "Value", "Value"],
             ["A", "A", 120.00, 120.00],
             ["B", "B", 120.00, 120.00],
@@ -154,21 +155,22 @@ internal class ExcelDiffBuilderRulesTests
             ["D", "D", 120.00, 120.00],
             ]);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[4, 3, 4, 4], DefaultCellStyles.ChangedCell);
-        await Assert.That(ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true)).IsTrue();
+
+        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public async Task Diff_WithRegexReplaceRule()
+    public void Diff_WithRegexReplaceRule()
     {
         // Arrange
-        using var oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content1);
-        using var newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content1);
+        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content1);
+        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content1);
         newExcelPackage.Workbook.Worksheets[0].Cells[4, 2].Value = 200.00;
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
         // Act
-        var result = excelDiffBuilder
+        using ExcelPackage result = excelDiffBuilder
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
                 .SetNewFile(newFileStream, "NewFile.xlsx")
@@ -179,7 +181,7 @@ internal class ExcelDiffBuilderRulesTests
             .Build();
 
         // Assert
-        var expectedResult = ExcelTestHelper.ConvertToExcelPackage([
+        using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Title", "Title", "Value", "Value"],
             ["A", "A", 100.00, 100.00],
             ["X", "X", 100.00, 100.00],
@@ -187,7 +189,8 @@ internal class ExcelDiffBuilderRulesTests
             ["D", "D", 100.00, 100.00],
             ]);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[4, 3, 4, 4], DefaultCellStyles.ChangedCell);
-        await Assert.That(ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true)).IsTrue();
+
+        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
     }
 
 }

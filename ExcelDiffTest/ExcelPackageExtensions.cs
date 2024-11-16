@@ -1,6 +1,4 @@
-﻿using OfficeOpenXml;
-
-namespace ExcelDiffTest;
+﻿namespace ExcelDiffTest;
 
 internal static class ExcelPackageExtensions
 {
@@ -17,7 +15,7 @@ internal static class ExcelPackageExtensions
         ExcelWorksheet excelWorksheet = excelPackage.Workbook.Worksheets.Add(worksheetName);
         for (int row = 0; row < data.Length; row++)
         {
-            var rowData = data[row];
+            object?[] rowData = data[row];
             for (int column = 0; column < rowData.Length; column++)
             {
                 excelWorksheet.Cells[row + 1, column + 1].Value = rowData[column];

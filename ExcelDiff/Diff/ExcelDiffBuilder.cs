@@ -199,6 +199,8 @@ public class ExcelDiffBuilder
     /// <summary>
     /// Sets a comment to be added to the header columns of the new data in the comparison output.
     /// </summary>
+    /// <param name="newHeaderColumnComment">Comment text for new data header columns.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetNewHeaderColumnComment(string newHeaderColumnComment)
     {
         diffConfig = diffConfig with { NewHeaderColumnComment = newHeaderColumnComment };
@@ -208,6 +210,8 @@ public class ExcelDiffBuilder
     /// <summary>
     /// Sets a postfix for the header columns of the old data in the comparison output.
     /// </summary>
+    /// <param name="oldHeaderColumnPostfix">Postfix for old data header columns.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetOldHeaderColumnPostfix(string oldHeaderColumnPostfix)
     {
         diffConfig = diffConfig with { OldHeaderColumnPostfix = oldHeaderColumnPostfix };
@@ -217,6 +221,8 @@ public class ExcelDiffBuilder
     /// <summary>
     /// Sets a postfix for the header columns of the new data in the comparison output.
     /// </summary>
+    /// <param name="newHeaderColumnPostfix">Postfix for new data header columns.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetNewHeaderColumnPostfix(string newHeaderColumnPostfix)
     {
         diffConfig = diffConfig with { NewHeaderColumnPostfix = newHeaderColumnPostfix };
@@ -226,6 +232,8 @@ public class ExcelDiffBuilder
     /// <summary>
     /// Configures whether to ignore unchanged rows in the output.
     /// </summary>
+    /// <param name="ignoreUnchangedRows">Whether to ignore unchanged rows (default is true).</param>
+    /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder IgnoreUnchangedRows(bool ignoreUnchangedRows = true)
     {
         diffConfig = diffConfig with { IgnoreUnchangedRows = ignoreUnchangedRows };
@@ -235,6 +243,8 @@ public class ExcelDiffBuilder
     /// <summary>
     /// Sets a custom rule for determining if a row should be skipped during the comparison.
     /// </summary>
+    /// <param name="skipRowRule">The <see cref="SkipRowPredicate"/> to determine the rows to skip.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetSkipRowRule(SkipRowPredicate? skipRowRule)
     {
         diffConfig = diffConfig with { SkipRowRule = skipRowRule };
@@ -242,8 +252,65 @@ public class ExcelDiffBuilder
     }
 
     /// <summary>
+    /// Sets the style for headers in the comparison output.
+    /// </summary>
+    /// <param name="headerStyle">The <see cref="CellStyle"/> to apply to headers.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
+    public ExcelDiffBuilder SetHeaderStyle(CellStyle headerStyle)
+    {
+        diffConfig = diffConfig with { HeaderStyle = headerStyle };
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the style for rows that were removed in the comparison output.
+    /// </summary>
+    /// <param name="removedRowStyle">The <see cref="CellStyle"/> to apply to removed rows.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
+    public ExcelDiffBuilder SetRemovedRowStyle(CellStyle removedRowStyle)
+    {
+        diffConfig = diffConfig with { RemovedRowStyle = removedRowStyle };
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the style for rows that were added in the comparison output.
+    /// </summary>
+    /// <param name="addedRowStyle">The <see cref="CellStyle"/> to apply to added rows.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
+    public ExcelDiffBuilder SetAddedRowStyle(CellStyle addedRowStyle)
+    {
+        diffConfig = diffConfig with { AddedRowStyle = addedRowStyle };
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the style for cells with changes in the comparison output.
+    /// </summary>
+    /// <param name="changedCellStyle">The <see cref="CellStyle"/> to apply to changed cells.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
+    public ExcelDiffBuilder SetChangedCellStyle(CellStyle changedCellStyle)
+    {
+        diffConfig = diffConfig with { ChangedCellStyle = changedCellStyle };
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the style for key columns in rows with changes in the comparison output.
+    /// </summary>
+    /// <param name="changedRowKeyColumnsStyle">The <see cref="CellStyle"/> to apply to key columns in changed rows.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
+    public ExcelDiffBuilder SetChangedRowKeyColumnsStyle(CellStyle changedRowKeyColumnsStyle)
+    {
+        diffConfig = diffConfig with { ChangedRowKeyColumnsStyle = changedRowKeyColumnsStyle };
+        return this;
+    }
+
+    /// <summary>
     /// Configures whether comparisons should ignore case sensitivity.
     /// </summary>
+    /// <param name="ignoreCase">Whether to ignore case sensitivity (default is true).</param>
+    /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder IgnoreCase(bool ignoreCase = true)
     {
         diffConfig = diffConfig with { IgnoreCase = ignoreCase };
@@ -254,6 +321,8 @@ public class ExcelDiffBuilder
     /// <summary>
     /// Specifies whether multiple worksheets should be merged into one for the comparison.
     /// </summary>
+    /// <param name="mergeWorksheets">Whether to merge worksheets (default is true).</param>
+    /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder MergeWorkSheets(bool mergeWorksheets = true)
     {
         xlsxConfig = xlsxConfig with { MergeWorksheets = mergeWorksheets };
@@ -263,6 +332,8 @@ public class ExcelDiffBuilder
     /// <summary>
     /// Specifies whether multiple documents should be merged into one for the comparison.
     /// </summary>
+    /// <param name="mergeDocuments">Whether to merge documents (default is true).</param>
+    /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder MergeDocuments(bool mergeDocuments = true)
     {
         xlsxConfig = xlsxConfig with { MergeDocuments = mergeDocuments };
@@ -272,6 +343,8 @@ public class ExcelDiffBuilder
     /// <summary>
     /// Adds a column to the output containing the row numbers.
     /// </summary>
+    /// <param name="rowNumberColumnName">The name of the row number column.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder AddRowNumberAsColumn(string rowNumberColumnName = "RowNumber")
     {
         xlsxConfig = xlsxConfig with { RowNumberColumnName = rowNumberColumnName };
@@ -281,6 +354,8 @@ public class ExcelDiffBuilder
     /// <summary>
     /// Adds a column to the output containing the worksheet names.
     /// </summary>
+    /// <param name="worksheetColumnName">The name of the worksheet name column.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder AddWorksheetNameAsColumn(string worksheetColumnName = "WorksheetName")
     {
         xlsxConfig = xlsxConfig with { WorksheetNameColumnName = worksheetColumnName };
@@ -290,6 +365,8 @@ public class ExcelDiffBuilder
     /// <summary>
     /// Adds a column to the output containing the merged worksheet names.
     /// </summary>
+    /// <param name="mergedWorksheetColumnName">The name of the merged worksheet name column.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder AddMergedWorksheetNameAsColumn(string mergedWorksheetColumnName = "MergedWorksheetName")
     {
         xlsxConfig = xlsxConfig with { MergedWorksheetNameColumnName = mergedWorksheetColumnName };
@@ -299,6 +376,8 @@ public class ExcelDiffBuilder
     /// <summary>
     /// Adds a column to the output containing the document names.
     /// </summary>
+    /// <param name="documentNameColumnName">The name of the document name column.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder AddDocumentNameAsColumn(string documentNameColumnName = "DocumentName")
     {
         xlsxConfig = xlsxConfig with { DocumentNameColumnName = documentNameColumnName };
@@ -308,6 +387,8 @@ public class ExcelDiffBuilder
     /// <summary>
     /// Sets the name for the merged document.
     /// </summary>
+    /// <param name="mergedDocumentName">The name of the merged document.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetMergedDocumentName(string mergedDocumentName)
     {
         xlsxConfig = xlsxConfig with { MergedDocumentName = mergedDocumentName };
@@ -317,6 +398,7 @@ public class ExcelDiffBuilder
     /// <summary>
     /// Configures whether to hide columns representing old data.
     /// </summary>
+    /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder HideOldColumns()
     {
         hideOldColumns = true;
@@ -326,6 +408,8 @@ public class ExcelDiffBuilder
     /// <summary>
     /// Specifies columns to hide in the output.
     /// </summary>
+    /// <param name="columnsToHide">The names of the columns to hide.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder HideColumns(params string[] columnsToHide)
     {
         this.columnsToHide = columnsToHide;
@@ -335,6 +419,8 @@ public class ExcelDiffBuilder
     /// <summary>
     /// Specifies columns to display in the output.
     /// </summary>
+    /// <param name="columnsToShow">The names of the columns to show.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder ShowColumns(params string[] columnsToShow)
     {
         this.columnsToShow = columnsToShow;
@@ -344,6 +430,8 @@ public class ExcelDiffBuilder
     /// <summary>
     /// Sets custom headers for the output worksheet.
     /// </summary>
+    /// <param name="header">Header row strings.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetHeader(params string[] header)
     {
         this.header = header;
@@ -353,6 +441,8 @@ public class ExcelDiffBuilder
     /// <summary>
     /// Configures whether columns should automatically adjust to fit content.
     /// </summary>
+    /// <param name="autoFitColumns">Whether to auto-fit columns (default is true).</param>
+    /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetAutoFitColumns(bool autoFitColumns = true)
     {
         this.autoFitColumns = autoFitColumns;
@@ -362,6 +452,8 @@ public class ExcelDiffBuilder
     /// <summary>
     /// Configures whether an filter should be applied to the output worksheet.
     /// </summary>
+    /// <param name="autoFilter">Whether to apply an auto-filter (default is true).</param>
+    /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetAutoFilter(bool autoFilter = true)
     {
         this.autoFilter = autoFilter;
@@ -371,6 +463,8 @@ public class ExcelDiffBuilder
     /// <summary>
     /// Configures whether panes should be frozen in the output worksheet.
     /// </summary>
+    /// <param name="freezePanes">Whether to freeze panes (default is true).</param>
+    /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetFreezePanes(bool freezePanes = true)
     {
         this.freezePanes = freezePanes;
@@ -380,6 +474,9 @@ public class ExcelDiffBuilder
     /// <summary>
     /// Sets a custom width for a specific column in the output worksheet.
     /// </summary>
+    /// <param name="column">The column index (1-based) to set the width for.</param>
+    /// <param name="size">The width size for the column.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetColumnSize(int column, double size)
     {
         columnSizeDict[column] = size;
@@ -389,6 +486,8 @@ public class ExcelDiffBuilder
     /// <summary>
     /// Sets custom widths for multiple columns in the output worksheet.
     /// </summary>
+    /// <param name="sizes">Array of column widths for the output worksheet.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetColumnSizes(double[] sizes)
     {
         sizes ??= [];
@@ -403,6 +502,7 @@ public class ExcelDiffBuilder
     /// Builds the Excel comparison output, with an optional post-processing action.
     /// </summary>
     /// <param name="postProcessingAction">An optional action to perform additional processing on the <see cref="ExcelPackage"/>.</param>
+    /// <returns>The generated <see cref="ExcelPackage"/> containing the comparison output.</returns>
     public ExcelPackage Build(Action<ExcelPackage>? postProcessingAction = null)
     {
         StringComparer stringComparer = diffConfig.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
@@ -463,12 +563,13 @@ public class ExcelDiffBuilder
                 }
             }
             postProcessingAction?.Invoke(excelPackage);
-            return excelPackage;
+            ExcelPackage result = excelPackage;
+            excelPackage = null;
+            return result;
         }
-        catch
+        finally
         {
             excelPackage?.Dispose();
-            throw;
         }
     }
 

@@ -8,10 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EPPlus" Version="7.4.*" />
+    <Using Include="ExcelDiffEngine" />
+    <Using Include="OfficeOpenXml" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="EPPlus" Version="7.4.*" />
     <PackageReference Include="TUnit" VersionOverride="$(TUnitVersion)" Version="0.2.15" />
   </ItemGroup>
 
