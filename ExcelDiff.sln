@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelDiffUI", "ExcelDiffUI\ExcelDiffUI.csproj", "{653B3DDC-02EA-43A6-89F0-6909AD2FA2D3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{B33DA943-72A4-436F-9C43-77D7CFBBAC3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B33DA943-72A4-436F-9C43-77D7CFBBAC3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B33DA943-72A4-436F-9C43-77D7CFBBAC3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{653B3DDC-02EA-43A6-89F0-6909AD2FA2D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{653B3DDC-02EA-43A6-89F0-6909AD2FA2D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{653B3DDC-02EA-43A6-89F0-6909AD2FA2D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{653B3DDC-02EA-43A6-89F0-6909AD2FA2D3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
