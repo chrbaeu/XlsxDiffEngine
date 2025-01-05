@@ -342,7 +342,7 @@ internal class ExcelDiffBuilderBasicTests
                 .SetNewFile(newFileStream, "NewFile.xlsx")
                 .SetMergedWorksheetName("Test")
                 )
-            .MergeWorkSheets()
+            .MergeWorksheets()
             .AddMergedWorksheetNameAsColumn("MergedWorksheet")
             .Build();
 

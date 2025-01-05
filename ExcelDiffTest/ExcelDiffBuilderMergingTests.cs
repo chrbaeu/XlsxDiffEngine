@@ -77,7 +77,7 @@ internal class ExcelDiffBuilderMergingTests
                 .SetNewFile(newFileStream, "NewFile.xlsx")
                 .SetMergedWorksheetName("Merged")
                 )
-            .MergeWorkSheets()
+            .MergeWorksheets()
             .Build();
 
         // Assert

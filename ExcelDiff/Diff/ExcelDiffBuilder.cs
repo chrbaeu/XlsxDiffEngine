@@ -38,6 +38,21 @@ public class ExcelDiffBuilder
     }
 
     /// <summary>
+    /// Adds files for comparison, specifying the "old" and "new" <see cref="XlsxFileInfo"/>.
+    /// </summary>
+    /// <param name="oldFile">The <see cref="XlsxFileInfo"/> for the old data.</param>
+    /// <param name="newFile">The <see cref="XlsxFileInfo"/> for the old data.</param>
+    /// <returns></returns>
+    public ExcelDiffBuilder AddFiles(XlsxFileInfo oldFile, XlsxFileInfo newFile)
+    {
+        ArgumentNullThrowHelper.ThrowIfNull(oldFile);
+        ArgumentNullThrowHelper.ThrowIfNull(newFile);
+        oldFiles.Add(oldFile);
+        newFiles.Add(newFile);
+        return this;
+    }
+
+    /// <summary>
     /// Defines primary key columns used to match rows between compared files.
     /// </summary>
     /// <param name="keyColumns">Array of column names representing primary keys.</param>
@@ -323,7 +338,7 @@ public class ExcelDiffBuilder
     /// </summary>
     /// <param name="mergeWorksheets">Whether to merge worksheets (default is true).</param>
     /// <returns>The current builder instance for method chaining.</returns>
-    public ExcelDiffBuilder MergeWorkSheets(bool mergeWorksheets = true)
+    public ExcelDiffBuilder MergeWorksheets(bool mergeWorksheets = true)
     {
         xlsxConfig = xlsxConfig with { MergeWorksheets = mergeWorksheets };
         return this;
@@ -399,9 +414,9 @@ public class ExcelDiffBuilder
     /// Configures whether to hide columns representing old data.
     /// </summary>
     /// <returns>The current builder instance for method chaining.</returns>
-    public ExcelDiffBuilder HideOldColumns()
+    public ExcelDiffBuilder HideOldColumns(bool hideOldColumns = true)
     {
-        hideOldColumns = true;
+        this.hideOldColumns = hideOldColumns;
         return this;
     }
 
