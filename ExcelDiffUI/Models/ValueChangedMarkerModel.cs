@@ -1,5 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System.Drawing;
 
 namespace ExcelDiffUI.Models;
 
@@ -12,5 +11,5 @@ public sealed partial class ValueChangedMarkerModel : ObservableObject
     public partial double MinDeviationAbsolute { get; set; }
 
     [ObservableProperty]
-    public partial Color Color { get; set; }
+    public partial string Color { get; set; }
 }

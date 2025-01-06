@@ -67,12 +67,13 @@ public sealed class ExcelDiffWriter
                 }
                 ExcelRange? oldDstCell = worksheet.Cells[row, column];
                 object? oldValue = SetCell(oldDstCell, columnName, oldRow, ruleHandler, DataKind.Old);
+                string oldText = config.AddOldValueAsComment ? oldDstCell?.Text ?? "" : "";
                 if (config.ShowOldDataColumn) { column++; } else { oldDstCell = null; }
                 ExcelRange newDstCell = worksheet.Cells[row, column];
                 object? newValue = SetCell(newDstCell, columnName, newRow, ruleHandler, DataKind.New);
                 if (config.AddOldValueAsComment && oldValue?.ToString() != newValue?.ToString())
                 {
-                    string? comment = config.OldValueCommentPrefix is { } prefix ? prefix + oldValue?.ToString() : oldValue?.ToString();
+                    string? comment = config.OldValueCommentPrefix is { } prefix ? prefix + oldText : oldText;
                     _ = newDstCell.AddComment(comment ?? "");
                 }
                 column++;
@@ -157,8 +158,8 @@ public sealed class ExcelDiffWriter
 
     private object? SetCell(ExcelRange dstCell, string columnName, int? oldRow, ModificationRuleHandler ruleHandler, DataKind dataKind)
     {
-        (object? value, ExcelRange? srcCell) = GetValueAndCell(columnName, oldRow, dataKind == DataKind.Old ? oldDataSource : newDataSource);
-        if (dataKind != DataKind.Old || config.ShowOldDataColumn)
+        (object? value, ExcelRange? srcCell) = GetValueAndCell(columnName, oldRow, dataKind.HasFlag(DataKind.Old) ? oldDataSource : newDataSource);
+        if (!dataKind.HasFlag(DataKind.Old) || config.ShowOldDataColumn)
         {
             dstCell.Value = value;
             if (config.CopyCellStyle) { ExcelHelper.CopyCellStyle(dstCell, srcCell); }

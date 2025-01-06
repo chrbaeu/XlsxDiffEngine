@@ -312,4 +312,34 @@
   <data name="FileAddTimestampTooltip" xml:space="preserve">
     <value>Add date to the output file name</value>
   </data>
+  <data name="MergedWorksheetNameTooltip" xml:space="preserve">
+    <value>Name of the merged worksheet</value>
+  </data>
+  <data name="MergedDocumentNameTooltip" xml:space="preserve">
+    <value>Name of the merged document</value>
+  </data>
+  <data name="SaveAndRestoreInputFilePathsMg" xml:space="preserve">
+    <value>Do you want to save the selected file paths as well?</value>
+  </data>
+  <data name="MsgBoxTitleQuestion" xml:space="preserve">
+    <value>Question</value>
+  </data>
+  <data name="OptionsSettingsHeader" xml:space="preserve">
+    <value>General settings</value>
+  </data>
+  <data name="OptionsSettingsSkipEmptyRows" xml:space="preserve">
+    <value>Skip empty rows</value>
+  </data>
+  <data name="OptionsPluginsHeader" xml:space="preserve">
+    <value>Plugins</value>
+  </data>
+  <data name="OptionsModRuleTargetOldNonEmpty" xml:space="preserve">
+    <value>Old (non empty)</value>
+  </data>
+  <data name="OptionsModRuleTargetNewNonEmpty" xml:space="preserve">
+    <value>New (non empty)</value>
+  </data>
+  <data name="OptionsModRuleTargetAllNonEmpty" xml:space="preserve">
+    <value>All (non empty)</value>
+  </data>
 </root>

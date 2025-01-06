@@ -12,6 +12,10 @@ public sealed class ColorToBrushConverter : IValueConverter
         {
             return new SolidColorBrush(Color.FromArgb(color.A, color.R, color.G, color.B));
         }
+        if (value is string colorString)
+        {
+            return new SolidColorBrush((Color)ColorConverter.ConvertFromString(colorString));
+        }
         return null;
     }
 

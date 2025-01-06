@@ -41,6 +41,16 @@ public sealed partial class MainViewModel(
         IsBusy = true;
         try
         {
+            if (Options.DiffOptions.SaveAndRestoreInputFilePaths is null)
+            {
+                var result = dialogService.ShowMessageBox(this, localizer["MsgBoxTitleQuestion"], localizer["SaveAndRestoreInputFilePathsMg"], DialogButton.YesNo);
+                Options.DiffOptions.SaveAndRestoreInputFilePaths = result switch
+                {
+                    DialogResult.Yes => true,
+                    DialogResult.No => false,
+                    _ => null
+                };
+            }
             Directory.CreateDirectory(Path.Combine(userSettingsFolder, "Configs"));
             var path = dialogService.ShowSaveFileDialog(this, "Config (*.json)|*.json", Path.Combine(userSettingsFolder, "Configs"));
             if (!string.IsNullOrEmpty(path) && !await diffConfigService.Export(path))
@@ -97,6 +107,10 @@ public sealed partial class MainViewModel(
             {
                 dialogService.ShowMessageBox(this, localizer["MsgBoxTitleError"], localizer["DiffSaveFailedMsg"], DialogButton.OK);
             }
+        }
+        catch (Exception e)
+        {
+            dialogService.ShowMessageBox(this, localizer["MsgBoxTitleError"], localizer["DiffSaveFailedMsg"], DialogButton.OK);
         }
         finally
         {

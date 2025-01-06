@@ -1,5 +1,6 @@
 ﻿using CliFx;
 using ExcelDiffUI.Common;
+using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
@@ -24,6 +25,16 @@ internal static class Program
             ConsoleHelper.InitConsole();
             return new CliApplicationBuilder()
                 .AddCommandsFromThisAssembly()
+                .UseTypeActivator(commandTypes =>
+                {
+                    ServiceCollection services = new();
+                    services.AddAllServices();
+                    foreach (var commandType in commandTypes)
+                    {
+                        services.AddTransient(commandType);
+                    }
+                    return services.BuildServiceProvider();
+                })
                 .Build()
                 .RunAsync()
                 .AsTask()

@@ -5,6 +5,7 @@ using ExcelDiffUI.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
+using OfficeOpenXml;
 using Serilog;
 using System.Globalization;
 using System.Windows;
@@ -44,6 +45,7 @@ public partial class App : Application
         TranslateExtension.Localizer = appHost.Services.GetRequiredService<IStringLocalizer<Resources.Resources>>();
 
         // Create main window view model
+        appHost.Services.GetRequiredService<DiffConfigService>().Reset();
         MainWindowViewModel vm = appHost.Services.GetRequiredService<MainWindowViewModel>();
         await appHost.Services.GetRequiredService<WindowStateSettingsService>().TryToRestoreWindowStateAsync(vm.WindowState);
 

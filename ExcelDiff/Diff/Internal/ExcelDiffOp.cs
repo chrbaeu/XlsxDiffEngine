@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Data;
+using System.Globalization;
 using System.Text;
 
 namespace ExcelDiffEngine;
@@ -78,14 +79,23 @@ internal sealed class ExcelDiffOp
     private List<DataKey> GetDataKeys(IExcelDataSource dataSource)
     {
         List<DataKey> dataKeys = [];
+        HashSet<string> primaryKeySet = [];
         for (int row = 1; row <= dataSource.DataRows; row++)
         {
             if (config.SkipRowRule is not null && config.SkipRowRule(dataSource, row)) { continue; }
-            dataKeys.Add(new DataKey(
+            var dataKey = new DataKey(
                 GetKey(dataSource, row, config.KeyColumns),
                 GetKey(dataSource, row, config.SecondaryKeyColumns),
                 config.GroupKeyColumns.Count > 0 ? GetKey(dataSource, row, config.GroupKeyColumns) : "",
-                row));
+                row);
+            if (primaryKeySet.Contains(dataKey.PrimaryKey))
+            {
+                int i = 1;
+                for (; primaryKeySet.Contains($"@+{i}{dataKey.PrimaryKey}"); i++) { }
+                dataKey = dataKey with { PrimaryKey = $"@+{i}{dataKey.PrimaryKey}" };
+            }
+            primaryKeySet.Add(dataKey.PrimaryKey);
+            dataKeys.Add(dataKey);
         }
         return dataKeys;
     }

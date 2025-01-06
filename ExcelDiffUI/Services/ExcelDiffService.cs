@@ -1,38 +1,52 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using ExcelDiffEngine;
+using ExcelDiffEngine.Diff;
 using ExcelDiffUI.Models;
+using OfficeOpenXml;
+using System.Drawing;
 using System.IO;
 
 namespace ExcelDiffUI.Services;
 
-public sealed partial class ExcelDiffService : ObservableObject
+public sealed partial class ExcelDiffService(
+    DiffConfigModel optionsModel,
+    PluginService pluginService
+    ) : ObservableObject
 {
-    private readonly DiffConfigModel optionsModel;
-    private readonly OldFileConfigModel oldFileConfig;
-    private readonly NewFileConfigModel newFileConfig;
-    private readonly OutputFileConfigModel outputFileConfig;
-
-    public ExcelDiffService(
-        DiffConfigModel optionsModel
-        )
-    {
-        this.optionsModel = optionsModel;
-        this.oldFileConfig = optionsModel.OldFileConfig;
-        this.newFileConfig = optionsModel.NewFileConfig;
-        this.outputFileConfig = optionsModel.OutputFileConfig;
-    }
-
     public bool SaveDiff()
     {
-        if (oldFileConfig.IsFolderConfig || newFileConfig.IsFolderConfig)
+        if (optionsModel.OldFileConfig.IsFolderConfig || optionsModel.NewFileConfig.IsFolderConfig)
         {
         }
 
-        if (!oldFileConfig.IsExisitingFile() || !newFileConfig.IsExisitingFile() || !oldFileConfig.IsValidPath()) { return false; }
-        var oldFileInfo = new XlsxFileInfo(oldFileConfig.FilePath) { FromRow = oldFileConfig.StartRow, FromColumn = oldFileConfig.StartColumn };
-        var newFileInfo = new XlsxFileInfo(newFileConfig.FilePath) { FromRow = newFileConfig.StartRow, FromColumn = newFileConfig.StartColumn };
+        if (!optionsModel.OldFileConfig.IsExisitingFile() || !optionsModel.NewFileConfig.IsExisitingFile() || !optionsModel.OutputFileConfig.IsValidPath()) { return false; }
+        Action<ExcelPackage>? prepareAction = x =>
+        {
+            foreach (var plugin in optionsModel.Plugins)
+            {
+                pluginService.Plugins.Where(p => p.Name == plugin).FirstOrDefault()?.OnExcelPackageLoading(optionsModel, x);
+            }
+        };
+        var oldFileInfo = new XlsxFileInfo(optionsModel.OldFileConfig.FilePath)
+        {
+            FromRow = optionsModel.OldFileConfig.StartRow,
+            FromColumn = optionsModel.OldFileConfig.StartColumn,
+            MergedWorksheetName = string.IsNullOrWhiteSpace(optionsModel.MergedWorksheetName) ? null : optionsModel.MergedWorksheetName,
+            PrepareExcelPackageCallback = prepareAction,
+        };
+        var newFileInfo = new XlsxFileInfo(optionsModel.NewFileConfig.FilePath)
+        {
+            FromRow = optionsModel.NewFileConfig.StartRow,
+            FromColumn = optionsModel.NewFileConfig.StartColumn,
+            MergedWorksheetName = string.IsNullOrWhiteSpace(optionsModel.MergedWorksheetName) ? null : optionsModel.MergedWorksheetName,
+            PrepareExcelPackageCallback = prepareAction,
+        };
         ExcelDiffBuilder builder = new ExcelDiffBuilder()
             .AddFiles(oldFileInfo, newFileInfo);
+        if (optionsModel.SkipEmptyRows)
+        {
+            builder.SetSkipRowRule(SkipRules.SkipEmptyRows);
+        }
         if (optionsModel.AddRowNumberColumn)
         {
             builder.AddRowNumberAsColumn(optionsModel.RowNumberColumnName);
@@ -58,7 +72,7 @@ public sealed partial class ExcelDiffService : ObservableObject
         builder.MergeDocuments(optionsModel.MergeDocuments);
         foreach (var valueChangedMaker in optionsModel.ValueChangedMarkers)
         {
-            CellStyle cellStyle = new() { BackgroundColor = valueChangedMaker.Color };
+            CellStyle cellStyle = new() { BackgroundColor = ColorTranslator.FromHtml(valueChangedMaker.Color) };
             builder.AddValueChangedMarker(valueChangedMaker.MinDeviationInPercent, valueChangedMaker.MinDeviationAbsolute, cellStyle);
         }
         foreach (var modificationRuleModel in optionsModel.ModificationRules)
@@ -68,7 +82,47 @@ public sealed partial class ExcelDiffService : ObservableObject
                 modificationRuleModel.Target.Value, modificationRuleModel.AdditionalValue);
             builder.AddModificationRules(modificationRule);
         }
-        builder.Build(GetOutputFileName());
+        var keyColumns = optionsModel.Columns.Where(x => x.Mode == ColumnMode.Key).Select(x => x.Name).ToArray();
+        if (keyColumns.Length > 0)
+        {
+            builder.SetKeyColumns(keyColumns);
+        }
+        var secondaryKeyColumns = optionsModel.Columns.Where(x => x.Mode == ColumnMode.SecondaryKey).Select(x => x.Name).ToArray();
+        if (secondaryKeyColumns.Length > 0)
+        {
+            builder.SetSecondaryKeyColumns(secondaryKeyColumns);
+        }
+        var groupKeyColumns = optionsModel.Columns.Where(x => x.Mode == ColumnMode.GroupKey).Select(x => x.Name).ToArray();
+        if (groupKeyColumns.Length > 0)
+        {
+            builder.SetGroupKeyColumns(groupKeyColumns);
+        }
+        var columnsToTextCompareOnly = optionsModel.Columns.Where(x => x.Mode == ColumnMode.TextCompare).Select(x => x.Name).ToArray();
+        if (columnsToTextCompareOnly.Length > 0)
+        {
+            builder.SetColumnsToTextCompareOnly(columnsToTextCompareOnly);
+        }
+        var columnsToIngore = optionsModel.Columns.Where(x => x.Mode == ColumnMode.Ignore).Select(x => x.Name).ToArray();
+        if (columnsToIngore.Length > 0)
+        {
+            builder.SetColumnsToIgnore(columnsToIngore);
+        }
+        var columnsToOmit = optionsModel.Columns.Where(x => x.Mode == ColumnMode.Omit).Select(x => x.Name).ToArray();
+        if (columnsToOmit.Length > 0)
+        {
+            builder.SetColumnsToOmit(columnsToOmit);
+        }
+        foreach (var plugin in optionsModel.Plugins)
+        {
+            pluginService.Plugins.Where(p => p.Name == plugin).FirstOrDefault()?.OnDiffCreation(optionsModel, builder);
+        }
+        builder.Build(GetOutputFileName(), x =>
+        {
+            foreach (var plugin in optionsModel.Plugins)
+            {
+                pluginService.Plugins.Where(p => p.Name == plugin).FirstOrDefault()?.OnExcelPackageSaving(optionsModel, x);
+            }
+        });
         return true;
     }
 
@@ -76,25 +130,25 @@ public sealed partial class ExcelDiffService : ObservableObject
     {
         string fileName = "Diff";
         string? path;
-        if (outputFileConfig.IsFolderConfig)
+        if (optionsModel.OutputFileConfig.IsFolderConfig)
         {
-            path = outputFileConfig.FilePath;
-            if (oldFileConfig.IsValidPath() && newFileConfig.IsValidPath())
+            path = optionsModel.OutputFileConfig.FilePath;
+            if (optionsModel.OldFileConfig.IsValidPath() && optionsModel.NewFileConfig.IsValidPath())
             {
-                var oldFileName = Path.GetFileNameWithoutExtension(oldFileConfig.FilePath);
-                var newFileName = Path.GetFileNameWithoutExtension(newFileConfig.FilePath);
+                var oldFileName = Path.GetFileNameWithoutExtension(optionsModel.OldFileConfig.FilePath);
+                var newFileName = Path.GetFileNameWithoutExtension(optionsModel.NewFileConfig.FilePath);
                 fileName = $"{oldFileName}_vs_{newFileName}";
             }
         }
         else
         {
-            path = Path.GetDirectoryName(oldFileConfig.FilePath);
-            if (oldFileConfig.IsValidPath())
+            path = Path.GetDirectoryName(optionsModel.OldFileConfig.FilePath);
+            if (optionsModel.OldFileConfig.IsValidPath())
             {
-                fileName = Path.GetFileNameWithoutExtension(oldFileConfig.FilePath);
+                fileName = Path.GetFileNameWithoutExtension(optionsModel.OldFileConfig.FilePath);
             }
         }
-        if (outputFileConfig.AddDateTime)
+        if (optionsModel.OutputFileConfig.AddDateTime)
         {
             fileName += $"_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}";
         }
@@ -103,9 +157,28 @@ public sealed partial class ExcelDiffService : ObservableObject
 
     public List<string> GetColumnNames()
     {
+        Action<ExcelPackage>? prepareAction = x =>
+        {
+            foreach (var plugin in optionsModel.Plugins)
+            {
+                pluginService.Plugins.Where(p => p.Name == plugin).FirstOrDefault()?.OnExcelPackageLoading(optionsModel, x);
+            }
+        };
+        var oldFileInfo = optionsModel.OldFileConfig.IsExisitingFile() ? new XlsxFileInfo(optionsModel.OldFileConfig.FilePath)
+        {
+            FromRow = optionsModel.OldFileConfig.StartRow,
+            FromColumn = optionsModel.OldFileConfig.StartColumn,
+            MergedWorksheetName = string.IsNullOrWhiteSpace(optionsModel.MergedWorksheetName) ? null : optionsModel.MergedWorksheetName,
+            PrepareExcelPackageCallback = prepareAction,
+        } : null;
+        var newFileInfo = optionsModel.NewFileConfig.IsExisitingFile() ? new XlsxFileInfo(optionsModel.NewFileConfig.FilePath)
+        {
+            FromRow = optionsModel.NewFileConfig.StartRow,
+            FromColumn = optionsModel.NewFileConfig.StartColumn,
+            MergedWorksheetName = string.IsNullOrWhiteSpace(optionsModel.MergedWorksheetName) ? null : optionsModel.MergedWorksheetName,
+            PrepareExcelPackageCallback = prepareAction,
+        } : null;
         List<string> columns = [];
-        XlsxFileInfo oldFileInfo = oldFileConfig.IsExisitingFile() ? new(oldFileConfig.FilePath) { FromRow = oldFileConfig.StartRow, FromColumn = oldFileConfig.StartColumn } : null;
-        XlsxFileInfo newFileInfo = newFileConfig.IsExisitingFile() ? new(newFileConfig.FilePath) { FromRow = newFileConfig.StartRow, FromColumn = newFileConfig.StartColumn } : null;
         foreach (XlsxFileInfo xlsxFileInfo in new XlsxFileInfo?[] { newFileInfo, oldFileInfo }.OfType<XlsxFileInfo>())
         {
             using XlsxDataProvider xlsxDataProvider = new(xlsxFileInfo);
@@ -117,6 +190,6 @@ public sealed partial class ExcelDiffService : ObservableObject
                 }
             }
         }
-        return columns;
+        return columns.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
     }
 }

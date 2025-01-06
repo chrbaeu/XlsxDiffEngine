@@ -199,6 +199,9 @@
                                                 <ComboBoxItem Content="{s:Translate OptionsModRuleTargetOld}" Tag="{x:Static excelDiffEngine:DataKind.Old}" />
                                                 <ComboBoxItem Content="{s:Translate OptionsModRuleTargetNew}" Tag="{x:Static excelDiffEngine:DataKind.New}" />
                                                 <ComboBoxItem Content="{s:Translate OptionsModRuleTargetAll}" Tag="{x:Static excelDiffEngine:DataKind.All}" />
+                                                <ComboBoxItem Content="{s:Translate OptionsModRuleTargetOldNonEmpty}" Tag="{x:Static excelDiffEngine:DataKind.OldNonEmpty}" />
+                                                <ComboBoxItem Content="{s:Translate OptionsModRuleTargetNewNonEmpty}" Tag="{x:Static excelDiffEngine:DataKind.NewNonEmpty}" />
+                                                <ComboBoxItem Content="{s:Translate OptionsModRuleTargetAllNonEmpty}" Tag="{x:Static excelDiffEngine:DataKind.AllNonEmpty}" />
                                             </ComboBox>
                                         </StackPanel>
                                         <StackPanel Margin="5,0,5,0" IsEnabled="{Binding IsAktive, Mode=OneWay}" Orientation="Horizontal">
@@ -226,18 +229,73 @@
                     </Expander>
 
                     <Expander Header="{s:Translate OptionsMergingHeader}" IsExpanded="False">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="5" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="5" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="5" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <CheckBox
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                Margin="5,0,5,0"
+                                VerticalAlignment="Center"
+                                Content="{s:Translate OptionsMergingWorksheets}"
+                                IsChecked="{Binding DiffOptions.MergeWorksheets, Mode=TwoWay}" />
+                            <TextBox
+                                Grid.Row="0"
+                                Grid.Column="2"
+                                Text="{Binding DiffOptions.MergedWorksheetName, Mode=TwoWay}"
+                                ToolTip="{s:Translate MergedWorksheetNameTooltip}" />
+                            <CheckBox
+                                Grid.Row="2"
+                                Grid.Column="0"
+                                Margin="5,0,5,0"
+                                VerticalAlignment="Center"
+                                Content="{s:Translate OptionsMergingDocuments}"
+                                IsChecked="{Binding DiffOptions.MergeDocuments, Mode=TwoWay}" />
+                            <TextBox
+                                Grid.Row="2"
+                                Grid.Column="2"
+                                Text="{Binding DiffOptions.MergedDocumentName, Mode=TwoWay}"
+                                ToolTip="{s:Translate MergedDocumentNameTooltip}" />
+                        </Grid>
+                    </Expander>
+
+                    <Expander Header="{s:Translate OptionsSettingsHeader}" IsExpanded="False">
                         <WrapPanel>
                             <CheckBox
                                 Margin="5,0,5,0"
                                 VerticalAlignment="Center"
-                                Content="{s:Translate OptionsMergingWorksheets}"
-                                IsChecked="{Binding DiffOptions.MergeWorksheets}" />
-                            <CheckBox
-                                Margin="5,0,5,0"
-                                VerticalAlignment="Center"
-                                Content="{s:Translate OptionsMergingDocuments}"
-                                IsChecked="{Binding DiffOptions.MergeDocuments}" />
+                                Content="{s:Translate OptionsSettingsSkipEmptyRows}"
+                                IsChecked="{Binding DiffOptions.SkipEmptyRows}" />
                         </WrapPanel>
+                    </Expander>
+
+                    <Expander Header="{s:Translate OptionsPluginsHeader}" IsExpanded="False" Visibility="{Binding ShowPlugins, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <ItemsControl ItemsSource="{Binding Plugins}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox
+                                        Margin="5,0,5,0"
+                                        VerticalAlignment="Center"
+                                        Content="{Binding Name}"
+                                        IsChecked="{Binding IsChecked, Mode=TwoWay}" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </Expander>
 
                 </StackPanel>

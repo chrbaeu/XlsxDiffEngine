@@ -312,4 +312,34 @@
   <data name="FileAddTimestampTooltip" xml:space="preserve">
     <value>Datum zum Dateinamen der Ausgabedatei hinzufügen</value>
   </data>
+  <data name="MergedWorksheetNameTooltip" xml:space="preserve">
+    <value>Name des zusammengeführten Arbeitsblatts</value>
+  </data>
+  <data name="MergedDocumentNameTooltip" xml:space="preserve">
+    <value>Name des zusammengeführten Documents</value>
+  </data>
+  <data name="SaveAndRestoreInputFilePathsMg" xml:space="preserve">
+    <value>Möchten Sie die ausgewählten Dateipfade ebenfalls speichern?</value>
+  </data>
+  <data name="MsgBoxTitleQuestion" xml:space="preserve">
+    <value>Frage</value>
+  </data>
+  <data name="OptionsSettingsHeader" xml:space="preserve">
+    <value>Allgemeine Einstellungen</value>
+  </data>
+  <data name="OptionsSettingsSkipEmptyRows" xml:space="preserve">
+    <value>Leere Zeilen überspringen</value>
+  </data>
+  <data name="OptionsPluginsHeader" xml:space="preserve">
+    <value>Plugins</value>
+  </data>
+  <data name="OptionsModRuleTargetOldNonEmpty" xml:space="preserve">
+    <value>Alt (nicht leer)</value>
+  </data>
+  <data name="OptionsModRuleTargetNewNonEmpty" xml:space="preserve">
+    <value>Neu (nicht leer)</value>
+  </data>
+  <data name="OptionsModRuleTargetAllNonEmpty" xml:space="preserve">
+    <value>Alle (nicht leer)</value>
+  </data>
 </root>

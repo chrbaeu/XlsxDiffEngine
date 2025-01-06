@@ -178,22 +178,43 @@ public enum ModificationKind
 /// <summary>
 /// Specifies the target data set for a modification rule, indicating if it applies to all data, only the old data, or only the new data.
 /// </summary>
+[Flags]
 public enum DataKind
 {
     /// <summary>
-    /// The modification rule applies to all data.
-    /// </summary>
-    All,
-
-    /// <summary>
     /// The modification rule applies to the old data only.
     /// </summary>
-    Old,
+    Old = 1,
 
     /// <summary>
     /// The modification rule applies to the new data only.
     /// </summary>
-    New
+    New = 2,
+
+    /// <summary>
+    /// The modification rule applies to all data.
+    /// </summary>
+    All = Old | New,
+
+    /// <summary>
+    /// Specifices that the modification rule applies not to empty cells. Musst be combined with other flags.
+    /// </summary>
+    NonEmpty = 4,
+
+    /// <summary>
+    /// The modification rule applies to the old data only, but not to empty cells.
+    /// </summary>
+    OldNonEmpty = Old | NonEmpty,
+
+    /// <summary>
+    /// The modification rule applies to the new data only, but not to empty cells.
+    /// </summary>
+    NewNonEmpty = New | NonEmpty,
+
+    /// <summary>
+    /// The modification rule applies to all data, but not to empty cells.
+    /// </summary>
+    AllNonEmpty = Old | New | NonEmpty,
 }
 
 /// <summary>

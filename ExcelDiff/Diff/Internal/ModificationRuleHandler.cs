@@ -27,7 +27,8 @@ internal sealed class ModificationRuleHandler
 
     private static void ApplyRule(ExcelRange excelCell, ModificationRule rule, DataKind dataKind)
     {
-        if (rule.Target != DataKind.All && rule.Target != dataKind) { return; }
+        if (!rule.Target.HasFlag(dataKind)) { return; }
+        if (rule.Target.HasFlag(DataKind.NonEmpty) && excelCell.Value is null) { return; }
         switch (rule.ModificationKind)
         {
             case ModificationKind.NumberFormat:

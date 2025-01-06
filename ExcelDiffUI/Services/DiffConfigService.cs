@@ -13,6 +13,7 @@ public class DiffConfigService(
     IStringLocalizer<Resources.Resources> localizer
     )
 {
+    private readonly JsonSerializerOptions jsonSerializerOptions = new() { WriteIndented = true };
 
     public void Reset()
     {
@@ -48,7 +49,12 @@ public class DiffConfigService(
     {
         try
         {
-            string json = JsonSerializer.Serialize<DiffConfigModel>(diffConfigModel);
+            if (diffConfigModel.SaveAndRestoreInputFilePaths != true)
+            {
+                diffConfigModel.OldFileConfig.FilePath = "";
+                diffConfigModel.NewFileConfig.FilePath = "";
+            }
+            string json = JsonSerializer.Serialize<DiffConfigModel>(diffConfigModel, jsonSerializerOptions);
             await File.WriteAllTextAsync(filePath, json);
             return true;
         }
@@ -62,9 +68,12 @@ public class DiffConfigService(
     private void UpdateDiffConfigModel(DiffConfigModel newDiffConfigModel)
     {
         MappingHelper.Map(newDiffConfigModel, diffConfigModel);
-        newDiffConfigModel.OldFileConfig.FilePath = diffConfigModel.OldFileConfig.FilePath;
+        if (newDiffConfigModel.SaveAndRestoreInputFilePaths != true)
+        {
+            newDiffConfigModel.OldFileConfig.FilePath = diffConfigModel.OldFileConfig.FilePath;
+            newDiffConfigModel.NewFileConfig.FilePath = diffConfigModel.NewFileConfig.FilePath;
+        }
         MappingHelper.Map(newDiffConfigModel.OldFileConfig, diffConfigModel.OldFileConfig);
-        newDiffConfigModel.NewFileConfig.FilePath = diffConfigModel.NewFileConfig.FilePath;
         MappingHelper.Map(newDiffConfigModel.NewFileConfig, diffConfigModel.NewFileConfig);
         newDiffConfigModel.OutputFileConfig.FilePath = diffConfigModel.OutputFileConfig.FilePath;
         MappingHelper.Map(newDiffConfigModel.OutputFileConfig, diffConfigModel.OutputFileConfig);
@@ -74,6 +83,11 @@ public class DiffConfigService(
         MappingHelper.Map(newDiffConfigModel.ModificationRules[0], diffConfigModel.ModificationRules[0]);
         MappingHelper.Map(newDiffConfigModel.ModificationRules[1], diffConfigModel.ModificationRules[1]);
         MappingHelper.Map(newDiffConfigModel.ModificationRules[2], diffConfigModel.ModificationRules[2]);
+        diffConfigModel.Plugins.Clear();
+        foreach (string plugin in newDiffConfigModel.Plugins)
+        {
+            diffConfigModel.Plugins.Add(plugin);
+        }
         columnInfoService.LoadColumnsFromConfig(newDiffConfigModel.Columns);
     }
 

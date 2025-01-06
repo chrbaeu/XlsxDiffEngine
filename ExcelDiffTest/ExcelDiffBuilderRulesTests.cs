@@ -127,9 +127,11 @@ internal class ExcelDiffBuilderRulesTests
     }
 
     [Test]
-    public void Diff_WithFormulaRule()
+    public void Diff_WithFormulaRule_AllCells()
     {
         // Arrange
+        content1[1][1] = null;
+        content2[1][1] = 0;
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content1);
         using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content2);
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
@@ -149,7 +151,42 @@ internal class ExcelDiffBuilderRulesTests
         // Assert
         using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Title", "Title", "Value", "Value"],
-            ["A", "A", 120.00, 120.00],
+            ["A", "A", 0, 0],
+            ["B", "B", 120.00, 120.00],
+            ["C", "C", 120.00, 120.05],
+            ["D", "D", 120.00, 120.00],
+            ]);
+        ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[4, 3, 4, 4], DefaultCellStyles.ChangedCell);
+
+        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+    }
+
+    [Test]
+    public void Diff_WithFormulaRule_NonEmptyCells()
+    {
+        // Arrange
+        content1[1][1] = null;
+        content2[1][1] = null;
+        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content1);
+        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content2);
+        using var oldFileStream = oldExcelPackage.ToMemoryStream();
+        using var newFileStream = newExcelPackage.ToMemoryStream();
+
+        // Act
+        using ExcelPackage result = excelDiffBuilder
+            .AddFiles(x => x
+                .SetOldFile(oldFileStream, "OldFile.xlsx")
+                .SetNewFile(newFileStream, "NewFile.xlsx")
+                )
+            .AddModificationRules([
+                new("Value", ModificationKind.Formula, "={#}*1.2", DataKind.OldNonEmpty),
+                ])
+            .Build();
+
+        // Assert
+        using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
+            ["Title", "Title", "Value", "Value"],
+            ["A", "A", null, null],
             ["B", "B", 120.00, 120.00],
             ["C", "C", 120.00, 120.05],
             ["D", "D", 120.00, 120.00],

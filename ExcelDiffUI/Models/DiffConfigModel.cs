@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
-using System.Drawing;
 
 namespace ExcelDiffUI.Models;
 
@@ -15,22 +14,25 @@ public sealed partial class DiffConfigModel : ObservableObject
     public ObservableCollection<ColumnInfoModel> Columns { get; init; } = [];
 
     [ObservableProperty]
+    public partial bool? SaveAndRestoreInputFilePaths { get; set; }
+
+    [ObservableProperty]
     public partial bool AddRowNumberColumn { get; set; }
 
     [ObservableProperty]
-    public partial string RowNumberColumnName { get; set; } = "Row";
+    public partial string RowNumberColumnName { get; set; } = "";
 
     [ObservableProperty]
     public partial bool AddWorksheetNameColumn { get; set; }
 
     [ObservableProperty]
-    public partial string WorksheetNameColumnName { get; set; } = "Worksheet name";
+    public partial string WorksheetNameColumnName { get; set; } = "";
 
     [ObservableProperty]
     public partial bool AddDocumentNameColumn { get; set; }
 
     [ObservableProperty]
-    public partial string DocumentNameColumnName { get; set; } = "Document name";
+    public partial string DocumentNameColumnName { get; set; } = "";
 
 
     [ObservableProperty]
@@ -56,13 +58,21 @@ public sealed partial class DiffConfigModel : ObservableObject
     public partial bool MergeWorksheets { get; set; }
 
     [ObservableProperty]
+    public partial string MergedWorksheetName { get; set; } = "";
+
+    [ObservableProperty]
     public partial bool MergeDocuments { get; set; }
 
+    [ObservableProperty]
+    public partial string MergedDocumentName { get; set; } = "";
+
+    [ObservableProperty]
+    public partial bool SkipEmptyRows { get; set; }
 
     public ObservableCollection<ValueChangedMarkerModel> ValueChangedMarkers { get; init; } = [
-        new() { MinDeviationAbsolute = 0.00, MinDeviationInPercent = 0.00, Color = Color.Yellow },
-        new() { MinDeviationAbsolute = 0.00, MinDeviationInPercent = 0.10, Color = Color.Orange },
-        new() { MinDeviationAbsolute = 0.00, MinDeviationInPercent = 0.20, Color = Color.Red },
+        new() { MinDeviationAbsolute = 0.00, MinDeviationInPercent = 0.00, Color = "#FFFFFF00" },
+        new() { MinDeviationAbsolute = 0.00, MinDeviationInPercent = 0.10, Color = "#FFFFA500" },
+        new() { MinDeviationAbsolute = 0.00, MinDeviationInPercent = 0.20, Color = "#FFFF0000" },
         ];
 
     public ObservableCollection<ModificationRuleModel> ModificationRules { get; init; } = [
@@ -70,4 +80,6 @@ public sealed partial class DiffConfigModel : ObservableObject
         new ModificationRuleModel() { Name = "Rule 2", Value = "={#}"  },
         new ModificationRuleModel() { Name = "Rule 3", Value = "={#}"  },
         ];
+
+    public ObservableCollection<string> Plugins { get; init; } = [];
 }

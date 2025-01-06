@@ -21,7 +21,7 @@ internal static class ServiceCollectionExtensions
             loggerConfiguration.ReadFrom.Configuration(services.GetRequiredService<IConfiguration>()));
 
         services.AddSingleton<AppInfo>(new AppInfo(
-            "Excel Diff Tool UI",
+            "Excel Diff UI",
             AppContext.BaseDirectory,
             Assembly.GetExecutingAssembly().GetName().Version ?? new(),
             Program.AppStartupTimestamp));
@@ -46,6 +46,7 @@ internal static class ServiceCollectionExtensions
         services.AddScoped<DiffConfigModel>();
         services.AddScoped<ColumnInfoService>();
         services.AddScoped<ExcelDiffService>();
+        services.AddScoped<PluginService>();
     }
 
     private static void AddViewsAndViewModels(this IServiceCollection services)
