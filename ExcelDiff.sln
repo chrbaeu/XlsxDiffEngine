@@ -3,18 +3,18 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35017.193
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelDiffSample", "ExcelDiffSample\ExcelDiffSample.csproj", "{7A1BF20A-3100-4F83-84EF-5B1565A28994}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XlsxDiffSample", "XlsxDiffSample\XlsxDiffSample.csproj", "{7A1BF20A-3100-4F83-84EF-5B1565A28994}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelDiffEngine", "ExcelDiff\ExcelDiffEngine.csproj", "{2D957CA4-8782-48B5-89D3-37617DEECF33}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XlsxDiffEngine", "XlsxDiffEngine\XlsxDiffEngine.csproj", "{2D957CA4-8782-48B5-89D3-37617DEECF33}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelDiffTest", "ExcelDiffTest\ExcelDiffTest.csproj", "{B33DA943-72A4-436F-9C43-77D7CFBBAC3C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XlsxDiffEngineTests", "XlsxDiffEngineTests\XlsxDiffEngineTests.csproj", "{B33DA943-72A4-436F-9C43-77D7CFBBAC3C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D6134A59-7A01-4379-A669-AA1A3BF207A9}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelDiffUI", "ExcelDiffUI\ExcelDiffUI.csproj", "{653B3DDC-02EA-43A6-89F0-6909AD2FA2D3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XlsxDiffTool", "XlsxDiffTool\XlsxDiffTool.csproj", "{653B3DDC-02EA-43A6-89F0-6909AD2FA2D3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

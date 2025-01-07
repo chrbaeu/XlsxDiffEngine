@@ -1,8 +1,8 @@
-# ExcelDiffEngine
+# XlsxDiffEngine
 
-ExcelDiffEngine is a simple C# library for comparing Excel (.xlsx) files. It provides powerful configuration options to customize data comparisons, allowing you to generate annotated output files that highlight all changes, additions, and removals. (For reading and writing Excel files, the [EPPlus](https://github.com/EPPlusSoftware/EPPlus) library is used.)
+XlsxDiffEngine is a simple C# library for comparing Excel (.xlsx) files. It provides powerful configuration options to customize data comparisons, allowing you to generate annotated output files that highlight all changes, additions, and removals. (For reading and writing Excel files, the [EPPlus](https://github.com/EPPlusSoftware/EPPlus) library is used.)
 
-![Logo](https://raw.githubusercontent.com/chrbaeu/ExcelDiffEngine/refs/heads/main/ExcelDiff/Icon.png)
+![Logo](https://raw.githubusercontent.com/chrbaeu/XlsxDiffEngine/refs/heads/main/ExcelDiff/Icon.png)
 
 ## Features
 
@@ -13,13 +13,15 @@ ExcelDiffEngine is a simple C# library for comparing Excel (.xlsx) files. It pro
 
 ## Installation
 
-Add ExcelDiffEngine to your project via NuGet:
+Add XlsxDiffEngine to your project via NuGet:
 
-[Chriffizient.ExcelDiffEngine on NuGet](https://www.nuget.org/packages/Chriffizient.ExcelDiffEngine)
+[Chriffizient.XlsxDiffEngine on NuGet](https://www.nuget.org/packages/Chriffizient.XlsxDiffEngine)
 
 ```bash
-dotnet add package Chriffizient.ExcelDiffEngine
+dotnet add package Chriffizient.XlsxDiffEngine
 ```
+
+(Prior to Version 0.6.0 the package id was Chriffizient.ExcelDiffEngine instead of Chriffizient.XlsxDiffEngine)
 
 ## Getting Started
 
@@ -32,7 +34,7 @@ Use the `Build` method to save an annotated comparison Excel output file.
 ### Example
 
 ```csharp  
-using ExcelDiffEngine;  
+using XlsxDiffEngine;  
 using OfficeOpenXml;  
   
 new ExcelDiffBuilder()
@@ -44,7 +46,7 @@ new ExcelDiffBuilder()
     .Build("ComparisonOutput.xlsx");
 ```
 
-For more examples, take a look at the tests.
+For more examples, take a look at the tests. Or try out the functions via the XlsxDiffTool WPF application.
 
 ## Dependencies
 
