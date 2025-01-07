@@ -2,7 +2,7 @@
 
 XlsxDiffEngine is a simple C# library for comparing Excel (.xlsx) files. It provides powerful configuration options to customize data comparisons, allowing you to generate annotated output files that highlight all changes, additions, and removals. (For reading and writing Excel files, the [EPPlus](https://github.com/EPPlusSoftware/EPPlus) library is used.)
 
-![Logo](https://raw.githubusercontent.com/chrbaeu/XlsxDiffEngine/refs/heads/main/ExcelDiff/Icon.png)
+![Logo](https://raw.githubusercontent.com/chrbaeu/XlsxDiffEngine/refs/heads/main/XlsxDiffEngine/Icon.png)
 
 ## Features
 
@@ -20,8 +20,6 @@ Add XlsxDiffEngine to your project via NuGet:
 ```bash
 dotnet add package Chriffizient.XlsxDiffEngine
 ```
-
-(Prior to Version 0.6.0 the package id was Chriffizient.ExcelDiffEngine instead of Chriffizient.XlsxDiffEngine)
 
 ## Getting Started
 

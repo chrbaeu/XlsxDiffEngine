@@ -21,7 +21,7 @@ internal static class ServiceCollectionExtensions
             loggerConfiguration.ReadFrom.Configuration(services.GetRequiredService<IConfiguration>()));
 
         services.AddSingleton<AppInfo>(new AppInfo(
-            "Excel Diff UI",
+            "XlsxDiffTool",
             AppContext.BaseDirectory,
             Assembly.GetExecutingAssembly().GetName().Version ?? new(),
             Program.AppStartupTimestamp));

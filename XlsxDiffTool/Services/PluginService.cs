@@ -1,4 +1,6 @@
-﻿namespace XlsxDiffTool.Services;
+﻿using XlsxDiffTool.Plugins;
+
+namespace XlsxDiffTool.Services;
 
 public class PluginService
 {

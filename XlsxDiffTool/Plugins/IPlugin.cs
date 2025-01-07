@@ -1,8 +1,8 @@
-﻿using XlsxDiffEngine;
+﻿using OfficeOpenXml;
+using XlsxDiffEngine;
 using XlsxDiffTool.Models;
-using OfficeOpenXml;
 
-namespace XlsxDiffTool.Services;
+namespace XlsxDiffTool.Plugins;
 
 public interface IPlugin
 {

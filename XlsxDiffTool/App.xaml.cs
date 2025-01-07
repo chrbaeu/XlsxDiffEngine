@@ -1,14 +1,14 @@
-﻿using XlsxDiffTool.Common;
-using XlsxDiffTool.Services;
-using XlsxDiffTool.ViewModels;
-using XlsxDiffTool.Views;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
 using OfficeOpenXml;
 using Serilog;
 using System.Globalization;
 using System.Windows;
+using XlsxDiffTool.Common;
+using XlsxDiffTool.Services;
+using XlsxDiffTool.ViewModels;
+using XlsxDiffTool.Views;
 
 namespace XlsxDiffTool;
 
