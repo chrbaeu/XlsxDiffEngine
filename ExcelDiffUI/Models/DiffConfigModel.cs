@@ -69,6 +69,12 @@ public sealed partial class DiffConfigModel : ObservableObject
     [ObservableProperty]
     public partial bool SkipEmptyRows { get; set; }
 
+    [ObservableProperty]
+    public partial bool SkipUnchangedRows { get; set; }
+
+    [ObservableProperty]
+    public partial bool AlwaysSetPrimaryKeyColumnValues { get; set; }
+
     public ObservableCollection<ValueChangedMarkerModel> ValueChangedMarkers { get; init; } = [
         new() { MinDeviationAbsolute = 0.00, MinDeviationInPercent = 0.00, Color = "#FFFFFF00" },
         new() { MinDeviationAbsolute = 0.00, MinDeviationInPercent = 0.10, Color = "#FFFFA500" },

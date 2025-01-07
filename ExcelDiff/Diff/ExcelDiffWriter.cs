@@ -67,7 +67,7 @@ public sealed class ExcelDiffWriter
                 }
                 ExcelRange? oldDstCell = worksheet.Cells[row, column];
                 object? oldValue = SetCell(oldDstCell, columnName, oldRow, ruleHandler, DataKind.Old);
-                string oldText = config.AddOldValueAsComment ? oldDstCell?.Text ?? "" : "";
+                string oldText = config.AddOldValueAsComment ? oldDstCell.Text ?? "" : "";
                 if (config.ShowOldDataColumn) { column++; } else { oldDstCell = null; }
                 ExcelRange newDstCell = worksheet.Cells[row, column];
                 object? newValue = SetCell(newDstCell, columnName, newRow, ruleHandler, DataKind.New);
@@ -80,6 +80,11 @@ public sealed class ExcelDiffWriter
                 isChanged |= GetAndHandleChangedState(columnName, oldDstCell, oldValue, newDstCell, newValue);
                 if (config.KeyColumns.Contains(columnName, stringComparer))
                 {
+                    if (config.AlwaysSetPrimaryKeyColumnValues && oldDstCell is not null)
+                    {
+                        if (oldDstCell.Value is { } && newDstCell.Value is null) { newDstCell.Value = oldDstCell.Value; }
+                        if (newDstCell.Value is { } && oldDstCell.Value is null) { oldDstCell.Value = newDstCell.Value; }
+                    }
                     if (oldDstCell is not null) { keyCells.Add(oldDstCell); }
                     keyCells.Add(newDstCell);
                 }
@@ -93,7 +98,7 @@ public sealed class ExcelDiffWriter
             }
             if (oldRow is null) { ExcelHelper.SetCellStyle(worksheet.Cells[row, startColumn, row, column - 1], config.AddedRowStyle); }
             if (newRow is null) { ExcelHelper.SetCellStyle(worksheet.Cells[row, startColumn, row, column - 1], config.RemovedRowStyle); }
-            if (config.IgnoreUnchangedRows && !isChanged)
+            if (config.SkipUnchangedRows && !isChanged)
             {
                 worksheet.Cells[row, startColumn, row, column - 1].Clear();
                 continue;

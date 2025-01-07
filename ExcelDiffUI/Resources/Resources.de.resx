@@ -328,7 +328,7 @@
     <value>Allgemeine Einstellungen</value>
   </data>
   <data name="OptionsSettingsSkipEmptyRows" xml:space="preserve">
-    <value>Leere Zeilen überspringen</value>
+    <value>Leere Zeilen entfernen</value>
   </data>
   <data name="OptionsPluginsHeader" xml:space="preserve">
     <value>Plugins</value>
@@ -341,5 +341,11 @@
   </data>
   <data name="OptionsModRuleTargetAllNonEmpty" xml:space="preserve">
     <value>Alle (nicht leer)</value>
+  </data>
+  <data name="OptionsSettingsAlwaysSetPrimaryKeyColumnValues" xml:space="preserve">
+    <value>Key Spaltenwerte immer setzen</value>
+  </data>
+  <data name="OptionsSettingsSkipUnchangedRows" xml:space="preserve">
+    <value>Unveränderte Zeilen entfernen</value>
   </data>
 </root>

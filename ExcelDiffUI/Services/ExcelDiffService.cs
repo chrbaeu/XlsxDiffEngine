@@ -47,6 +47,8 @@ public sealed partial class ExcelDiffService(
         {
             builder.SetSkipRowRule(SkipRules.SkipEmptyRows);
         }
+        builder.SkipUnchangedRows(optionsModel.SkipUnchangedRows);
+        builder.AlwaysSetPrimaryKeyColumnValues(optionsModel.AlwaysSetPrimaryKeyColumnValues);
         if (optionsModel.AddRowNumberColumn)
         {
             builder.AddRowNumberAsColumn(optionsModel.RowNumberColumnName);

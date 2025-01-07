@@ -164,7 +164,7 @@ internal class ExcelDiffBuilderBasicTests
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
                 .SetNewFile(newFileStream, "NewFile.xlsx")
                 )
-            .IgnoreUnchangedRows()
+            .SkipUnchangedRows()
             .Build();
 
         // Assert

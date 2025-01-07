@@ -106,9 +106,15 @@ public record class ExcelDiffConfig
     public string? NewHeaderColumnPostfix { get; init; }
 
     /// <summary>
-    /// Indicates whether to ignore unchanged rows in the comparison output.
+    /// Indicates whether to skip unchanged rows in the comparison output.
     /// </summary>
-    public bool IgnoreUnchangedRows { get; init; }
+    public bool SkipUnchangedRows { get; init; }
+
+    /// <summary>
+    /// Indicates whether to always set primary key column values in the comparison output.
+    /// (Not supported in combination with ShowOldDataColumn = false)
+    /// </summary>
+    public bool AlwaysSetPrimaryKeyColumnValues { get; init; }
 
     /// <summary>
     /// A predicate to determine which rows should be skipped during comparison.

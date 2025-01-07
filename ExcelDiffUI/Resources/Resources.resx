@@ -328,7 +328,7 @@
     <value>General settings</value>
   </data>
   <data name="OptionsSettingsSkipEmptyRows" xml:space="preserve">
-    <value>Skip empty rows</value>
+    <value>Remove empty rows</value>
   </data>
   <data name="OptionsPluginsHeader" xml:space="preserve">
     <value>Plugins</value>
@@ -341,5 +341,11 @@
   </data>
   <data name="OptionsModRuleTargetAllNonEmpty" xml:space="preserve">
     <value>All (non empty)</value>
+  </data>
+  <data name="OptionsSettingsAlwaysSetPrimaryKeyColumnValues" xml:space="preserve">
+    <value>Always set key column values</value>
+  </data>
+  <data name="OptionsSettingsSkipUnchangedRows" xml:space="preserve">
+    <value>Remove unchanged rows</value>
   </data>
 </root>

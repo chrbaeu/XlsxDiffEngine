@@ -245,13 +245,13 @@ public class ExcelDiffBuilder
     }
 
     /// <summary>
-    /// Configures whether to ignore unchanged rows in the output.
+    /// Configures whether to skip unchanged rows in the output.
     /// </summary>
-    /// <param name="ignoreUnchangedRows">Whether to ignore unchanged rows (default is true).</param>
+    /// <param name="skipUnchangedRows">Whether to skip unchanged rows (default is true).</param>
     /// <returns>The current builder instance for method chaining.</returns>
-    public ExcelDiffBuilder IgnoreUnchangedRows(bool ignoreUnchangedRows = true)
+    public ExcelDiffBuilder SkipUnchangedRows(bool skipUnchangedRows = true)
     {
-        diffConfig = diffConfig with { IgnoreUnchangedRows = ignoreUnchangedRows };
+        diffConfig = diffConfig with { SkipUnchangedRows = skipUnchangedRows };
         return this;
     }
 
@@ -330,6 +330,17 @@ public class ExcelDiffBuilder
     {
         diffConfig = diffConfig with { IgnoreCase = ignoreCase };
         xlsxConfig = xlsxConfig with { IgnoreCase = ignoreCase };
+        return this;
+    }
+
+    /// <summary>
+    /// Configures whether to always set primary key column values, even if they not exisits one of the the data sources.
+    /// </summary>
+    /// <param name="alwaysSetPrimaryKeyColumnValues">Whether to always set primary key column values (default is false).</param>
+    /// <returns>The current builder instance for method chaining.</returns>
+    public ExcelDiffBuilder AlwaysSetPrimaryKeyColumnValues(bool alwaysSetPrimaryKeyColumnValues = false)
+    {
+        diffConfig = diffConfig with { AlwaysSetPrimaryKeyColumnValues = alwaysSetPrimaryKeyColumnValues };
         return this;
     }
 
@@ -598,4 +609,5 @@ public class ExcelDiffBuilder
         using ExcelPackage excelPackage = Build(postProcessingAction);
         excelPackage.SaveAs(new FileInfo(outputFilePath));
     }
+
 }
