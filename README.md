@@ -44,7 +44,7 @@ new ExcelDiffBuilder()
     .Build("ComparisonOutput.xlsx");
 ```
 
-For more examples, take a look at the tests. Or try out the functions via the XlsxDiffTool WPF application.
+For more examples, take a look at the tests, or try out the functions via the XlsxDiffTool WPF application.
 
 ## Dependencies
 

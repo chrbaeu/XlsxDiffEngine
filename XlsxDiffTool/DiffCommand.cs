@@ -1,9 +1,9 @@
 ﻿using CliFx;
 using CliFx.Attributes;
 using CliFx.Infrastructure;
+using System.IO;
 using XlsxDiffTool.Models;
 using XlsxDiffTool.Services;
-using System.IO;
 
 namespace XlsxDiffTool;
 

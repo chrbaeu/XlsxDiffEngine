@@ -1,7 +1,7 @@
-﻿using XlsxDiffTool.Common;
-using Serilog;
+﻿using Serilog;
 using System.IO;
 using System.Text.Json;
+using XlsxDiffTool.Common;
 
 namespace XlsxDiffTool.Services;
 

@@ -1,6 +1,6 @@
-﻿using XlsxDiffTool.Models;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
+using XlsxDiffTool.Models;
 
 namespace XlsxDiffTool.Services;
 

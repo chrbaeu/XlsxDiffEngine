@@ -1,5 +1,5 @@
-﻿using XlsxDiffTool.Common;
-using System.Windows;
+﻿using System.Windows;
+using XlsxDiffTool.Common;
 
 namespace XlsxDiffTool.Views;
 

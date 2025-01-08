@@ -1,9 +1,9 @@
-﻿using XlsxDiffTool.Common;
-using XlsxDiffTool.Models;
-using Microsoft.Extensions.Localization;
+﻿using Microsoft.Extensions.Localization;
 using Serilog;
 using System.IO;
 using System.Text.Json;
+using XlsxDiffTool.Common;
+using XlsxDiffTool.Models;
 
 namespace XlsxDiffTool.Services;
 

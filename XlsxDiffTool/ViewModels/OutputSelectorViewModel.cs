@@ -1,8 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System.IO;
 using XlsxDiffTool.Common;
 using XlsxDiffTool.Models;
-using System.IO;
 
 namespace XlsxDiffTool.ViewModels;
 

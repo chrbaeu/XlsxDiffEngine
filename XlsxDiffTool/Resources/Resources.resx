@@ -348,4 +348,7 @@
   <data name="OptionsSettingsSkipUnchangedRows" xml:space="preserve">
     <value>Remove unchanged rows</value>
   </data>
+  <data name="OptionsHeader" xml:space="preserve">
+    <value>Options:</value>
+  </data>
 </root>

@@ -1,5 +1,5 @@
-﻿using XlsxDiffEngine;
-using OfficeOpenXml;
+﻿using OfficeOpenXml;
+using XlsxDiffEngine;
 
 namespace XlsxDiffSample;
 

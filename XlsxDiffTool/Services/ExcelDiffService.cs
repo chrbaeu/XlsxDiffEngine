@@ -1,10 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using XlsxDiffEngine;
-using XlsxDiffEngine.Diff;
-using XlsxDiffTool.Models;
 using OfficeOpenXml;
 using System.Drawing;
 using System.IO;
+using XlsxDiffEngine;
+using XlsxDiffEngine.Diff;
+using XlsxDiffTool.Models;
 
 namespace XlsxDiffTool.Services;
 
