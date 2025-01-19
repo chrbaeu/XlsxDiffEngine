@@ -20,6 +20,49 @@ public sealed class ColumnInfoService : IDisposable
         optionsModel.OldFileConfig.PropertyChanged += InputFileConfig_PropertyChanged;
     }
 
+    public async Task LoadColumnsFromConfig(params ICollection<ColumnInfoModel> columsFromConfig)
+    {
+        var columnNames = await Task.Run(excelDiffService.GetColumnNames);
+        var existingColumns = columnNames.ToDictionary(x => x, StringComparer.OrdinalIgnoreCase);
+        Columns.Clear();
+        foreach (ColumnInfoModel column in columsFromConfig)
+        {
+            column.IsNotMapped = !existingColumns.ContainsKey(column.Name);
+            Columns.Add(column);
+            existingColumns.Remove(column.Name);
+        }
+    }
+
+    public void AddManualColumn(string columnName)
+    {
+        if (Columns.Any(x => x.Name.Equals(columnName, StringComparison.OrdinalIgnoreCase)))
+        {
+            return;
+        }
+        Columns.Add(new() { Name = columnName, IsNotMapped = true });
+    }
+
+    public void RemoveManualColumn(string columnName)
+    {
+        if (Columns.Any(x => x.Name.Equals(columnName, StringComparison.OrdinalIgnoreCase)))
+        {
+            Columns.Remove(Columns.First(x => x.Name.Equals(columnName, StringComparison.OrdinalIgnoreCase)));
+        }
+    }
+
+    public async Task ReloadColumns()
+    {
+        var columnNames = await Task.Run(excelDiffService.GetColumnNames);
+        UpdateWithColumnsFromFiles(columnNames);
+    }
+
+    public void Dispose()
+    {
+        optionsModel.PropertyChanged -= OptionsModel_PropertyChanged;
+        optionsModel.NewFileConfig.PropertyChanged -= InputFileConfig_PropertyChanged;
+        optionsModel.OldFileConfig.PropertyChanged -= InputFileConfig_PropertyChanged;
+    }
+
     private void OptionsModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(DiffConfigModel.AddRowNumberColumn) || e.PropertyName == nameof(DiffConfigModel.RowNumberColumnName))
@@ -42,42 +85,11 @@ public sealed class ColumnInfoService : IDisposable
             || e.PropertyName == nameof(FileConfigModel.StartRow)
             || e.PropertyName == nameof(FileConfigModel.StartColumn))
         {
-            UpdateWithColumnsFromFiles(excelDiffService.GetColumnNames());
+            if (!Columns.Any(x => x.ColumnKind != ColumnKind.Default))
+            {
+                ReloadColumns();
+            }
         }
-    }
-
-    public void LoadColumnsFromConfig(params ICollection<ColumnInfoModel> columsFromConfig)
-    {
-        var existingColumns = Columns
-            .Where(x => !x.IsNotMapped && x.ColumnKind == ColumnKind.Default)
-            .ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
-        Columns.Clear();
-        foreach (ColumnInfoModel column in columsFromConfig)
-        {
-            column.IsNotMapped = column.ColumnKind == ColumnKind.Default && !existingColumns.ContainsKey(column.Name);
-            Columns.Add(column);
-            existingColumns.Remove(column.Name);
-        }
-        foreach (ColumnInfoModel column in existingColumns.Values)
-        {
-            Columns.Add(column);
-        }
-    }
-
-    public void AddManualColumn(string columnName)
-    {
-        if (Columns.Any(x => x.Name.Equals(columnName, StringComparison.OrdinalIgnoreCase)))
-        {
-            return;
-        }
-        Columns.Add(new() { Name = columnName, IsNotMapped = true });
-    }
-
-    public void Dispose()
-    {
-        optionsModel.PropertyChanged -= OptionsModel_PropertyChanged;
-        optionsModel.NewFileConfig.PropertyChanged -= InputFileConfig_PropertyChanged;
-        optionsModel.OldFileConfig.PropertyChanged -= InputFileConfig_PropertyChanged;
     }
 
     private void UpdateWithColumnsFromFiles(ICollection<string> colomNamesFromFiles)

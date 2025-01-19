@@ -15,7 +15,7 @@ public class DiffConfigService(
 {
     private readonly JsonSerializerOptions jsonSerializerOptions = new() { WriteIndented = true };
 
-    public void Reset()
+    public async Task Reset()
     {
         DiffConfigModel defaultDiffConfigModel = new()
         {
@@ -23,7 +23,7 @@ public class DiffConfigService(
             WorksheetNameColumnName = localizer["OptionsAddColumnWorksheetName"],
             DocumentNameColumnName = localizer["OptionsAddColumnDocumentName"],
         };
-        UpdateDiffConfigModel(defaultDiffConfigModel);
+        await UpdateDiffConfigModel(defaultDiffConfigModel);
     }
 
     public async Task<bool> Import(string filePath)
@@ -35,7 +35,7 @@ public class DiffConfigService(
             if (string.IsNullOrEmpty(json)) { return false; }
             DiffConfigModel? loadedDiffConfigModel = JsonSerializer.Deserialize<DiffConfigModel>(json);
             if (loadedDiffConfigModel is null) { return false; }
-            UpdateDiffConfigModel(loadedDiffConfigModel);
+            await UpdateDiffConfigModel(loadedDiffConfigModel);
             return true;
         }
         catch (Exception e)
@@ -65,7 +65,7 @@ public class DiffConfigService(
         }
     }
 
-    private void UpdateDiffConfigModel(DiffConfigModel newDiffConfigModel)
+    private async Task UpdateDiffConfigModel(DiffConfigModel newDiffConfigModel)
     {
         MappingHelper.Map(newDiffConfigModel, diffConfigModel);
         if (newDiffConfigModel.SaveAndRestoreInputFilePaths != true)
@@ -88,7 +88,7 @@ public class DiffConfigService(
         {
             diffConfigModel.Plugins.Add(plugin);
         }
-        columnInfoService.LoadColumnsFromConfig(newDiffConfigModel.Columns);
+        await columnInfoService.LoadColumnsFromConfig(newDiffConfigModel.Columns);
     }
 
 }

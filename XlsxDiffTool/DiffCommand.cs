@@ -39,7 +39,7 @@ internal sealed class DiffCommand(
         }
         if (string.IsNullOrEmpty(ConfigPath))
         {
-            diffConfigService.Reset();
+            await diffConfigService.Reset();
         }
         else
         {
@@ -49,7 +49,6 @@ internal sealed class DiffCommand(
             }
             await diffConfigService.Import(ConfigPath);
         }
-        diffConfigService.Reset();
         diffConfigModel.OldFileConfig.FilePath = OldPath;
         diffConfigModel.NewFileConfig.FilePath = NewPath;
         try

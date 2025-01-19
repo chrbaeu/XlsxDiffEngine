@@ -41,9 +41,10 @@ internal static class ServiceCollectionExtensions
 
     private static void AddApplicationServices(this IServiceCollection services)
     {
+        services.AddScoped<DiffConfigModel>();
+        services.AddScoped<AppStateModel>();
         services.AddScoped<WindowStateSettingsService>();
         services.AddScoped<DiffConfigService>();
-        services.AddScoped<DiffConfigModel>();
         services.AddScoped<ColumnInfoService>();
         services.AddScoped<ExcelDiffService>();
         services.AddScoped<PluginService>();

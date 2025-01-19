@@ -40,12 +40,12 @@ public partial class App : Application
         await appHost.StartAsync();
 
         // Static configurations
-        // ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
         ViewConverter.ViewFactory = appHost.Services.GetRequiredService<ViewFactory>();
         TranslateExtension.Localizer = appHost.Services.GetRequiredService<IStringLocalizer<Resources.Resources>>();
 
         // Create main window view model
-        appHost.Services.GetRequiredService<DiffConfigService>().Reset();
+        await appHost.Services.GetRequiredService<DiffConfigService>().Reset();
         MainWindowViewModel vm = appHost.Services.GetRequiredService<MainWindowViewModel>();
         await appHost.Services.GetRequiredService<WindowStateSettingsService>().TryToRestoreWindowStateAsync(vm.WindowState);
 

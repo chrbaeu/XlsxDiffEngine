@@ -10,7 +10,7 @@
     d:DataContext="{d:DesignInstance Type=vm:MainViewModel, IsDesignTimeCreatable=False}"
     d:DesignHeight="450"
     d:DesignWidth="800"
-    IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
+    IsEnabled="{Binding AppStateModel.IsBusy, Converter={StaticResource InverseBoolConverter}}"
     mc:Ignorable="d">
 
     <Grid Margin="10">
@@ -103,7 +103,7 @@
                         Grid.Row="3"
                         Grid.Column="6"
                         Orientation="Horizontal"
-                        Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}">
+                        Visibility="{Binding AppStateModel.IsBusy, Converter={StaticResource BoolToVisibilityConverter}}">
                         <TextBlock VerticalAlignment="Center" Text="Processing " />
                         <ProgressBar Width="100" VerticalAlignment="Center" IsIndeterminate="True" />
                     </StackPanel>

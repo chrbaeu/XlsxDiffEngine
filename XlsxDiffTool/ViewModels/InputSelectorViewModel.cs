@@ -47,7 +47,15 @@ public abstract partial class InputSelectorViewModel(
     public void ChooseFile()
     {
         var initialDirectory = Path.GetDirectoryName(FileConfig.FilePath) ?? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        string filePath = dialogService.ShowOpenFileDialog(this, "Excel (*.xlsx)|*.xlsx", initialDirectory);
+        string filePath;
+        if (FileConfig.IsFolderConfig)
+        {
+            filePath = dialogService.ShowOpenFolderDialog(this, initialDirectory);
+        }
+        else
+        {
+            filePath = dialogService.ShowOpenFileDialog(this, "Excel (*.xlsx)|*.xlsx", initialDirectory);
+        }
         if (!string.IsNullOrEmpty(filePath))
         {
             FileConfig.FilePath = filePath;

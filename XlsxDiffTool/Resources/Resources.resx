@@ -354,4 +354,7 @@
   <data name="OptionsSettingsSkipRemovedRows" xml:space="preserve">
     <value>Remove deleted rows</value>
   </data>
+  <data name="ColumnConfigReload" xml:space="preserve">
+    <value>Updates the columns based on the selected files</value>
+  </data>
 </root>

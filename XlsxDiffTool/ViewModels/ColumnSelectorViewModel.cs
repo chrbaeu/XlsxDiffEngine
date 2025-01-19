@@ -7,7 +7,7 @@ using XlsxDiffTool.Services;
 
 namespace XlsxDiffTool.ViewModels;
 
-public partial class ColumnSelectorViewModel(ColumnInfoService columnInfoService) : ObservableObject, IViewModel
+public partial class ColumnSelectorViewModel(ColumnInfoService columnInfoService, AppStateModel appStateModel) : ObservableObject, IViewModel
 {
     [ObservableProperty]
     public partial string ColumnName { get; set; } = "";
@@ -21,6 +21,26 @@ public partial class ColumnSelectorViewModel(ColumnInfoService columnInfoService
         {
             columnInfoService.AddManualColumn(columnName);
             ColumnName = "";
+        }
+    }
+
+    [RelayCommand]
+    public void RemoveColumn(string columnName)
+    {
+        columnInfoService.RemoveManualColumn(columnName);
+    }
+
+    [RelayCommand]
+    public async Task ReloadColumns()
+    {
+        appStateModel.IsBusy = true;
+        try
+        {
+            await columnInfoService.ReloadColumns();
+        }
+        finally
+        {
+            appStateModel.IsBusy = false;
         }
     }
 }

@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Localization;
 using System.IO;
 using XlsxDiffTool.Common;
+using XlsxDiffTool.Models;
 using XlsxDiffTool.Services;
 
 namespace XlsxDiffTool.ViewModels;
@@ -13,6 +14,7 @@ public sealed partial class MainViewModel(
     ColumnSelectorViewModel columnsConfig,
     OptionsViewModel options,
     OutputSelectorViewModel outputFile,
+    AppStateModel appStateModel,
     ExcelDiffService excelDiffService,
     IDialogService dialogService,
     DiffConfigService diffConfigService,
@@ -31,14 +33,13 @@ public sealed partial class MainViewModel(
 
     public OutputSelectorViewModel OutputFile { get; } = outputFile;
 
-    [ObservableProperty]
-    public partial bool IsBusy { get; set; }
+    public AppStateModel AppStateModel { get; } = appStateModel;
 
 
     [RelayCommand]
     private async Task SaveConfig()
     {
-        IsBusy = true;
+        AppStateModel.IsBusy = true;
         try
         {
             if (Options.DiffOptions.SaveAndRestoreInputFilePaths is null)
@@ -60,14 +61,14 @@ public sealed partial class MainViewModel(
         }
         finally
         {
-            IsBusy = false;
+            AppStateModel.IsBusy = false;
         }
     }
 
     [RelayCommand]
     private async Task LoadConfig()
     {
-        IsBusy = true;
+        AppStateModel.IsBusy = true;
         try
         {
             Directory.CreateDirectory(Path.Combine(userSettingsFolder, "Configs"));
@@ -79,28 +80,28 @@ public sealed partial class MainViewModel(
         }
         finally
         {
-            IsBusy = false;
+            AppStateModel.IsBusy = false;
         }
     }
 
     [RelayCommand]
-    private void ResetConfig()
+    private async Task ResetConfig()
     {
-        IsBusy = true;
+        AppStateModel.IsBusy = true;
         try
         {
-            diffConfigService.Reset();
+            await diffConfigService.Reset();
         }
         finally
         {
-            IsBusy = false;
+            AppStateModel.IsBusy = false;
         }
     }
 
     [RelayCommand]
     private async Task SaveDiff()
     {
-        IsBusy = true;
+        AppStateModel.IsBusy = true;
         try
         {
             if (!await Task.Run(excelDiffService.SaveDiff))
@@ -114,7 +115,7 @@ public sealed partial class MainViewModel(
         }
         finally
         {
-            IsBusy = false;
+            AppStateModel.IsBusy = false;
         }
     }
 

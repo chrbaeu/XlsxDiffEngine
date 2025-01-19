@@ -354,4 +354,7 @@
   <data name="OptionsSettingsSkipRemovedRows" xml:space="preserve">
     <value>Gelöschte Zeilen entfernen</value>
   </data>
+  <data name="ColumnConfigReload" xml:space="preserve">
+    <value>Aktualisiert die Spalten basierend auf den ausgewählten Dateien</value>
+  </data>
 </root>

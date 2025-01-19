@@ -16,8 +16,8 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
-            <!--<RowDefinition Height="5"/>
-            <RowDefinition Height="Auto"/>-->
+            <RowDefinition Height="5" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -26,10 +26,19 @@
         </Grid.ColumnDefinitions>
         <TextBlock
             Grid.Row="0"
-            Grid.ColumnSpan="3"
+            Grid.ColumnSpan="2"
             Margin="0,0,0,2"
             Style="{StaticResource BodyStrongTextBlockStyle}"
             Text="{s:Translate ColumnConfigHeader}" />
+        <Button
+            Grid.Row="0"
+            Grid.Column="2"
+            Padding="2,2,2,2"
+            HorizontalAlignment="Right"
+            Command="{Binding ReloadColumnsCommand, Mode=OneTime}"
+            ToolTip="{s:Translate ColumnConfigReload}">
+            <TextBlock FontFamily="{StaticResource SymbolThemeFontFamily}" Text="&#xE72C;" />
+        </Button>
         <Border
             Grid.Row="1"
             Grid.ColumnSpan="3"
@@ -47,6 +56,8 @@
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="5" />
                                 <ColumnDefinition Width="180" />
+                                <ColumnDefinition Width="5" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Name}" />
                             <TextBlock
@@ -74,12 +85,29 @@
                                 <ComboBoxItem Content="{s:Translate ColumnModeOmit}" Tag="{x:Static models:ColumnMode.Omit}" />
                                 <ComboBoxItem Content="{s:Translate ColumnModeTextCompare}" Tag="{x:Static models:ColumnMode.TextCompare}" />
                             </ComboBox>
+                            <Button
+                                Grid.Column="6"
+                                Padding="7,7,7,7"
+                                Command="{Binding DataContext.RemoveColumnCommand, Mode=OneTime, RelativeSource={RelativeSource AncestorType=ListView}}"
+                                CommandParameter="{Binding Name}">
+                                <TextBlock FontFamily="{StaticResource SymbolThemeFontFamily}" Text="&#xE711;" />
+                            </Button>
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
         </Border>
-        <!--<TextBox Grid.Row="3" Grid.Column="0" Text="{Binding ColumnName, Mode=TwoWay}" d:Text="ColumnName" />
-        <Button Grid.Row="3" Grid.Column="2" Content="+" Command="{Binding AddColumnCommand, Mode=OneTime}" />-->
+        <TextBox
+            Grid.Row="3"
+            Grid.Column="0"
+            d:Text="ColumnName"
+            Text="{Binding ColumnName, Mode=TwoWay}" />
+        <Button
+            Grid.Row="3"
+            Grid.Column="2"
+            Padding="7,7,7,7"
+            Command="{Binding AddColumnCommand, Mode=OneTime}">
+            <TextBlock FontFamily="{StaticResource SymbolThemeFontFamily}" Text="&#xE710;" />
+        </Button>
     </Grid>
 </UserControl>

@@ -2,6 +2,7 @@
 using OfficeOpenXml;
 using System.Drawing;
 using System.IO;
+using System.Text.RegularExpressions;
 using XlsxDiffEngine;
 using XlsxDiffEngine.Diff;
 using XlsxDiffTool.Models;
@@ -15,34 +16,39 @@ public sealed partial class ExcelDiffService(
 {
     public bool SaveDiff()
     {
-        if (optionsModel.OldFileConfig.IsFolderConfig || optionsModel.NewFileConfig.IsFolderConfig)
+        if (optionsModel.OldFileConfig.IsFolderConfig != optionsModel.NewFileConfig.IsFolderConfig)
         {
+            return false;
         }
+        else if (!optionsModel.OldFileConfig.IsFolderConfig && !optionsModel.NewFileConfig.IsFolderConfig)
+        {
+            if (!optionsModel.OldFileConfig.IsExisitingFile() || !optionsModel.NewFileConfig.IsExisitingFile()) { return false; }
+        }
+        if (!optionsModel.OutputFileConfig.IsValidPath()) { return false; }
 
-        if (!optionsModel.OldFileConfig.IsExisitingFile() || !optionsModel.NewFileConfig.IsExisitingFile() || !optionsModel.OutputFileConfig.IsValidPath()) { return false; }
-        Action<ExcelPackage>? prepareAction = x =>
+        var (oldXlsxFileInfos, newXlsxFileInfos) = GetXlsxFilesInfos();
+        if (oldXlsxFileInfos.Count == 1 && newXlsxFileInfos.Count == 1)
         {
-            foreach (var plugin in optionsModel.Plugins)
+            SaveDiff(oldXlsxFileInfos[0], newXlsxFileInfos[0], null);
+        }
+        else
+        {
+            var oldDict = oldXlsxFileInfos.ToDictionary(x => x.DocumentName, StringComparer.OrdinalIgnoreCase);
+            var newDict = newXlsxFileInfos.ToDictionary(x => x.DocumentName, StringComparer.OrdinalIgnoreCase);
+            if (!oldDict.Keys.Order().SequenceEqual(newDict.Keys.Order(), StringComparer.OrdinalIgnoreCase)) { return false; }
+            int fileNumber = 1;
+            foreach (var key in oldDict.Keys)
             {
-                pluginService.Plugins.Where(p => p.Name == plugin).FirstOrDefault()?.OnExcelPackageLoading(optionsModel, x);
+                SaveDiff(oldDict[key], newDict[key], fileNumber++);
             }
-        };
-        var oldFileInfo = new XlsxFileInfo(optionsModel.OldFileConfig.FilePath)
-        {
-            FromRow = optionsModel.OldFileConfig.StartRow,
-            FromColumn = optionsModel.OldFileConfig.StartColumn,
-            MergedWorksheetName = string.IsNullOrWhiteSpace(optionsModel.MergedWorksheetName) ? null : optionsModel.MergedWorksheetName,
-            PrepareExcelPackageCallback = prepareAction,
-        };
-        var newFileInfo = new XlsxFileInfo(optionsModel.NewFileConfig.FilePath)
-        {
-            FromRow = optionsModel.NewFileConfig.StartRow,
-            FromColumn = optionsModel.NewFileConfig.StartColumn,
-            MergedWorksheetName = string.IsNullOrWhiteSpace(optionsModel.MergedWorksheetName) ? null : optionsModel.MergedWorksheetName,
-            PrepareExcelPackageCallback = prepareAction,
-        };
+        }
+        return true;
+    }
+
+    private bool SaveDiff(XlsxFileInfo oldXlsxFileInfo, XlsxFileInfo newXlsxFileInfo, int? fileNumber)
+    {
         ExcelDiffBuilder builder = new ExcelDiffBuilder()
-            .AddFiles(oldFileInfo, newFileInfo);
+            .AddFiles(oldXlsxFileInfo, newXlsxFileInfo);
         if (optionsModel.SkipEmptyRows)
         {
             builder.SetSkipRowRule(SkipRules.SkipEmptyRows);
@@ -119,7 +125,7 @@ public sealed partial class ExcelDiffService(
         {
             pluginService.Plugins.Where(p => p.Name == plugin).FirstOrDefault()?.OnDiffCreation(optionsModel, builder);
         }
-        builder.Build(GetOutputFileName(), x =>
+        builder.Build(GetOutputFileName(oldXlsxFileInfo, newXlsxFileInfo, fileNumber), x =>
         {
             foreach (var plugin in optionsModel.Plugins)
             {
@@ -129,27 +135,20 @@ public sealed partial class ExcelDiffService(
         return true;
     }
 
-    private string GetOutputFileName()
+    private string GetOutputFileName(XlsxFileInfo oldXlsxFileInfo, XlsxFileInfo newXlsxFileInfo, int? fileNumber)
     {
-        string fileName = "Diff";
-        string? path;
+        string numberPostfix = fileNumber is int n ? $" {n}" : "";
+        string fileName = "Diff" + numberPostfix;
+        string path = "";
         if (optionsModel.OutputFileConfig.IsFolderConfig)
         {
             path = optionsModel.OutputFileConfig.FilePath;
-            if (optionsModel.OldFileConfig.IsValidPath() && optionsModel.NewFileConfig.IsValidPath())
-            {
-                var oldFileName = Path.GetFileNameWithoutExtension(optionsModel.OldFileConfig.FilePath);
-                var newFileName = Path.GetFileNameWithoutExtension(optionsModel.NewFileConfig.FilePath);
-                fileName = $"{oldFileName}_vs_{newFileName}";
-            }
+            fileName = $"{oldXlsxFileInfo.DocumentName}_vs_{newXlsxFileInfo.DocumentName}";
         }
-        else
+        else if (optionsModel.OutputFileConfig.IsValidPath() && Path.GetFileNameWithoutExtension(optionsModel.OldFileConfig.FilePath).Length > 0)
         {
-            path = Path.GetDirectoryName(optionsModel.OldFileConfig.FilePath) ?? "";
-            if (optionsModel.OldFileConfig.IsValidPath())
-            {
-                fileName = Path.GetFileNameWithoutExtension(optionsModel.OldFileConfig.FilePath);
-            }
+            path = Path.GetDirectoryName(optionsModel.OutputFileConfig.FilePath) ?? "";
+            fileName = Path.GetFileNameWithoutExtension(optionsModel.OldFileConfig.FilePath) + numberPostfix;
         }
         if (optionsModel.OutputFileConfig.AddDateTime)
         {
@@ -160,29 +159,9 @@ public sealed partial class ExcelDiffService(
 
     public List<string> GetColumnNames()
     {
-        Action<ExcelPackage>? prepareAction = x =>
-        {
-            foreach (var plugin in optionsModel.Plugins)
-            {
-                pluginService.Plugins.Where(p => p.Name == plugin).FirstOrDefault()?.OnExcelPackageLoading(optionsModel, x);
-            }
-        };
-        var oldFileInfo = optionsModel.OldFileConfig.IsExisitingFile() ? new XlsxFileInfo(optionsModel.OldFileConfig.FilePath)
-        {
-            FromRow = optionsModel.OldFileConfig.StartRow,
-            FromColumn = optionsModel.OldFileConfig.StartColumn,
-            MergedWorksheetName = string.IsNullOrWhiteSpace(optionsModel.MergedWorksheetName) ? null : optionsModel.MergedWorksheetName,
-            PrepareExcelPackageCallback = prepareAction,
-        } : null;
-        var newFileInfo = optionsModel.NewFileConfig.IsExisitingFile() ? new XlsxFileInfo(optionsModel.NewFileConfig.FilePath)
-        {
-            FromRow = optionsModel.NewFileConfig.StartRow,
-            FromColumn = optionsModel.NewFileConfig.StartColumn,
-            MergedWorksheetName = string.IsNullOrWhiteSpace(optionsModel.MergedWorksheetName) ? null : optionsModel.MergedWorksheetName,
-            PrepareExcelPackageCallback = prepareAction,
-        } : null;
+        var (oldXlsxFileInfos, newXlsxFileInfos) = GetXlsxFilesInfos();
         List<string> columns = [];
-        foreach (XlsxFileInfo xlsxFileInfo in new XlsxFileInfo?[] { newFileInfo, oldFileInfo }.OfType<XlsxFileInfo>())
+        foreach (XlsxFileInfo xlsxFileInfo in oldXlsxFileInfos.Concat(newXlsxFileInfos))
         {
             using XlsxDataProvider xlsxDataProvider = new(xlsxFileInfo);
             foreach (IExcelDataSource dataSource in xlsxDataProvider.GetDataSources())
@@ -195,4 +174,55 @@ public sealed partial class ExcelDiffService(
         }
         return columns.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
     }
+
+    private (List<XlsxFileInfo> oldFiles, List<XlsxFileInfo> newFiles) GetXlsxFilesInfos()
+    {
+        List<XlsxFileInfo> oldFiles = [];
+        List<XlsxFileInfo> newFiles = [];
+        if (optionsModel.OldFileConfig.IsFolderConfig && optionsModel.NewFileConfig.IsFolderConfig)
+        {
+            oldFiles = new DirectoryInfo(optionsModel.OldFileConfig.FilePath)
+                .GetFiles("*.xlsx")
+                .Select(x => CreateXlsxFileInfo(optionsModel.OldFileConfig, x.FullName)).ToList();
+            newFiles = new DirectoryInfo(optionsModel.NewFileConfig.FilePath)
+                .GetFiles("*.xlsx")
+                .Select(x => CreateXlsxFileInfo(optionsModel.NewFileConfig, x.FullName)).ToList();
+        }
+        else
+        {
+            if (optionsModel.OldFileConfig.IsExisitingFile())
+            {
+                oldFiles.Add(CreateXlsxFileInfo(optionsModel.OldFileConfig));
+            }
+            if (optionsModel.NewFileConfig.IsExisitingFile())
+            {
+                newFiles.Add(CreateXlsxFileInfo(optionsModel.NewFileConfig));
+            }
+        }
+        return (oldFiles, newFiles);
+    }
+
+    private XlsxFileInfo CreateXlsxFileInfo(FileConfigModel fileConfigModel, string? path = null)
+    {
+        path ??= fileConfigModel.FilePath;
+        var documentName = string.IsNullOrWhiteSpace(fileConfigModel.FileNameSelectorRegex)
+            ? Path.GetFileNameWithoutExtension(path)
+            : new Regex(fileConfigModel.FileNameSelectorRegex).Match(Path.GetFileNameWithoutExtension(path)).Value;
+        return new(path)
+        {
+            FromRow = fileConfigModel.StartRow,
+            FromColumn = fileConfigModel.StartColumn,
+            MergedWorksheetName = string.IsNullOrWhiteSpace(optionsModel.MergedWorksheetName) ? null : optionsModel.MergedWorksheetName,
+            PrepareExcelPackageCallback = prepareAction,
+            DocumentName = documentName,
+        };
+        void prepareAction(ExcelPackage x)
+        {
+            foreach (var plugin in optionsModel.Plugins)
+            {
+                pluginService.Plugins.Where(p => p.Name == plugin).FirstOrDefault()?.OnExcelPackageLoading(optionsModel, x);
+            }
+        }
+    }
+
 }

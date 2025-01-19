@@ -77,14 +77,10 @@
                 <StackPanel Margin="5,0,0,0" Orientation="Horizontal" Visibility="{Binding FileConfig.IsFolderConfig, Converter={StaticResource BoolToVisibilityConverter}}">
                     <TextBlock VerticalAlignment="Center" Text="{s:Translate FileNameRegex}" ToolTip="{s:Translate FileNameRegexTooltip}" />
                     <TextBox
-                        Width="75"
+                        MinWidth="75"
                         Margin="5,0,5,0"
                         Text="{Binding FileConfig.FileNameSelectorRegex, Mode=TwoWay}"
-                        ToolTip="{s:Translate FileNameRegexTooltip}">
-                        <i:Interaction.Behaviors>
-                            <behaviors:IntegerInputBehavior />
-                        </i:Interaction.Behaviors>
-                    </TextBox>
+                        ToolTip="{s:Translate FileNameRegexTooltip}" />
                 </StackPanel>
             </StackPanel>
         </WrapPanel>
