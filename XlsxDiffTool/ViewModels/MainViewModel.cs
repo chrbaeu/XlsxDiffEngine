@@ -108,7 +108,7 @@ public sealed partial class MainViewModel(
                 dialogService.ShowMessageBox(this, localizer["MsgBoxTitleError"], localizer["DiffSaveFailedMsg"], DialogButton.OK);
             }
         }
-        catch (Exception e)
+        catch (Exception)
         {
             dialogService.ShowMessageBox(this, localizer["MsgBoxTitleError"], localizer["DiffSaveFailedMsg"], DialogButton.OK);
         }

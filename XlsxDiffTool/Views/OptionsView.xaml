@@ -284,6 +284,11 @@
                             <CheckBox
                                 Margin="5,0,5,0"
                                 VerticalAlignment="Center"
+                                Content="{s:Translate OptionsSettingsSkipRemovedRows}"
+                                IsChecked="{Binding DiffOptions.SkipRemovedRows}" />
+                            <CheckBox
+                                Margin="5,0,5,0"
+                                VerticalAlignment="Center"
                                 Content="{s:Translate OptionsSettingsAlwaysSetPrimaryKeyColumnValues}"
                                 IsChecked="{Binding DiffOptions.AlwaysSetPrimaryKeyColumnValues}" />
                         </WrapPanel>

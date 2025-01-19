@@ -73,6 +73,9 @@ public sealed partial class DiffConfigModel : ObservableObject
     public partial bool SkipUnchangedRows { get; set; }
 
     [ObservableProperty]
+    public partial bool SkipRemovedRows { get; set; }
+
+    [ObservableProperty]
     public partial bool AlwaysSetPrimaryKeyColumnValues { get; set; }
 
     public ObservableCollection<ValueChangedMarkerModel> ValueChangedMarkers { get; init; } = [

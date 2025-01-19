@@ -256,6 +256,17 @@ public class ExcelDiffBuilder
     }
 
     /// <summary>
+    /// Configures whether to skip removed rows in the output.
+    /// </summary>
+    /// <param name="skipRemovedRows">Whether to skip removed rows (default is true).</param>
+    /// <returns>The current builder instance for method chaining.</returns>
+    public ExcelDiffBuilder SkipRemovedRows(bool skipRemovedRows = true)
+    {
+        diffConfig = diffConfig with { SkipRemovedRows = skipRemovedRows };
+        return this;
+    }
+
+    /// <summary>
     /// Sets a custom rule for determining if a row should be skipped during the comparison.
     /// </summary>
     /// <param name="skipRowRule">The <see cref="SkipRowPredicate"/> to determine the rows to skip.</param>

@@ -177,6 +177,71 @@ internal class ExcelDiffBuilderBasicTests
     }
 
     [Test]
+    public void Diff_RowbasedWithoutRemovedRows()
+    {
+        // Arrange
+        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
+        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
+        newExcelPackage.Workbook.Worksheets[0].Cells[4, 1].Value = "D";
+        newExcelPackage.Workbook.Worksheets[0].Cells[5, 1].Value = "E";
+        using var oldFileStream = oldExcelPackage.ToMemoryStream();
+        using var newFileStream = newExcelPackage.ToMemoryStream();
+
+        // Act
+        using ExcelPackage result = excelDiffBuilder
+            .AddFiles(x => x
+                .SetOldFile(oldFileStream, "OldFile.xlsx")
+                .SetNewFile(newFileStream, "NewFile.xlsx")
+                )
+            .SkipRemovedRows()
+            .Build();
+
+        // Assert
+        using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
+            ["Title", "Title", "Value", "Value"],
+            ["A", "A", 1, 1],
+            ["B", "B", 2, 4],
+            ["C", "D", 3, 3],
+            [null, "E", null, null],
+            ]);
+
+        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult);
+    }
+
+    [Test]
+    public void Diff_KeyedWithoutRemovedRows()
+    {
+        // Arrange
+        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
+        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
+        newExcelPackage.Workbook.Worksheets[0].Cells[4, 1].Value = "D";
+        newExcelPackage.Workbook.Worksheets[0].Cells[5, 1].Value = "E";
+        using var oldFileStream = oldExcelPackage.ToMemoryStream();
+        using var newFileStream = newExcelPackage.ToMemoryStream();
+
+        // Act
+        using ExcelPackage result = excelDiffBuilder
+            .AddFiles(x => x
+                .SetOldFile(oldFileStream, "OldFile.xlsx")
+                .SetNewFile(newFileStream, "NewFile.xlsx")
+                )
+            .SetKeyColumns("Title")
+            .SkipRemovedRows()
+            .Build();
+
+        // Assert
+        using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
+            ["Title", "Title", "Value", "Value"],
+            ["A", "A", 1, 1],
+            ["B", "B", 2, 4],
+            [null, "D", null, 3],
+            [null, "E", null, null],
+            ]);
+
+        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult);
+    }
+
+    [Test]
     public void Diff_WithColumnHeaderPostfix()
     {
         // Arrange

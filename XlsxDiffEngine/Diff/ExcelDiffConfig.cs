@@ -111,6 +111,11 @@ public record class ExcelDiffConfig
     public bool SkipUnchangedRows { get; init; }
 
     /// <summary>
+    /// Indicates whether to skip removed rows in the comparison output.
+    /// </summary>
+    public bool SkipRemovedRows { get; init; }
+
+    /// <summary>
     /// Indicates whether to always set primary key column values in the comparison output.
     /// (Not supported in combination with ShowOldDataColumn = false)
     /// </summary>

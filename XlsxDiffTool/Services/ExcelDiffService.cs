@@ -48,6 +48,7 @@ public sealed partial class ExcelDiffService(
             builder.SetSkipRowRule(SkipRules.SkipEmptyRows);
         }
         builder.SkipUnchangedRows(optionsModel.SkipUnchangedRows);
+        builder.SkipRemovedRows(optionsModel.SkipRemovedRows);
         builder.AlwaysSetPrimaryKeyColumnValues(optionsModel.AlwaysSetPrimaryKeyColumnValues);
         if (optionsModel.AddRowNumberColumn)
         {
@@ -144,7 +145,7 @@ public sealed partial class ExcelDiffService(
         }
         else
         {
-            path = Path.GetDirectoryName(optionsModel.OldFileConfig.FilePath);
+            path = Path.GetDirectoryName(optionsModel.OldFileConfig.FilePath) ?? "";
             if (optionsModel.OldFileConfig.IsValidPath())
             {
                 fileName = Path.GetFileNameWithoutExtension(optionsModel.OldFileConfig.FilePath);

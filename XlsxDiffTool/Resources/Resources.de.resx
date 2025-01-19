@@ -351,4 +351,7 @@
   <data name="OptionsHeader" xml:space="preserve">
     <value>Optionen:</value>
   </data>
+  <data name="OptionsSettingsSkipRemovedRows" xml:space="preserve">
+    <value>Gelöschte Zeilen entfernen</value>
+  </data>
 </root>
