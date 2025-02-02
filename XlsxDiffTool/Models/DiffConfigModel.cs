@@ -78,6 +78,9 @@ public sealed partial class DiffConfigModel : ObservableObject
     [ObservableProperty]
     public partial bool AlwaysSetPrimaryKeyColumnValues { get; set; }
 
+    [ObservableProperty]
+    public partial string Script { get; set; } = "";
+
     public ObservableCollection<ValueChangedMarkerModel> ValueChangedMarkers { get; init; } = [
         new() { MinDeviationAbsolute = 0.00, MinDeviationInPercent = 0.00, Color = "#FFFFFF00" },
         new() { MinDeviationAbsolute = 0.00, MinDeviationInPercent = 0.10, Color = "#FFFFA500" },
@@ -91,4 +94,8 @@ public sealed partial class DiffConfigModel : ObservableObject
         ];
 
     public ObservableCollection<string> Plugins { get; init; } = [];
+
+    // Colors
+
+    // Worksheets
 }

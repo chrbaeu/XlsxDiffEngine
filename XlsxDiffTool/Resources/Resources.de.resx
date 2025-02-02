@@ -357,4 +357,7 @@
   <data name="ColumnConfigReload" xml:space="preserve">
     <value>Aktualisiert die Spalten basierend auf den ausgewählten Dateien</value>
   </data>
+  <data name="OptionsScript" xml:space="preserve">
+    <value>Skript</value>
+  </data>
 </root>

@@ -294,6 +294,10 @@
                         </WrapPanel>
                     </Expander>
 
+                    <Expander Header="{s:Translate OptionsScript}" IsExpanded="False">
+                        <TextBox MinHeight="75" AcceptsReturn="True" Text="{Binding DiffOptions.Script}" />
+                    </Expander>
+
                     <Expander Header="{s:Translate OptionsPluginsHeader}" IsExpanded="False" Visibility="{Binding ShowPlugins, Converter={StaticResource BoolToVisibilityConverter}}">
                         <ItemsControl ItemsSource="{Binding Plugins}">
                             <ItemsControl.ItemsPanel>

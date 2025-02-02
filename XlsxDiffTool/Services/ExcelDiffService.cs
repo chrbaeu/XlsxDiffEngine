@@ -218,6 +218,10 @@ public sealed partial class ExcelDiffService(
         };
         void prepareAction(ExcelPackage x)
         {
+            if (!string.IsNullOrEmpty(optionsModel.Script))
+            {
+                ExcelScriptExecutor.ExecuteScript(x, optionsModel.Script);
+            }
             foreach (var plugin in optionsModel.Plugins)
             {
                 pluginService.Plugins.Where(p => p.Name == plugin).FirstOrDefault()?.OnExcelPackageLoading(optionsModel, x);
