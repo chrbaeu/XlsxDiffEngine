@@ -27,28 +27,39 @@ public sealed partial class ExcelDiffService(
         if (!optionsModel.OutputFileConfig.IsValidPath()) { return false; }
 
         var (oldXlsxFileInfos, newXlsxFileInfos) = GetXlsxFilesInfos();
-        if (oldXlsxFileInfos.Count == 1 && newXlsxFileInfos.Count == 1)
+        var oldDict = oldXlsxFileInfos.ToDictionary(x => x.DocumentName, StringComparer.OrdinalIgnoreCase);
+        var newDict = newXlsxFileInfos.ToDictionary(x => x.DocumentName, StringComparer.OrdinalIgnoreCase);
+        if (optionsModel.MergeDocuments || (oldXlsxFileInfos.Count == 1 && newXlsxFileInfos.Count == 1))
         {
-            SaveDiff(oldXlsxFileInfos[0], newXlsxFileInfos[0], null);
+            if (optionsModel.MergeDocuments)
+            {
+                if (!oldDict.Keys.Order().SequenceEqual(newDict.Keys.Order(), StringComparer.OrdinalIgnoreCase)) { return false; }
+                SaveDiff(newDict.Keys.Order().Select(key => (oldDict[key], newDict[key])).ToList(), null);
+            }
+            else
+            {
+                SaveDiff([(oldXlsxFileInfos[0], newXlsxFileInfos[0])], null);
+            }
         }
         else
         {
-            var oldDict = oldXlsxFileInfos.ToDictionary(x => x.DocumentName, StringComparer.OrdinalIgnoreCase);
-            var newDict = newXlsxFileInfos.ToDictionary(x => x.DocumentName, StringComparer.OrdinalIgnoreCase);
             if (!oldDict.Keys.Order().SequenceEqual(newDict.Keys.Order(), StringComparer.OrdinalIgnoreCase)) { return false; }
             int fileNumber = 1;
             foreach (var key in oldDict.Keys)
             {
-                SaveDiff(oldDict[key], newDict[key], fileNumber++);
+                SaveDiff([(oldDict[key], newDict[key])], fileNumber++);
             }
         }
         return true;
     }
 
-    private bool SaveDiff(XlsxFileInfo oldXlsxFileInfo, XlsxFileInfo newXlsxFileInfo, int? fileNumber)
+    private bool SaveDiff(List<(XlsxFileInfo OldFile, XlsxFileInfo NewFile)> xlsxFileInfos, int? fileNumber)
     {
-        ExcelDiffBuilder builder = new ExcelDiffBuilder()
-            .AddFiles(oldXlsxFileInfo, newXlsxFileInfo);
+        ExcelDiffBuilder builder = new();
+        foreach (var item in xlsxFileInfos)
+        {
+            builder.AddFiles(item.OldFile, item.NewFile);
+        }
         if (optionsModel.SkipEmptyRows)
         {
             builder.SetSkipRowRule(SkipRules.SkipEmptyRows);
@@ -79,6 +90,10 @@ public sealed partial class ExcelDiffService(
         }
         builder.MergeWorksheets(optionsModel.MergeWorksheets);
         builder.MergeDocuments(optionsModel.MergeDocuments);
+        if (!string.IsNullOrEmpty(optionsModel.MergedDocumentName))
+        {
+            builder.SetMergedDocumentName(optionsModel.MergedDocumentName);
+        }
         foreach (var valueChangedMaker in optionsModel.ValueChangedMarkers)
         {
             CellStyle cellStyle = new() { BackgroundColor = ColorTranslator.FromHtml(valueChangedMaker.Color) };
@@ -125,7 +140,8 @@ public sealed partial class ExcelDiffService(
         {
             pluginService.Plugins.Where(p => p.Name == plugin).FirstOrDefault()?.OnDiffCreation(optionsModel, builder);
         }
-        builder.Build(GetOutputFileName(oldXlsxFileInfo, newXlsxFileInfo, fileNumber), x =>
+        string fileName = GetOutputFileName(xlsxFileInfos[0].OldFile, xlsxFileInfos[0].NewFile, fileNumber);
+        builder.Build(fileName, x =>
         {
             foreach (var plugin in optionsModel.Plugins)
             {
