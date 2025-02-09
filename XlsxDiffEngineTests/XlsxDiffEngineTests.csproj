@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="EPPlus" Version="7.*" />
-    <PackageReference Include="TUnit" VersionOverride="$(TUnitVersion)" Version="0.9.11" />
+    <PackageReference Include="TUnit" VersionOverride="$(TUnitVersion)" Version="0.10.19" />
   </ItemGroup>
 
   <ItemGroup>

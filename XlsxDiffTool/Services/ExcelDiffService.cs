@@ -29,12 +29,13 @@ public sealed partial class ExcelDiffService(
         var (oldXlsxFileInfos, newXlsxFileInfos) = GetXlsxFilesInfos();
         var oldDict = oldXlsxFileInfos.ToDictionary(x => x.DocumentName, StringComparer.OrdinalIgnoreCase);
         var newDict = newXlsxFileInfos.ToDictionary(x => x.DocumentName, StringComparer.OrdinalIgnoreCase);
+        var keys = oldDict.Keys.Intersect(newDict.Keys, StringComparer.OrdinalIgnoreCase).Order().ToList();
         if (optionsModel.MergeDocuments || (oldXlsxFileInfos.Count == 1 && newXlsxFileInfos.Count == 1))
         {
             if (optionsModel.MergeDocuments)
             {
-                if (!oldDict.Keys.Order().SequenceEqual(newDict.Keys.Order(), StringComparer.OrdinalIgnoreCase)) { return false; }
-                SaveDiff(newDict.Keys.Order().Select(key => (oldDict[key], newDict[key])).ToList(), null);
+                if (keys.Count == 0) { return false; }
+                SaveDiff(keys.Select(key => (oldDict[key], newDict[key])).ToList(), null);
             }
             else
             {
@@ -43,9 +44,9 @@ public sealed partial class ExcelDiffService(
         }
         else
         {
-            if (!oldDict.Keys.Order().SequenceEqual(newDict.Keys.Order(), StringComparer.OrdinalIgnoreCase)) { return false; }
+            if (keys.Count == 0) { return false; }
             int fileNumber = 1;
-            foreach (var key in oldDict.Keys)
+            foreach (var key in keys)
             {
                 SaveDiff([(oldDict[key], newDict[key])], fileNumber++);
             }
