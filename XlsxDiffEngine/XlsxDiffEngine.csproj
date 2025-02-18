@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <AnalysisMode>all</AnalysisMode>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Version>0.6.2</Version>
+    <Version>0.6.3</Version>
     <Title>XlsxDiffEngine</Title>
     <Description>A simple library to generate excel documents representing the diff of excel documents based on EPPlus.</Description>
     <PackageId>Chriffizient.XlsxDiffEngine</PackageId>
@@ -35,7 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="EPPlus" Version="[7.4.2]" />
+    <PackageReference Include="EPPlus" Version="[7.4.2, )" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">

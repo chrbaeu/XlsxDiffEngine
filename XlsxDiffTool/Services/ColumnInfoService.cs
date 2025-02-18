@@ -79,7 +79,7 @@ public sealed class ColumnInfoService : IDisposable
         }
     }
 
-    private void InputFileConfig_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private async void InputFileConfig_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(FileConfigModel.FilePath)
             || e.PropertyName == nameof(FileConfigModel.StartRow)
@@ -87,7 +87,7 @@ public sealed class ColumnInfoService : IDisposable
         {
             if (!Columns.Any(x => x.ColumnKind != ColumnKind.Default))
             {
-                ReloadColumns();
+                await ReloadColumns();
             }
         }
     }

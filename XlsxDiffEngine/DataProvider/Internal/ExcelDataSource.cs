@@ -7,7 +7,7 @@ internal sealed class ExcelDataSource : IExcelDataSource
 {
     private readonly ExcelWorksheet worksheet;
     private readonly ExcelDataSourceConfig config;
-    private readonly ExcelAddress section;
+    private readonly ExcelAddress? section;
     private readonly List<string> columnNames = [];
     private readonly Dictionary<string, int> columnDict;
     private readonly int dataRowsOffset;
@@ -21,9 +21,9 @@ internal sealed class ExcelDataSource : IExcelDataSource
         this.section = section ?? worksheet.Dimension;
         this.config = config ?? new ExcelDataSourceConfig();
         Name = worksheet.Name;
-        DataRows = this.section.Rows - 1;
+        DataRows = (this.section?.Rows - 1) ?? 0;
         columnDict = new(this.config.StringComparer);
-        dataRowsOffset = this.section.Start.Row;
+        dataRowsOffset = this.section?.Start?.Row ?? 1;
     }
 
     public IReadOnlyCollection<string> GetColumnNames()
@@ -48,6 +48,7 @@ internal sealed class ExcelDataSource : IExcelDataSource
             columnDict.Add(config.CustomColumnName, -1);
         }
         HashSet<string> columnsToIgnore = new(config.ColumnsToIgnore, config.StringComparer);
+        if (section is null) { return columnNames; }
         for (int columnIndex = section.Start.Column; columnIndex <= section.End.Column; columnIndex++)
         {
             string columnName = worksheet.Cells[section.Start.Row, columnIndex].Text;
@@ -139,6 +140,7 @@ internal sealed class ExcelDataSource : IExcelDataSource
             {
                 return Enumerable.Range(1, DataRows).Select(x => config.CustomColumnValue).ToArray();
             }
+            if (section is null) { return Enumerable.Range(1, DataRows).Select(x => (object?)null).ToArray(); }
             object?[] cellValues = worksheet.Cells[section.Start.Row + 1, column, section.End.Row, column].GetValue<object?[]>();
             return cellValues;
         }
