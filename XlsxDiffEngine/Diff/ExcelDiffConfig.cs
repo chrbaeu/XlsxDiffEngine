@@ -48,6 +48,16 @@ public record class ExcelDiffConfig
     public IReadOnlyCollection<string> ColumnsToTextCompareOnly { get; init; } = [];
 
     /// <summary>
+    /// The columns to sort by in the comparison output.
+    /// </summary>
+    public IReadOnlyCollection<string> ColumnsToSortBy { get; init; } = [];
+
+    /// <summary>
+    /// The columns to fill with the old value if no new value exists.
+    /// </summary>
+    public IReadOnlyCollection<string> ColumnsToFillWithOldValueIfNoNewValueExists { get; init; } = [];
+
+    /// <summary>
     /// A collection of modification rules that define how to handle changes based on specific criteria.
     /// </summary>
     public IReadOnlyList<ModificationRule> ModificationRules { get; init; } = [];
@@ -56,6 +66,16 @@ public record class ExcelDiffConfig
     /// A collection of value change markers that specify thresholds and styles for highlighting value changes.
     /// </summary>
     public IReadOnlyList<ValueChangedMarker> ValueChangedMarkers { get; init; } = [];
+
+    /// <summary>
+    /// Indicates whether to always compare null values as text.
+    /// </summary>
+    public bool AlwaysCompareNullValuesAsText { get; init; }
+
+    /// <summary>
+    /// Indicates whether to add an empty row after each group in the comparison output.
+    /// </summary>
+    public bool AddEmptyRowAfterGroups { get; init; }
 
     /// <summary>
     /// Indicates whether cell formatting should be copied to the output.
@@ -116,12 +136,6 @@ public record class ExcelDiffConfig
     public bool SkipRemovedRows { get; init; }
 
     /// <summary>
-    /// Indicates whether to always set primary key column values in the comparison output.
-    /// (Not supported in combination with ShowOldDataColumn = false)
-    /// </summary>
-    public bool AlwaysSetPrimaryKeyColumnValues { get; init; }
-
-    /// <summary>
     /// A predicate to determine which rows should be skipped during comparison.
     /// </summary>
     public SkipRowPredicate? SkipRowRule { get; init; }
@@ -147,9 +161,14 @@ public record class ExcelDiffConfig
     public CellStyle ChangedCellStyle { get; init; } = DefaultCellStyles.ChangedCell;
 
     /// <summary>
-    /// The style for key columns in rows with changes in the comparison output.
+    /// The style for key columns cells in rows with changes in the comparison output.
     /// </summary>
     public CellStyle ChangedRowKeyColumnsStyle { get; init; } = DefaultCellStyles.ChangedRowKeyColumns;
+
+    /// <summary>
+    /// The style for cells with non-original fallback values in the comparison output.
+    /// </summary>
+    public CellStyle FallbackValueStyle { get; init; } = DefaultCellStyles.FallbackValue;
 }
 
 /// <summary>

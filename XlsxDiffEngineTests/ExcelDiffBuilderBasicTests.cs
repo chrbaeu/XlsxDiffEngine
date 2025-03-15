@@ -623,4 +623,72 @@ internal class ExcelDiffBuilderBasicTests
         ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
     }
 
+    [Test]
+    public void Diff_WithSort()
+    {
+        // Arrange
+        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
+        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
+        using var oldFileStream = oldExcelPackage.ToMemoryStream();
+        using var newFileStream = newExcelPackage.ToMemoryStream();
+
+        // Act
+        using ExcelPackage result = excelDiffBuilder
+            .AddFiles(x => x
+                .SetOldFile(oldFileStream, "OldFile.xlsx")
+                .SetNewFile(newFileStream, "NewFile.xlsx")
+                )
+            .SetColumnsToSortBy("Value")
+            .Build();
+
+        // Assert
+        using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
+            ["Title", "Title", "Value", "Value"],
+            ["A", "A", 1, 1],
+            ["C", "C", 3, 3],
+            ["B", "B", 2, 4],
+            ]);
+        ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[4, 3, 4, 4], DefaultCellStyles.ChangedCell);
+
+        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+    }
+
+    [Test]
+    public void Diff_WithOldValueFallback()
+    {
+        // Arrange
+        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
+        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
+        newExcelPackage.Workbook.Worksheets[0].Cells[4, 1].Value = "D";
+        using var oldFileStream = oldExcelPackage.ToMemoryStream();
+        using var newFileStream = newExcelPackage.ToMemoryStream();
+
+        // Act
+        using ExcelPackage result = excelDiffBuilder
+            .AddFiles(x => x
+                .SetOldFile(oldFileStream, "OldFile.xlsx")
+                .SetNewFile(newFileStream, "NewFile.xlsx")
+                )
+            .SetKeyColumns("Title")
+            .SetColumnsToFillWithOldValueIfNoNewValueExists("Title")
+            .Build();
+
+        // Assert
+        using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
+            ["Title", "Title", "Value", "Value"],
+            ["A", "A", 1, 1],
+            ["B", "B", 2, 4],
+            [null, "D", null, 3],
+            ["C", "C", 3, null],
+            ]);
+
+        ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[3, 1, 3, 2], DefaultCellStyles.ChangedRowKeyColumns);
+        ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[3, 3, 3, 4], DefaultCellStyles.ChangedCell);
+        ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[4, 1, 4, 4], DefaultCellStyles.AddedRow);
+        ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[5, 1, 5, 4], DefaultCellStyles.RemovedRow);
+        ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[5, 2], DefaultCellStyles.FallbackValue);
+
+        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+    }
+
 }

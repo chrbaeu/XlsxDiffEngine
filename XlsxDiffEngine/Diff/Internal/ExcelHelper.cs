@@ -31,6 +31,10 @@ internal static class ExcelHelper
         {
             cells.Style.Font.UnderLine = underline;
         }
+        if (cellStyle.Strike is bool strike)
+        {
+            cells.Style.Font.Strike = strike;
+        }
     }
 
     public static void CopyCellStyle(ExcelRange dstCell, ExcelRange? srcCell)
@@ -39,6 +43,7 @@ internal static class ExcelHelper
         dstCell.Style.Font.Bold = sourceCell.Style.Font.Bold;
         dstCell.Style.Font.Italic = sourceCell.Style.Font.Italic;
         dstCell.Style.Font.UnderLine = sourceCell.Style.Font.UnderLine;
+        dstCell.Style.Font.Strike = sourceCell.Style.Font.Strike;
         dstCell.Style.Font.Size = sourceCell.Style.Font.Size;
         TransferColor(dstCell.Style.Font.Color, sourceCell.Style.Font.Color);
         dstCell.Style.Fill.PatternType = sourceCell.Style.Fill.PatternType;

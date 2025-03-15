@@ -130,6 +130,28 @@ public class ExcelDiffBuilder
     }
 
     /// <summary>
+    /// Specifies columns to sort by in the comparison output.
+    /// </summary>
+    /// <param name="columnsToSortBy">Array of column names to sort by.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
+    public ExcelDiffBuilder SetColumnsToSortBy(params string[] columnsToSortBy)
+    {
+        diffConfig = diffConfig with { ColumnsToSortBy = columnsToSortBy };
+        return this;
+    }
+
+    /// <summary>
+    /// Specifies columns to fill with old values if no new value exists.
+    /// </summary>
+    /// <param name="columnsToFillWithOldValueIfNoNewValueExists">Array of column names to fill with old values if no new value exists.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
+    public ExcelDiffBuilder SetColumnsToFillWithOldValueIfNoNewValueExists(params string[] columnsToFillWithOldValueIfNoNewValueExists)
+    {
+        diffConfig = diffConfig with { ColumnsToFillWithOldValueIfNoNewValueExists = columnsToFillWithOldValueIfNoNewValueExists };
+        return this;
+    }
+
+    /// <summary>
     /// Sets the modification rules to apply to specific data changes.
     /// </summary>
     /// <param name="modificationRules">Array of modification rules.</param>
@@ -168,6 +190,28 @@ public class ExcelDiffBuilder
     }
 
     /// <summary>
+    /// Specifies whether to always compare null values as text.
+    /// </summary>
+    /// <param name="alwaysCompareNullValuesAsText">Whether to always compare null values as text (default is true).</param>
+    /// <returns>The current builder instance for method chaining.</returns>
+    public ExcelDiffBuilder AlwaysCompareNullValuesAsText(bool alwaysCompareNullValuesAsText = true)
+    {
+        diffConfig = diffConfig with { AlwaysCompareNullValuesAsText = alwaysCompareNullValuesAsText };
+        return this;
+    }
+
+    /// <summary>
+    /// Specifies whether to add an empty row after groups in the comparison output.
+    /// </summary>
+    /// <param name="addEmptyRowAfterGroups">Whether to add an empty row after groups (default is true).</param>
+    /// <returns>The current builder instance for method chaining.</returns>
+    public ExcelDiffBuilder AddEmptyRowAfterGroups(bool addEmptyRowAfterGroups = true)
+    {
+        diffConfig = diffConfig with { AddEmptyRowAfterGroups = addEmptyRowAfterGroups };
+        return this;
+    }
+
+    /// <summary>
     /// Specifies whether to copy cell formatting from the original data.
     /// </summary>
     /// <param name="copyCellFormat">Whether to copy cell formats (default is true).</param>
@@ -186,6 +230,17 @@ public class ExcelDiffBuilder
     public ExcelDiffBuilder CopyCellStyle(bool copyCellStyle = true)
     {
         diffConfig = diffConfig with { CopyCellStyle = copyCellStyle };
+        return this;
+    }
+
+    /// <summary>
+    /// Specifies whether to show the old data column in the comparison output.
+    /// </summary>
+    /// <param name="showOldDataColumn">Whether to show the old data column (default is true).</param>
+    /// <returns>The current builder instance for method chaining.</returns>
+    public ExcelDiffBuilder ShowOldDataColumn(bool showOldDataColumn = true)
+    {
+        diffConfig = diffConfig with { ShowOldDataColumn = showOldDataColumn };
         return this;
     }
 
@@ -341,17 +396,6 @@ public class ExcelDiffBuilder
     {
         diffConfig = diffConfig with { IgnoreCase = ignoreCase };
         xlsxConfig = xlsxConfig with { IgnoreCase = ignoreCase };
-        return this;
-    }
-
-    /// <summary>
-    /// Configures whether to always set primary key column values, even if they not exisits one of the the data sources.
-    /// </summary>
-    /// <param name="alwaysSetPrimaryKeyColumnValues">Whether to always set primary key column values (default is false).</param>
-    /// <returns>The current builder instance for method chaining.</returns>
-    public ExcelDiffBuilder AlwaysSetPrimaryKeyColumnValues(bool alwaysSetPrimaryKeyColumnValues = false)
-    {
-        diffConfig = diffConfig with { AlwaysSetPrimaryKeyColumnValues = alwaysSetPrimaryKeyColumnValues };
         return this;
     }
 
@@ -590,7 +634,7 @@ public class ExcelDiffBuilder
                         for (column = 1; column <= worksheet.Dimension.End.Column; column++)
                         {
                             if (columnsToShow.Contains(worksheet.Cells[row, column].Text, stringComparer)) { continue; }
-                            if (hideOldColumns && column % 2 != 0) { worksheet.Column(column).Hidden = true; }
+                            if (hideOldColumns && diffConfig.ShowOldDataColumn && column % 2 != 0) { worksheet.Column(column).Hidden = true; }
                             if (columnsToHide.Contains(worksheet.Cells[row, column].Text, stringComparer))
                             {
                                 worksheet.Column(column).Hidden = true;

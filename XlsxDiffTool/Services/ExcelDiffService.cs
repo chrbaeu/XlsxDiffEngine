@@ -67,7 +67,10 @@ public sealed partial class ExcelDiffService(
         }
         builder.SkipUnchangedRows(optionsModel.SkipUnchangedRows);
         builder.SkipRemovedRows(optionsModel.SkipRemovedRows);
-        builder.AlwaysSetPrimaryKeyColumnValues(optionsModel.AlwaysSetPrimaryKeyColumnValues);
+        if (optionsModel.AlwaysSetPrimaryKeyColumnValues)
+        {
+            builder.SetColumnsToFillWithOldValueIfNoNewValueExists([.. optionsModel.Columns.Where(x => x.Mode == ColumnMode.Key).Select(x => x.Name)]);
+        }
         if (optionsModel.AddRowNumberColumn)
         {
             builder.AddRowNumberAsColumn(optionsModel.RowNumberColumnName);

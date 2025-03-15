@@ -61,6 +61,20 @@ internal static class IEnumerableExtensions
         ArgumentNullThrowHelper.ThrowIfNull(source);
         return new HashSet<TSource>(source, comparer);
     }
+
+    public static IEnumerable<TSource> DistinctBy<TSource, TKey>(
+        this IEnumerable<TSource> source,
+        Func<TSource, TKey> keySelector)
+    {
+        HashSet<TKey> seenKeys = new HashSet<TKey>();
+        foreach (var element in source)
+        {
+            if (seenKeys.Add(keySelector(element)))
+            {
+                yield return element;
+            }
+        }
+    }
 }
 
 internal static class StringExtensions

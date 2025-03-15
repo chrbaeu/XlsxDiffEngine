@@ -62,7 +62,7 @@ internal static class ExcelTestHelper
 
                     if (styleA.Font.Bold != styleB.Font.Bold || styleA.Font.Italic != styleB.Font.Italic
                         || styleA.Font.UnderLine != styleB.Font.UnderLine || styleA.Font.Size != styleB.Font.Size
-                        || !IsSameColor(styleA.Font.Color, styleB.Font.Color))
+                        || styleA.Font.Strike != styleB.Font.Strike || !IsSameColor(styleA.Font.Color, styleB.Font.Color))
                     {
                         throw new ArgumentException($"Font style in worksheet '{worksheetA.Name}' differs at position [{row}, {col}].");
                     }

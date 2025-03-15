@@ -23,7 +23,7 @@ internal sealed class ExcelDiffOp
         MergedColumnNames = newDataSource.GetColumnNames().Union(oldDataSource.GetColumnNames(), stringComparer).ToList().AsReadOnly();
     }
 
-    public List<(int? oldRow, int? newRow)> GetMergedRows()
+    public List<(int? oldRow, int? newRow, int group)> GetMergedRows()
     {
         List<DataKey> oldDataKeys = GetDataKeys(oldDataSource);
         List<DataKey> newDataKeys = GetDataKeys(newDataSource);
@@ -31,48 +31,58 @@ internal sealed class ExcelDiffOp
         var oldSecondaryKeyDict = oldDataKeys.ToDictionary(x => x.SecondaryKey, stringComparer);
         var newKeyDict = newDataKeys.ToDictionary(x => x.PrimaryKey, stringComparer);
         var usedDataKeys = newDataKeys.Select(x => x.PrimaryKey).ToHashSet(stringComparer);
-        List<(int? oldRow, int? newRow)> diff = [];
-        foreach (string dataKey in GetCombinedKeyList(oldDataKeys, newDataKeys))
+        List<(int? oldRow, int? newRow, int group)> diff = [];
+        int group = 0;
+        string lastGroupKey = "";
+        foreach (DataKey dataKey in GetCombinedKeyList(oldDataKeys, newDataKeys))
         {
-            _ = oldKeyDict.TryGetValue(dataKey, out DataKey? oldRow);
-            _ = newKeyDict.TryGetValue(dataKey, out DataKey? newRow);
+            if (lastGroupKey != dataKey.GroupKey)
+            {
+                group++;
+                lastGroupKey = dataKey.GroupKey;
+            }
+            _ = oldKeyDict.TryGetValue(dataKey.PrimaryKey, out DataKey? oldRow);
+            _ = newKeyDict.TryGetValue(dataKey.PrimaryKey, out DataKey? newRow);
             if (newRow is null)
             {
-                if (oldRow is not null && !usedDataKeys.Contains(dataKey))
+                if (oldRow is not null && !usedDataKeys.Contains(dataKey.PrimaryKey))
                 {
-                    diff.Add((oldRow.RowNumber, null));
+                    diff.Add((oldRow.RowNumber, null, group));
                 }
             }
             else if (oldRow is not null)
             {
-                diff.Add((oldRow.RowNumber, newRow.RowNumber));
+                diff.Add((oldRow.RowNumber, newRow.RowNumber, group));
             }
-            else if (!usedDataKeys.Contains(dataKey) && oldSecondaryKeyDict.TryGetValue(newRow.SecondaryKey, out oldRow))
+            else if (!usedDataKeys.Contains(dataKey.PrimaryKey) && oldSecondaryKeyDict.TryGetValue(newRow.SecondaryKey, out oldRow))
             {
-                diff.Add((oldRow.RowNumber, newRow.RowNumber));
+                diff.Add((oldRow.RowNumber, newRow.RowNumber, group));
                 _ = usedDataKeys.Add(oldRow.PrimaryKey);
             }
             else
             {
-                diff.Add((null, newRow.RowNumber));
+                diff.Add((null, newRow.RowNumber, group));
             }
         }
         return diff;
     }
 
-    private static List<string> GetCombinedKeyList(List<DataKey> oldDataKeys, List<DataKey> newDataKeys)
+    private List<DataKey> GetCombinedKeyList(List<DataKey> oldDataKeys, List<DataKey> newDataKeys)
     {
         var groupKeys = newDataKeys
             .Select(item => item.GroupKey)
             .Union(oldDataKeys.Select(item => item.GroupKey))
             .ToList();
-        var combinedKeyList = groupKeys
+        List<DataKey> combinedKeyList = groupKeys
             .SelectMany(group => newDataKeys
                 .Where(item => item.GroupKey == group)
-                .Select(x => x.PrimaryKey)
-                .Union(oldDataKeys.Where(item => item.GroupKey == group).Select(x => x.PrimaryKey)))
-            .Distinct()
+                .Union(oldDataKeys.Where(item => item.GroupKey == group)))
+            .DistinctBy(x => x.PrimaryKey)
             .ToList();
+        if (config.ColumnsToSortBy.Count > 0)
+        {
+            combinedKeyList = combinedKeyList.OrderByList(x => x.SortData).ToList();
+        }
         return combinedKeyList;
     }
 
@@ -87,7 +97,8 @@ internal sealed class ExcelDiffOp
                 GetKey(dataSource, row, config.KeyColumns),
                 GetKey(dataSource, row, config.SecondaryKeyColumns),
                 config.GroupKeyColumns.Count > 0 ? GetKey(dataSource, row, config.GroupKeyColumns) : "",
-                row);
+                row,
+                GetSortingData(dataSource, row, config.ColumnsToSortBy));
             if (primaryKeySet.Contains(dataKey.PrimaryKey))
             {
                 int i = 1;
@@ -116,5 +127,17 @@ internal sealed class ExcelDiffOp
         return stringBuilder.ToString();
     }
 
-    private sealed record DataKey(string PrimaryKey, string SecondaryKey, string GroupKey, int RowNumber);
+    private static List<object?> GetSortingData(IExcelDataSource dataSource, int row, IReadOnlyCollection<string> columnNamesToSortBy)
+    {
+        if (columnNamesToSortBy.Count == 0) { return []; }
+        if (columnNamesToSortBy.Count == 1) { return [dataSource.GetCellValue(columnNamesToSortBy.First(), row)]; }
+        List<object?> sortData = [];
+        foreach (string columnName in columnNamesToSortBy)
+        {
+            sortData.Add(dataSource.GetCellValue(columnName, row));
+        }
+        return sortData;
+    }
+
+    private sealed record DataKey(string PrimaryKey, string SecondaryKey, string GroupKey, int RowNumber, List<object?> SortData);
 }

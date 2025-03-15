@@ -23,6 +23,11 @@ public sealed record class CellStyle
     public bool? Underline { get; init; }
 
     /// <summary>
+    /// Specifies whether the font is struck through. If null, the strike style is unspecified.
+    /// </summary>
+    public bool? Strike { get; init; }
+
+    /// <summary>
     /// The color of the font. If null, the font color is unspecified.
     /// </summary>
     public Color? FontColor { get; init; }

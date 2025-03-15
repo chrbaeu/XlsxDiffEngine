@@ -54,11 +54,17 @@ public sealed class ExcelDiffWriter
     private int WriteData(ExcelWorksheet worksheet, int row, int startColumn)
     {
         ModificationRuleHandler ruleHandler = new(config.ModificationRules, config.IgnoreCase);
-        foreach ((int? oldRow, int? newRow) in excelDiffOp.GetMergedRows())
+        int lastGroup = 0;
+        foreach ((int? oldRow, int? newRow, int group) in excelDiffOp.GetMergedRows())
         {
+            if (lastGroup != group && config.AddEmptyRowAfterGroups)
+            {
+                lastGroup = group;
+                row++;
+            }
             int column = startColumn;
             bool isChanged = false;
-            List<ExcelRange> keyCells = [];
+            List<ExcelRange> keyCells = [], fallbackValueCells = [];
             foreach (string columnName in excelDiffOp.MergedColumnNames)
             {
                 if (config.ColumnsToOmit.Contains(columnName, stringComparer))
@@ -67,11 +73,11 @@ public sealed class ExcelDiffWriter
                 }
                 ExcelRange? oldDstCell = worksheet.Cells[row, column];
                 object? oldValue = SetCell(oldDstCell, columnName, oldRow, ruleHandler, DataKind.Old);
-                string oldText = config.AddOldValueAsComment ? oldDstCell.Text ?? "" : "";
+                string oldText = config.AddOldValueAsComment ? oldDstCell.Text : "";
                 if (config.ShowOldDataColumn) { column++; } else { oldDstCell = null; }
                 ExcelRange newDstCell = worksheet.Cells[row, column];
                 object? newValue = SetCell(newDstCell, columnName, newRow, ruleHandler, DataKind.New);
-                if (config.AddOldValueAsComment && oldValue?.ToString() != newValue?.ToString())
+                if (config.AddOldValueAsComment && oldText != newDstCell.Text)
                 {
                     string? comment = config.OldValueCommentPrefix is { } prefix ? prefix + oldText : oldText;
                     _ = newDstCell.AddComment(comment ?? "");
@@ -80,13 +86,14 @@ public sealed class ExcelDiffWriter
                 isChanged |= GetAndHandleChangedState(columnName, oldDstCell, oldValue, newDstCell, newValue);
                 if (config.KeyColumns.Contains(columnName, stringComparer))
                 {
-                    if (config.AlwaysSetPrimaryKeyColumnValues && oldDstCell is not null)
-                    {
-                        if (oldDstCell.Value is { } && newDstCell.Value is null) { newDstCell.Value = oldDstCell.Value; }
-                        if (newDstCell.Value is { } && oldDstCell.Value is null) { oldDstCell.Value = newDstCell.Value; }
-                    }
                     if (oldDstCell is not null) { keyCells.Add(oldDstCell); }
                     keyCells.Add(newDstCell);
+                }
+                if (config.ColumnsToFillWithOldValueIfNoNewValueExists.Contains(columnName, stringComparer)
+                    && newRow is null)
+                {
+                    newDstCell.Value = oldValue;
+                    fallbackValueCells.Add(newDstCell);
                 }
             }
             if (isChanged && config.ChangedRowKeyColumnsStyle is not null)
@@ -94,6 +101,13 @@ public sealed class ExcelDiffWriter
                 foreach (ExcelRange keyCell in keyCells)
                 {
                     ExcelHelper.SetCellStyle(keyCell, config.ChangedRowKeyColumnsStyle);
+                }
+            }
+            if (config.FallbackValueStyle is not null)
+            {
+                foreach (ExcelRange cell in fallbackValueCells)
+                {
+                    ExcelHelper.SetCellStyle(cell, config.FallbackValueStyle);
                 }
             }
             if (oldRow is null) { ExcelHelper.SetCellStyle(worksheet.Cells[row, startColumn, row, column - 1], config.AddedRowStyle); }
@@ -139,6 +153,11 @@ public sealed class ExcelDiffWriter
                     cellStyle = valueChangedMarker.CellStyle;
                 }
             }
+        }
+        else if (!config.AlwaysCompareNullValuesAsText && (oldValue is double || newValue is double)
+            && config.ValueChangedMarkers.Count > 0)
+        {
+            cellStyle = config.ValueChangedMarkers[^1].CellStyle;
         }
         else if (oldValue?.ToString() != newValue?.ToString())
         {
