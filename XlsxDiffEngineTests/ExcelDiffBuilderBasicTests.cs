@@ -691,4 +691,40 @@ internal class ExcelDiffBuilderBasicTests
         ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
     }
 
+    [Test]
+    public void Diff_IgnoreColumnsNotInBoth_WorksAsExpected()
+    {
+        // Arrange
+        object?[][] oldFile = [
+            ["Title", "Value", "OldOnly"],
+            ["A", 1, "x"],
+            ["B", 2, "y"],
+        ];
+        object?[][] newFile = [
+            ["Title", "Value", "NewOnly"],
+            ["A", 1, "foo"],
+            ["B", 2, "bar"],
+        ];
+        using var oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFile);
+        using var newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFile);
+        using var oldFileStream = oldExcelPackage.ToMemoryStream();
+        using var newFileStream = newExcelPackage.ToMemoryStream();
+
+        // Act
+        using var result = excelDiffBuilder
+            .AddFiles(x => x
+                .SetOldFile(oldFileStream, "OldFile.xlsx")
+                .SetNewFile(newFileStream, "NewFile.xlsx")
+            )
+            .IgnoreColumnsNotInBoth(true)
+            .Build();
+
+        // Assert
+        using var expectedResult = ExcelTestHelper.ConvertToExcelPackage([
+            ["Title", "Title", "Value", "Value"],
+            ["A", "A", 1, 1],
+            ["B", "B", 2, 2],
+        ]);
+        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+    }
 }

@@ -88,6 +88,7 @@ public sealed partial class ExcelDiffService(
         builder.CopyCellFormat(optionsModel.CopyCellFormats);
         builder.CopyCellStyle(optionsModel.CopyCellStyles);
         builder.HideOldColumns(optionsModel.HideOldColumns);
+        builder.IgnoreColumnsNotInBoth(optionsModel.IgnoreColumnsNotInBoth);
         if (optionsModel.AddOldValueComment)
         {
             builder.AddOldValueAsComment(); // TODO prefix

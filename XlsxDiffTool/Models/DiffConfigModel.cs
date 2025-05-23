@@ -34,7 +34,6 @@ public sealed partial class DiffConfigModel : ObservableObject
     [ObservableProperty]
     public partial string DocumentNameColumnName { get; set; } = "";
 
-
     [ObservableProperty]
     public partial bool AutoFitColumns { get; set; } = true;
 
@@ -52,7 +51,6 @@ public sealed partial class DiffConfigModel : ObservableObject
 
     [ObservableProperty]
     public partial bool AddOldValueComment { get; set; }
-
 
     [ObservableProperty]
     public partial bool MergeWorksheets { get; set; }
@@ -83,6 +81,9 @@ public sealed partial class DiffConfigModel : ObservableObject
 
     [ObservableProperty]
     public partial bool UseFolderMode { get; set; }
+
+    [ObservableProperty]
+    public partial bool IgnoreColumnsNotInBoth { get; set; }
 
     public ObservableCollection<ValueChangedMarkerModel> ValueChangedMarkers { get; init; } = [
         new() { MinDeviationAbsolute = 0.00, MinDeviationInPercent = 0.00, Color = "#FFFFFF00" },

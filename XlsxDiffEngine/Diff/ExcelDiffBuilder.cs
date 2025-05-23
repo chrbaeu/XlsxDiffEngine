@@ -58,10 +58,7 @@ public class ExcelDiffBuilder
     /// <param name="keyColumns">Array of column names representing primary keys.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetKeyColumns(params string[] keyColumns)
-    {
-        diffConfig = diffConfig with { KeyColumns = keyColumns };
-        return this;
-    }
+        => UpdateConfig(x => x with { KeyColumns = keyColumns });
 
     /// <summary>
     /// Specifies secondary key columns for additional row-matching criteria.
@@ -69,10 +66,7 @@ public class ExcelDiffBuilder
     /// <param name="secondaryKeyColumns">Array of secondary key column names.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetSecondaryKeyColumns(params string[] secondaryKeyColumns)
-    {
-        diffConfig = diffConfig with { SecondaryKeyColumns = secondaryKeyColumns };
-        return this;
-    }
+        => UpdateConfig(x => x with { SecondaryKeyColumns = secondaryKeyColumns });
 
     /// <summary>
     /// Specifies grouping columns for organizing rows in the comparison output.
@@ -80,10 +74,7 @@ public class ExcelDiffBuilder
     /// <param name="groupKeyColumns">Array of column names to group rows by.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetGroupKeyColumns(params string[] groupKeyColumns)
-    {
-        diffConfig = diffConfig with { GroupKeyColumns = groupKeyColumns };
-        return this;
-    }
+        => UpdateConfig(x => x with { GroupKeyColumns = groupKeyColumns });
 
     /// <summary>
     /// Specifies the columns to include in the comparison.
@@ -91,10 +82,7 @@ public class ExcelDiffBuilder
     /// <param name="columnsToCompare">Array of column names to be compared.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetColumnsToCompare(params string[] columnsToCompare)
-    {
-        diffConfig = diffConfig with { ColumnsToCompare = columnsToCompare };
-        return this;
-    }
+        => UpdateConfig(x => x with { ColumnsToCompare = columnsToCompare });
 
     /// <summary>
     /// Specifies the columns to ignore during the comparison.
@@ -102,10 +90,7 @@ public class ExcelDiffBuilder
     /// <param name="columnsToIgnore">Array of column names to ignore.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetColumnsToIgnore(params string[] columnsToIgnore)
-    {
-        diffConfig = diffConfig with { ColumnsToIgnore = columnsToIgnore };
-        return this;
-    }
+        => UpdateConfig(x => x with { ColumnsToIgnore = columnsToIgnore });
 
     /// <summary>
     /// Specifies columns to omit from the output.
@@ -113,10 +98,7 @@ public class ExcelDiffBuilder
     /// <param name="columnsToOmit">Array of column names to omit.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetColumnsToOmit(params string[] columnsToOmit)
-    {
-        diffConfig = diffConfig with { ColumnsToOmit = columnsToOmit };
-        return this;
-    }
+        => UpdateConfig(x => x with { ColumnsToOmit = columnsToOmit });
 
     /// <summary>
     /// Specifies columns to be compared only as text, ignoring numeric data types.
@@ -124,10 +106,7 @@ public class ExcelDiffBuilder
     /// <param name="columnsToTextCompareOnly">Array of column names for text-only comparison.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetColumnsToTextCompareOnly(params string[] columnsToTextCompareOnly)
-    {
-        diffConfig = diffConfig with { ColumnsToTextCompareOnly = columnsToTextCompareOnly };
-        return this;
-    }
+        => UpdateConfig(x => x with { ColumnsToTextCompareOnly = columnsToTextCompareOnly });
 
     /// <summary>
     /// Specifies columns to sort by in the comparison output.
@@ -135,10 +114,7 @@ public class ExcelDiffBuilder
     /// <param name="columnsToSortBy">Array of column names to sort by.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetColumnsToSortBy(params string[] columnsToSortBy)
-    {
-        diffConfig = diffConfig with { ColumnsToSortBy = columnsToSortBy };
-        return this;
-    }
+        => UpdateConfig(x => x with { ColumnsToSortBy = columnsToSortBy });
 
     /// <summary>
     /// Specifies columns to fill with old values if no new value exists.
@@ -146,10 +122,7 @@ public class ExcelDiffBuilder
     /// <param name="columnsToFillWithOldValueIfNoNewValueExists">Array of column names to fill with old values if no new value exists.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetColumnsToFillWithOldValueIfNoNewValueExists(params string[] columnsToFillWithOldValueIfNoNewValueExists)
-    {
-        diffConfig = diffConfig with { ColumnsToFillWithOldValueIfNoNewValueExists = columnsToFillWithOldValueIfNoNewValueExists };
-        return this;
-    }
+        => UpdateConfig(x => x with { ColumnsToFillWithOldValueIfNoNewValueExists = columnsToFillWithOldValueIfNoNewValueExists });
 
     /// <summary>
     /// Sets the modification rules to apply to specific data changes.
@@ -157,10 +130,7 @@ public class ExcelDiffBuilder
     /// <param name="modificationRules">Array of modification rules.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetModificationRules(params ModificationRule[] modificationRules)
-    {
-        diffConfig = diffConfig with { ModificationRules = modificationRules };
-        return this;
-    }
+        => UpdateConfig(x => x with { ModificationRules = modificationRules });
 
     /// <summary>
     /// Adds additional modification rules to the existing set.
@@ -168,10 +138,7 @@ public class ExcelDiffBuilder
     /// <param name="modificationRules">Array of modification rules to add.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder AddModificationRules(params ModificationRule[] modificationRules)
-    {
-        diffConfig = diffConfig with { ModificationRules = [.. diffConfig.ModificationRules, .. modificationRules] };
-        return this;
-    }
+        => UpdateConfig(x => x with { ModificationRules = [.. diffConfig.ModificationRules, .. modificationRules] });
 
     /// <summary>
     /// Adds a marker for highlighting value changes, specifying deviation thresholds and cell styling.
@@ -181,13 +148,7 @@ public class ExcelDiffBuilder
     /// <param name="cellStyle">Optional cell style for marking changes.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder AddValueChangedMarker(double minDeviationInPercent, double minDeviationAbsolute, CellStyle? cellStyle)
-    {
-        diffConfig = diffConfig with
-        {
-            ValueChangedMarkers = [.. diffConfig.ValueChangedMarkers, new(minDeviationInPercent, minDeviationAbsolute, cellStyle)]
-        };
-        return this;
-    }
+        => UpdateConfig(x => x with { ValueChangedMarkers = [.. diffConfig.ValueChangedMarkers, new(minDeviationInPercent, minDeviationAbsolute, cellStyle)] });
 
     /// <summary>
     /// Specifies whether to always compare null values as text.
@@ -195,10 +156,7 @@ public class ExcelDiffBuilder
     /// <param name="alwaysCompareNullValuesAsText">Whether to always compare null values as text (default is true).</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder AlwaysCompareNullValuesAsText(bool alwaysCompareNullValuesAsText = true)
-    {
-        diffConfig = diffConfig with { AlwaysCompareNullValuesAsText = alwaysCompareNullValuesAsText };
-        return this;
-    }
+        => UpdateConfig(x => x with { AlwaysCompareNullValuesAsText = alwaysCompareNullValuesAsText });
 
     /// <summary>
     /// Specifies whether to add an empty row after groups in the comparison output.
@@ -206,10 +164,7 @@ public class ExcelDiffBuilder
     /// <param name="addEmptyRowAfterGroups">Whether to add an empty row after groups (default is true).</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder AddEmptyRowAfterGroups(bool addEmptyRowAfterGroups = true)
-    {
-        diffConfig = diffConfig with { AddEmptyRowAfterGroups = addEmptyRowAfterGroups };
-        return this;
-    }
+        => UpdateConfig(x => x with { AddEmptyRowAfterGroups = addEmptyRowAfterGroups });
 
     /// <summary>
     /// Specifies whether to copy cell formatting from the original data.
@@ -217,10 +172,7 @@ public class ExcelDiffBuilder
     /// <param name="copyCellFormat">Whether to copy cell formats (default is true).</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder CopyCellFormat(bool copyCellFormat = true)
-    {
-        diffConfig = diffConfig with { CopyCellFormat = copyCellFormat };
-        return this;
-    }
+        => UpdateConfig(x => x with { CopyCellFormat = copyCellFormat });
 
     /// <summary>
     /// Specifies whether to copy cell styling from the original data.
@@ -228,10 +180,7 @@ public class ExcelDiffBuilder
     /// <param name="copyCellStyle">Whether to copy cell styling (default is true).</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder CopyCellStyle(bool copyCellStyle = true)
-    {
-        diffConfig = diffConfig with { CopyCellStyle = copyCellStyle };
-        return this;
-    }
+        => UpdateConfig(x => x with { CopyCellStyle = copyCellStyle });
 
     /// <summary>
     /// Specifies whether to show the old data column in the comparison output.
@@ -239,10 +188,7 @@ public class ExcelDiffBuilder
     /// <param name="showOldDataColumn">Whether to show the old data column (default is true).</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder ShowOldDataColumn(bool showOldDataColumn = true)
-    {
-        diffConfig = diffConfig with { ShowOldDataColumn = showOldDataColumn };
-        return this;
-    }
+        => UpdateConfig(x => x with { ShowOldDataColumn = showOldDataColumn });
 
     /// <summary>
     /// Adds the old value as a comment to the cell with the new data when differences are detected.
@@ -250,10 +196,7 @@ public class ExcelDiffBuilder
     /// <param name="prefix">Optional prefix for the old value comment.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder AddOldValueAsComment(string? prefix = null)
-    {
-        diffConfig = diffConfig with { AddOldValueAsComment = true, OldValueCommentPrefix = prefix };
-        return this;
-    }
+        => UpdateConfig(x => x with { AddOldValueAsComment = true, OldValueCommentPrefix = prefix });
 
     /// <summary>
     /// Sets a comment to be added to the header columns of the old data in the comparison output.
@@ -261,10 +204,7 @@ public class ExcelDiffBuilder
     /// <param name="oldHeaderColumnComment">Comment text for old data header columns.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetOldHeaderColumnComment(string oldHeaderColumnComment)
-    {
-        diffConfig = diffConfig with { OldHeaderColumnComment = oldHeaderColumnComment };
-        return this;
-    }
+        => UpdateConfig(x => x with { OldHeaderColumnComment = oldHeaderColumnComment });
 
     /// <summary>
     /// Sets a comment to be added to the header columns of the new data in the comparison output.
@@ -272,10 +212,7 @@ public class ExcelDiffBuilder
     /// <param name="newHeaderColumnComment">Comment text for new data header columns.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetNewHeaderColumnComment(string newHeaderColumnComment)
-    {
-        diffConfig = diffConfig with { NewHeaderColumnComment = newHeaderColumnComment };
-        return this;
-    }
+        => UpdateConfig(x => x with { NewHeaderColumnComment = newHeaderColumnComment });
 
     /// <summary>
     /// Sets a postfix for the header columns of the old data in the comparison output.
@@ -283,10 +220,7 @@ public class ExcelDiffBuilder
     /// <param name="oldHeaderColumnPostfix">Postfix for old data header columns.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetOldHeaderColumnPostfix(string oldHeaderColumnPostfix)
-    {
-        diffConfig = diffConfig with { OldHeaderColumnPostfix = oldHeaderColumnPostfix };
-        return this;
-    }
+        => UpdateConfig(x => x with { OldHeaderColumnPostfix = oldHeaderColumnPostfix });
 
     /// <summary>
     /// Sets a postfix for the header columns of the new data in the comparison output.
@@ -294,10 +228,7 @@ public class ExcelDiffBuilder
     /// <param name="newHeaderColumnPostfix">Postfix for new data header columns.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetNewHeaderColumnPostfix(string newHeaderColumnPostfix)
-    {
-        diffConfig = diffConfig with { NewHeaderColumnPostfix = newHeaderColumnPostfix };
-        return this;
-    }
+        => UpdateConfig(x => x with { NewHeaderColumnPostfix = newHeaderColumnPostfix });
 
     /// <summary>
     /// Configures whether to skip unchanged rows in the output.
@@ -305,10 +236,7 @@ public class ExcelDiffBuilder
     /// <param name="skipUnchangedRows">Whether to skip unchanged rows (default is true).</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SkipUnchangedRows(bool skipUnchangedRows = true)
-    {
-        diffConfig = diffConfig with { SkipUnchangedRows = skipUnchangedRows };
-        return this;
-    }
+        => UpdateConfig(x => x with { SkipUnchangedRows = skipUnchangedRows });
 
     /// <summary>
     /// Configures whether to skip removed rows in the output.
@@ -316,10 +244,7 @@ public class ExcelDiffBuilder
     /// <param name="skipRemovedRows">Whether to skip removed rows (default is true).</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SkipRemovedRows(bool skipRemovedRows = true)
-    {
-        diffConfig = diffConfig with { SkipRemovedRows = skipRemovedRows };
-        return this;
-    }
+        => UpdateConfig(x => x with { SkipRemovedRows = skipRemovedRows });
 
     /// <summary>
     /// Sets a custom rule for determining if a row should be skipped during the comparison.
@@ -327,10 +252,7 @@ public class ExcelDiffBuilder
     /// <param name="skipRowRule">The <see cref="SkipRowPredicate"/> to determine the rows to skip.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetSkipRowRule(SkipRowPredicate? skipRowRule)
-    {
-        diffConfig = diffConfig with { SkipRowRule = skipRowRule };
-        return this;
-    }
+        => UpdateConfig(x => x with { SkipRowRule = skipRowRule });
 
     /// <summary>
     /// Sets the style for headers in the comparison output.
@@ -338,10 +260,7 @@ public class ExcelDiffBuilder
     /// <param name="headerStyle">The <see cref="CellStyle"/> to apply to headers.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetHeaderStyle(CellStyle headerStyle)
-    {
-        diffConfig = diffConfig with { HeaderStyle = headerStyle };
-        return this;
-    }
+        => UpdateConfig(x => x with { HeaderStyle = headerStyle });
 
     /// <summary>
     /// Sets the style for rows that were removed in the comparison output.
@@ -349,10 +268,7 @@ public class ExcelDiffBuilder
     /// <param name="removedRowStyle">The <see cref="CellStyle"/> to apply to removed rows.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetRemovedRowStyle(CellStyle removedRowStyle)
-    {
-        diffConfig = diffConfig with { RemovedRowStyle = removedRowStyle };
-        return this;
-    }
+        => UpdateConfig(x => x with { RemovedRowStyle = removedRowStyle });
 
     /// <summary>
     /// Sets the style for rows that were added in the comparison output.
@@ -360,10 +276,7 @@ public class ExcelDiffBuilder
     /// <param name="addedRowStyle">The <see cref="CellStyle"/> to apply to added rows.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetAddedRowStyle(CellStyle addedRowStyle)
-    {
-        diffConfig = diffConfig with { AddedRowStyle = addedRowStyle };
-        return this;
-    }
+        => UpdateConfig(x => x with { AddedRowStyle = addedRowStyle });
 
     /// <summary>
     /// Sets the style for cells with changes in the comparison output.
@@ -371,10 +284,7 @@ public class ExcelDiffBuilder
     /// <param name="changedCellStyle">The <see cref="CellStyle"/> to apply to changed cells.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetChangedCellStyle(CellStyle changedCellStyle)
-    {
-        diffConfig = diffConfig with { ChangedCellStyle = changedCellStyle };
-        return this;
-    }
+        => UpdateConfig(x => x with { ChangedCellStyle = changedCellStyle });
 
     /// <summary>
     /// Sets the style for key columns in rows with changes in the comparison output.
@@ -382,10 +292,7 @@ public class ExcelDiffBuilder
     /// <param name="changedRowKeyColumnsStyle">The <see cref="CellStyle"/> to apply to key columns in changed rows.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetChangedRowKeyColumnsStyle(CellStyle changedRowKeyColumnsStyle)
-    {
-        diffConfig = diffConfig with { ChangedRowKeyColumnsStyle = changedRowKeyColumnsStyle };
-        return this;
-    }
+        => UpdateConfig(x => x with { ChangedRowKeyColumnsStyle = changedRowKeyColumnsStyle });
 
     /// <summary>
     /// Configures whether comparisons should ignore case sensitivity.
@@ -580,6 +487,14 @@ public class ExcelDiffBuilder
     }
 
     /// <summary>
+    /// Configures whether columns that are not present in both documents should be ignored in the diff.
+    /// </summary>
+    /// <param name="ignore">If true, columns not in both documents will be ignored.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
+    public ExcelDiffBuilder IgnoreColumnsNotInBoth(bool ignore = true)
+        => UpdateConfig(x => x with { IgnoreColumnsNotInBoth = ignore });
+
+    /// <summary>
     /// Builds the Excel comparison output, with an optional post-processing action.
     /// </summary>
     /// <param name="postProcessingAction">An optional action to perform additional processing on the <see cref="ExcelPackage"/>.</param>
@@ -663,6 +578,12 @@ public class ExcelDiffBuilder
     {
         using ExcelPackage excelPackage = Build(postProcessingAction);
         excelPackage.SaveAs(new FileInfo(outputFilePath));
+    }
+
+    private ExcelDiffBuilder UpdateConfig(Func<ExcelDiffConfig, ExcelDiffConfig> update)
+    {
+        diffConfig = update(diffConfig);
+        return this;
     }
 
 }

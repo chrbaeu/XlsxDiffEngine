@@ -360,4 +360,7 @@
   <data name="OptionsScript" xml:space="preserve">
     <value>Skript</value>
   </data>
+  <data name="OptionsSettingsIgnoreColumnsNotInBoth" xml:space="preserve">
+    <value>Ignoriere Spalten die nicht in beiden Dateien vorkommen</value>
+  </data>
 </root>

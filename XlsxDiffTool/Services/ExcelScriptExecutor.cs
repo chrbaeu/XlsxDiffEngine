@@ -29,7 +29,7 @@ public partial class ExcelScriptExecutor
     [GeneratedRegex(@"^[A-Z]+$", RegexOptions.IgnoreCase)]
     private static partial Regex IsValidColumnLetterRegex { get; }
 
-    private record class Statement(int LineNumber, string Command, string Arg, string Value);
+    private sealed record class Statement(int LineNumber, string Command, string Arg, string Value);
 
     /// <summary>
     /// Executes a script on an ExcelPackage.

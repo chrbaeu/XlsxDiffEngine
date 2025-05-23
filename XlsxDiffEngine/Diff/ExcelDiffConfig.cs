@@ -126,6 +126,11 @@ public record class ExcelDiffConfig
     public string? NewHeaderColumnPostfix { get; init; }
 
     /// <summary>
+    /// If true, columns that are not present in both documents will be ignored in the diff.
+    /// </summary>
+    public bool IgnoreColumnsNotInBoth { get; init; }
+
+    /// <summary>
     /// Indicates whether to skip unchanged rows in the comparison output.
     /// </summary>
     public bool SkipUnchangedRows { get; init; }

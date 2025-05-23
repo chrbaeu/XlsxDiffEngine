@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="EPPlus" Version="7.*" />
-    <PackageReference Include="Chriffizient.XlsxDiffEngine" Version="0.6.*" />
+    <PackageReference Include="Chriffizient.XlsxDiffEngine" Version="0.7.0" />
   </ItemGroup>
 
 </Project>

@@ -20,7 +20,18 @@ internal sealed class ExcelDiffOp
         this.newDataSource = newDataSource;
         this.config = config;
         stringComparer = config.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
-        MergedColumnNames = newDataSource.GetColumnNames().Union(oldDataSource.GetColumnNames(), stringComparer).ToList().AsReadOnly();
+        if (config.IgnoreColumnsNotInBoth)
+        {
+            MergedColumnNames = newDataSource.GetColumnNames()
+                .Intersect(oldDataSource.GetColumnNames(), stringComparer)
+                .ToList().AsReadOnly();
+        }
+        else
+        {
+            MergedColumnNames = newDataSource.GetColumnNames()
+                .Union(oldDataSource.GetColumnNames(), stringComparer)
+                .ToList().AsReadOnly();
+        }
     }
 
     public List<(int? oldRow, int? newRow, int group)> GetMergedRows()
