@@ -8,18 +8,35 @@ namespace XlsxDiffEngine;
 /// </summary>
 public class ExcelDiffBuilder
 {
+    /// <summary>
+    /// The configuration options for Excel sheet comparison, including case sensitivity, key columns, and styling.
+    /// </summary>
     private ExcelDiffConfig diffConfig = new();
+
+    /// <summary>
+    /// The configuration for the data provider, controlling data extraction and worksheet merging.
+    /// </summary>
     private XlsxDataProviderConfig xlsxConfig = new();
+
+    /// <summary>
+    /// The list of old Excel files to compare.
+    /// </summary>
     private readonly List<XlsxFileInfo> oldFiles = [];
+
+    /// <summary>
+    /// The list of new Excel files to compare.
+    /// </summary>
     private readonly List<XlsxFileInfo> newFiles = [];
-    private bool hideOldColumns;
-    private string[] columnsToHide = [];
-    private string[] columnsToShow = [];
-    private string[] header = [];
-    private bool autoFitColumns = true;
-    private bool autoFilter = true;
+
+    /// <summary>
+    /// The header row to use in the output, if specified.
+    /// </summary>
+    private string[][] header = [];
+
+    /// <summary>
+    /// If true, panes will be frozen in the output worksheets. Default is true.
+    /// </summary>
     private bool freezePanes = true;
-    private readonly Dictionary<int, double> columnSizeDict = [];
 
     /// <summary>
     /// Adds files for comparison, allowing configuration of both "old" and "new" file sets.
@@ -231,6 +248,14 @@ public class ExcelDiffBuilder
         => UpdateConfig(x => x with { NewHeaderColumnPostfix = newHeaderColumnPostfix });
 
     /// <summary>
+    /// Configures whether columns that are not present in both documents should be ignored in the diff.
+    /// </summary>
+    /// <param name="ignore">If true, columns not in both documents will be ignored.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
+    public ExcelDiffBuilder IgnoreColumnsNotInBoth(bool ignore = true)
+        => UpdateConfig(x => x with { IgnoreColumnsNotInBoth = ignore });
+
+    /// <summary>
     /// Configures whether to skip unchanged rows in the output.
     /// </summary>
     /// <param name="skipUnchangedRows">Whether to skip unchanged rows (default is true).</param>
@@ -388,10 +413,7 @@ public class ExcelDiffBuilder
     /// </summary>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder HideOldColumns(bool hideOldColumns = true)
-    {
-        this.hideOldColumns = hideOldColumns;
-        return this;
-    }
+        => UpdateConfig(x => x with { HideOldColumns = hideOldColumns });
 
     /// <summary>
     /// Specifies columns to hide in the output.
@@ -399,10 +421,7 @@ public class ExcelDiffBuilder
     /// <param name="columnsToHide">The names of the columns to hide.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder HideColumns(params string[] columnsToHide)
-    {
-        this.columnsToHide = columnsToHide;
-        return this;
-    }
+        => UpdateConfig(x => x with { ColumnsToHide = columnsToHide });
 
     /// <summary>
     /// Specifies columns to display in the output.
@@ -410,10 +429,7 @@ public class ExcelDiffBuilder
     /// <param name="columnsToShow">The names of the columns to show.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder ShowColumns(params string[] columnsToShow)
-    {
-        this.columnsToShow = columnsToShow;
-        return this;
-    }
+        => UpdateConfig(x => x with { ColumnsToShow = columnsToShow });
 
     /// <summary>
     /// Sets custom headers for the output worksheet.
@@ -421,6 +437,17 @@ public class ExcelDiffBuilder
     /// <param name="header">Header row strings.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetHeader(params string[] header)
+    {
+        this.header = [.. header.Select(x => (new string[] { x }))];
+        return this;
+    }
+
+    /// <summary>
+    /// Sets custom headers for the output worksheet.
+    /// </summary>
+    /// <param name="header">Header strings.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
+    public ExcelDiffBuilder SetHeader(string[][] header)
     {
         this.header = header;
         return this;
@@ -432,10 +459,7 @@ public class ExcelDiffBuilder
     /// <param name="autoFitColumns">Whether to auto-fit columns (default is true).</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetAutoFitColumns(bool autoFitColumns = true)
-    {
-        this.autoFitColumns = autoFitColumns;
-        return this;
-    }
+        => UpdateConfig(x => x with { AutoFitColumns = autoFitColumns });
 
     /// <summary>
     /// Configures whether an filter should be applied to the output worksheet.
@@ -443,10 +467,7 @@ public class ExcelDiffBuilder
     /// <param name="autoFilter">Whether to apply an auto-filter (default is true).</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetAutoFilter(bool autoFilter = true)
-    {
-        this.autoFilter = autoFilter;
-        return this;
-    }
+        => UpdateConfig(x => x with { AutoFilter = autoFilter });
 
     /// <summary>
     /// Configures whether panes should be frozen in the output worksheet.
@@ -466,10 +487,18 @@ public class ExcelDiffBuilder
     /// <param name="size">The width size for the column.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetColumnSize(int column, double size)
-    {
-        columnSizeDict[column] = size;
-        return this;
-    }
+        => UpdateConfig(x => x with { ColumnSizeDict = x.ColumnSizeDict.Concat([new(column, size)]).ToDictionary(y => y.Key, y => y.Value) });
+
+
+    /// <summary>
+    /// Sets a custom width for a specific column in the output worksheet.
+    /// </summary>
+    /// <param name="columnName">The name of the column to set the width for.</param>
+    /// <param name="size">The width size for the column.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
+    public ExcelDiffBuilder SetColumnSize(string columnName, double size)
+        => UpdateConfig(x => x with { ColumnSizeDict = x.ColumnSizeDict.Concat([new(columnName, size)]).ToDictionary(y => y.Key, y => y.Value) });
+
 
     /// <summary>
     /// Sets custom widths for multiple columns in the output worksheet.
@@ -477,22 +506,7 @@ public class ExcelDiffBuilder
     /// <param name="sizes">Array of column widths for the output worksheet.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetColumnSizes(double[] sizes)
-    {
-        sizes ??= [];
-        for (int i = 0; i < sizes.Length; i++)
-        {
-            columnSizeDict[i + 1] = sizes[i];
-        }
-        return this;
-    }
-
-    /// <summary>
-    /// Configures whether columns that are not present in both documents should be ignored in the diff.
-    /// </summary>
-    /// <param name="ignore">If true, columns not in both documents will be ignored.</param>
-    /// <returns>The current builder instance for method chaining.</returns>
-    public ExcelDiffBuilder IgnoreColumnsNotInBoth(bool ignore = true)
-        => UpdateConfig(x => x with { IgnoreColumnsNotInBoth = ignore });
+        => UpdateConfig(x => x with { ColumnSizeDict = (sizes ?? []).Select((value, index) => (value, index)).ToDictionary(y => (object)(y.index + 1), y => y.value) });
 
     /// <summary>
     /// Builds the Excel comparison output, with an optional post-processing action.
@@ -502,15 +516,16 @@ public class ExcelDiffBuilder
     public ExcelPackage Build(Action<ExcelPackage>? postProcessingAction = null)
     {
         StringComparer stringComparer = diffConfig.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+
         using var oldDataProvider = new XlsxDataProvider(oldFiles, xlsxConfig);
         using var newDataProvider = new XlsxDataProvider(newFiles, xlsxConfig);
-        IReadOnlyList<IExcelDataSource> oldDataSources = oldDataProvider.GetDataSources();
+        var oldDataSources = oldDataProvider.GetDataSources();
         if (oldDataSources.Select(x => x.Name).ToHashSet(stringComparer).Count != oldDataSources.Count)
         {
             throw new InvalidOperationException("The old excel files to compare must contain unique worksheet names!");
         }
         var oldDataSourcesDict = oldDataSources.ToDictionary(x => x.Name, stringComparer);
-        IReadOnlyList<IExcelDataSource> newDataSources = newDataProvider.GetDataSources();
+        var newDataSources = newDataProvider.GetDataSources();
         if (newDataSources.Select(x => x.Name).ToHashSet(stringComparer).Count != newDataSources.Count)
         {
             throw new InvalidOperationException("The new excel files to compare must contain unique worksheet names!");
@@ -519,47 +534,37 @@ public class ExcelDiffBuilder
         {
             throw new InvalidOperationException("The excel files to compare must contain worksheets with the same name!");
         }
+
         ExcelPackage? excelPackage = null;
         try
         {
             excelPackage = new();
-            foreach (IExcelDataSource newDataSource in newDataSources)
+            foreach (var newDataSource in newDataSources)
             {
-                if (oldDataSourcesDict.TryGetValue(newDataSource.Name, out IExcelDataSource? oldDataSource))
+                if (!oldDataSourcesDict.TryGetValue(newDataSource.Name, out var oldDataSource))
                 {
-                    var diffEngine = new ExcelDiffWriter(oldDataSource, newDataSource, diffConfig);
-                    ExcelWorksheet worksheet = excelPackage.Workbook.Worksheets.Add(newDataSource.Name);
-                    int row = 1;
-                    int column = hideOldColumns ? 2 : 1;
-                    foreach (string headerRow in header)
+                    continue;
+                }
+                var diffEngine = new ExcelDiffWriter(oldDataSource, newDataSource, diffConfig);
+                var worksheet = excelPackage.Workbook.Worksheets.Add(newDataSource.Name);
+                int row = 1;
+                foreach (var headerRow in header)
+                {
+                    int startColumn = diffConfig.HideOldColumns ? 2 : 1;
+                    foreach (var headerRowColumn in headerRow)
                     {
-                        worksheet.Cells[row, column].Value = headerRow;
-                        row++;
+                        worksheet.Cells[row, startColumn++].Value = headerRowColumn;
                     }
-                    _ = diffEngine.WriteDiff(worksheet, row);
-                    if (autoFitColumns) { worksheet.Cells.AutoFitColumns(); }
-                    foreach (KeyValuePair<int, double> item in columnSizeDict)
-                    {
-                        worksheet.Column(item.Key).Width = item.Value;
-                    }
-                    if (autoFilter) { worksheet.Cells[row, column, worksheet.Dimension.End.Row, worksheet.Dimension.End.Column].AutoFilter = true; }
-                    if (freezePanes) { worksheet.View.FreezePanes(row + 1, 1); }
-                    if (hideOldColumns || columnsToHide.Length > 0)
-                    {
-                        for (column = 1; column <= worksheet.Dimension.End.Column; column++)
-                        {
-                            if (columnsToShow.Contains(worksheet.Cells[row, column].Text, stringComparer)) { continue; }
-                            if (hideOldColumns && diffConfig.ShowOldDataColumn && column % 2 != 0) { worksheet.Column(column).Hidden = true; }
-                            if (columnsToHide.Contains(worksheet.Cells[row, column].Text, stringComparer))
-                            {
-                                worksheet.Column(column).Hidden = true;
-                            }
-                        }
-                    }
+                    row++;
+                }
+                _ = diffEngine.WriteDiff(worksheet, row);
+                if (freezePanes)
+                {
+                    worksheet.View.FreezePanes(row + 1, 1);
                 }
             }
             postProcessingAction?.Invoke(excelPackage);
-            ExcelPackage result = excelPackage;
+            var result = excelPackage;
             excelPackage = null;
             return result;
         }
@@ -585,5 +590,4 @@ public class ExcelDiffBuilder
         diffConfig = update(diffConfig);
         return this;
     }
-
 }

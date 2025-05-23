@@ -63,7 +63,7 @@ public sealed partial class ExcelDiffService(
         }
         if (optionsModel.SkipEmptyRows)
         {
-            builder.SetSkipRowRule(SkipRules.SkipEmptyRows);
+            builder.SetSkipRowRule(PredefinedSkipRules.SkipEmptyRows);
         }
         builder.SkipUnchangedRows(optionsModel.SkipUnchangedRows);
         builder.SkipRemovedRows(optionsModel.SkipRemovedRows);
@@ -131,10 +131,10 @@ public sealed partial class ExcelDiffService(
         {
             builder.SetColumnsToTextCompareOnly(columnsToTextCompareOnly);
         }
-        var columnsToIngore = optionsModel.Columns.Where(x => x.Mode == ColumnMode.Ignore).Select(x => x.Name).ToArray();
-        if (columnsToIngore.Length > 0)
+        var columnsToIgnore = optionsModel.Columns.Where(x => x.Mode == ColumnMode.Ignore).Select(x => x.Name).ToArray();
+        if (columnsToIgnore.Length > 0)
         {
-            builder.SetColumnsToIgnore(columnsToIngore);
+            builder.SetColumnsToIgnore(columnsToIgnore);
         }
         var columnsToOmit = optionsModel.Columns.Where(x => x.Mode == ColumnMode.Omit).Select(x => x.Name).ToArray();
         if (columnsToOmit.Length > 0)

@@ -1,9 +1,9 @@
 ﻿namespace XlsxDiffEngine.Diff;
 
 /// <summary>
-/// Specifies predifiend rules for skipping rows during comparison.
+/// Specifies predefined rules for skipping rows during comparison.
 /// </summary>
-public static class SkipRules
+public static class PredefinedSkipRules
 {
     /// <summary>
     /// A predicate that skips rows with empty cells.

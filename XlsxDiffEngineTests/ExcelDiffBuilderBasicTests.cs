@@ -300,7 +300,6 @@ internal class ExcelDiffBuilderBasicTests
         ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult);
     }
 
-
     [Test]
     public void Diff_WithRowNumber()
     {
@@ -692,39 +691,71 @@ internal class ExcelDiffBuilderBasicTests
     }
 
     [Test]
-    public void Diff_IgnoreColumnsNotInBoth_WorksAsExpected()
+    public void Diff_WithCustomHeaderRows()
     {
         // Arrange
-        object?[][] oldFile = [
-            ["Title", "Value", "OldOnly"],
-            ["A", 1, "x"],
-            ["B", 2, "y"],
-        ];
-        object?[][] newFile = [
-            ["Title", "Value", "NewOnly"],
-            ["A", 1, "foo"],
-            ["B", 2, "bar"],
-        ];
-        using var oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFile);
-        using var newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFile);
+        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
+        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
         // Act
-        using var result = excelDiffBuilder
+        using ExcelPackage result = excelDiffBuilder
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
                 .SetNewFile(newFileStream, "NewFile.xlsx")
-            )
-            .IgnoreColumnsNotInBoth(true)
+                )
+            .SetHeader("Custom1", "Custom2")
             .Build();
 
         // Assert
-        using var expectedResult = ExcelTestHelper.ConvertToExcelPackage([
+        using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
+            ["Custom1", null, null, null],
+            ["Custom2", null, null, null],
             ["Title", "Title", "Value", "Value"],
             ["A", "A", 1, 1],
-            ["B", "B", 2, 2],
+            ["B", "B", 2, 4],
+            ["C", "C", 3, 3],
         ]);
+        expectedResult.Workbook.Worksheets[0].Cells[1, 1, 1, 4].Style.Font.Bold = false;
+        expectedResult.Workbook.Worksheets[0].Cells[3, 1, 3, 4].Style.Font.Bold = true;
+        ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[5, 3, 5, 4], DefaultCellStyles.ChangedCell);
+        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+    }
+
+    [Test]
+    public void Diff_WithCustomHeaderRowsAndColumns()
+    {
+        // Arrange
+        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
+        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
+        using var oldFileStream = oldExcelPackage.ToMemoryStream();
+        using var newFileStream = newExcelPackage.ToMemoryStream();
+
+        // Act
+        using ExcelPackage result = excelDiffBuilder
+            .AddFiles(x => x
+                .SetOldFile(oldFileStream, "OldFile.xlsx")
+                .SetNewFile(newFileStream, "NewFile.xlsx")
+                )
+            .SetHeader([
+                ["Top1", "Top2", "Top3", "Top4"],
+                ["Sub1", "Sub2", "Sub3", "Sub4"]
+            ])
+            .Build();
+
+        // Assert
+        using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
+            ["Top1", "Top2", "Top3", "Top4"],
+            ["Sub1", "Sub2", "Sub3", "Sub4"],
+            ["Title", "Title", "Value", "Value"],
+            ["A", "A", 1, 1],
+            ["B", "B", 2, 4],
+            ["C", "C", 3, 3],
+        ]);
+        expectedResult.Workbook.Worksheets[0].Cells[1, 1, 1, 4].Style.Font.Bold = false;
+        expectedResult.Workbook.Worksheets[0].Cells[3, 1, 3, 4].Style.Font.Bold = true;
+        ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[5, 3, 5, 4], DefaultCellStyles.ChangedCell);
         ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
     }
 }

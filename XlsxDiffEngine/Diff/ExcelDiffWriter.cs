@@ -12,7 +12,7 @@ public sealed class ExcelDiffWriter
     private readonly IExcelDataSource newDataSource;
     private readonly ExcelDiffConfig config;
     private readonly StringComparer stringComparer;
-    private readonly ExcelDiffOp excelDiffOp;
+    private readonly ExcelDiffOp diffOp;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ExcelDiffWriter"/> class with the specified data sources and configuration.
@@ -29,7 +29,7 @@ public sealed class ExcelDiffWriter
         this.newDataSource = newDataSource;
         this.config = config;
         stringComparer = config.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
-        excelDiffOp = new(oldDataSource, newDataSource, config);
+        diffOp = new(oldDataSource, newDataSource, config);
     }
 
     /// <summary>
@@ -48,6 +48,7 @@ public sealed class ExcelDiffWriter
 #endif
         int headerEndColumns = WriteHeader(worksheet, row, column);
         int dataEndRow = WriteData(worksheet, row + 1, column);
+        ConfigureColumns(worksheet, row, column, dataEndRow, headerEndColumns);
         return (dataEndRow, headerEndColumns);
     }
 
@@ -55,7 +56,7 @@ public sealed class ExcelDiffWriter
     {
         ModificationRuleHandler ruleHandler = new(config.ModificationRules, config.IgnoreCase);
         int lastGroup = 0;
-        foreach ((int? oldRow, int? newRow, int group) in excelDiffOp.GetMergedRows())
+        foreach ((int? oldRow, int? newRow, int group) in diffOp.GetMergedRows())
         {
             if (lastGroup != group && config.AddEmptyRowAfterGroups)
             {
@@ -65,7 +66,7 @@ public sealed class ExcelDiffWriter
             int column = startColumn;
             bool isChanged = false;
             List<ExcelRange> keyCells = [], fallbackValueCells = [];
-            foreach (string columnName in excelDiffOp.MergedColumnNames)
+            foreach (string columnName in diffOp.MergedColumnNames)
             {
                 if (config.ColumnsToOmit.Contains(columnName, stringComparer))
                 {
@@ -197,7 +198,7 @@ public sealed class ExcelDiffWriter
     private int WriteHeader(ExcelWorksheet worksheet, int startRow, int startColumn)
     {
         int column = startColumn;
-        foreach (string columnName in excelDiffOp.MergedColumnNames)
+        foreach (string columnName in diffOp.MergedColumnNames)
         {
             if (config.ColumnsToOmit.Contains(columnName, stringComparer))
             {
@@ -222,6 +223,55 @@ public sealed class ExcelDiffWriter
         column--;
         ExcelHelper.SetCellStyle(worksheet.Cells[startRow, startColumn, startRow, column], config.HeaderStyle);
         return column;
+    }
+
+    private void ConfigureColumns(ExcelWorksheet worksheet, int startRow, int startColumn, int endRow, int endColumn)
+    {
+        if (config.AutoFitColumns)
+        {
+            worksheet.Cells.AutoFitColumns();
+        }
+        foreach (var item in config.ColumnSizeDict)
+        {
+            if (item.Key is int columnIndex)
+            {
+                worksheet.Column(columnIndex).Width = item.Value;
+            }
+            else if (item.Key is string columnName)
+            {
+                for (int i = startColumn; i <= endColumn; i++)
+                {
+                    if (stringComparer.Equals(worksheet.Cells[startRow, i].Text, columnName))
+                    {
+                        worksheet.Column(i).Width = item.Value;
+                        break;
+                    }
+                }
+            }
+        }
+        if (config.AutoFilter)
+        {
+            worksheet.Cells[startRow, startColumn, endRow, endColumn].AutoFilter = true;
+        }
+        if (config.HideOldColumns || config.ColumnsToHide.Count > 0)
+        {
+            for (int col = 1; col <= endColumn; col++)
+            {
+                var cellText = worksheet.Cells[startRow, col].Text;
+                if (config.ColumnsToShow.Contains(cellText, stringComparer))
+                {
+                    continue;
+                }
+                if (config.HideOldColumns && config.ShowOldDataColumn && col % 2 != 0)
+                {
+                    worksheet.Column(col).Hidden = true;
+                }
+                if (config.ColumnsToHide.Contains(cellText, stringComparer))
+                {
+                    worksheet.Column(col).Hidden = true;
+                }
+            }
+        }
     }
 
 }

@@ -1,7 +1,7 @@
 ﻿namespace XlsxDiffEngine;
 
 /// <summary>
-/// Represents configuration options for comparing Excel sheets, including case sensitivity,
+/// Represents configuration options for comparing <see cref="IExcelDataSource"/> instances, including case sensitivity,
 /// key columns, column inclusion/exclusion, styling, and value change markers.
 /// </summary>
 public record class ExcelDiffConfig
@@ -174,6 +174,36 @@ public record class ExcelDiffConfig
     /// The style for cells with non-original fallback values in the comparison output.
     /// </summary>
     public CellStyle FallbackValueStyle { get; init; } = DefaultCellStyles.FallbackValue;
+
+    /// <summary>
+    /// If true, columns from the old file(s) will be hidden in the output.
+    /// </summary>
+    public bool HideOldColumns { get; init; }
+
+    /// <summary>
+    /// The columns to hide in the output, by name.
+    /// </summary>
+    public IReadOnlyCollection<string> ColumnsToHide { get; init; } = [];
+
+    /// <summary>
+    /// The columns to show in the output, by name. If empty, all columns are shown.
+    /// </summary>
+    public IReadOnlyCollection<string> ColumnsToShow { get; init; } = [];
+
+    /// <summary>
+    /// If true, columns will be auto-fitted to their content width in the output. Default is true.
+    /// </summary>
+    public bool AutoFitColumns { get; init; } = true;
+
+    /// <summary>
+    /// If true, an auto-filter will be applied to the output worksheets. Default is true.
+    /// </summary>
+    public bool AutoFilter { get; init; } = true;
+
+    /// <summary>
+    /// A dictionary mapping column indices/names to their explicit widths in the output.
+    /// </summary>
+    public IReadOnlyDictionary<object, double> ColumnSizeDict { get; init; } = new Dictionary<object, double>();
 }
 
 /// <summary>
@@ -232,7 +262,7 @@ public enum DataKind
     All = Old | New,
 
     /// <summary>
-    /// Specifices that the modification rule applies not to empty cells. Musst be combined with other flags.
+    /// The modification rule applies not to empty cells. Musst be combined with other flags.
     /// </summary>
     NonEmpty = 4,
 
