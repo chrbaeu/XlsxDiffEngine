@@ -41,7 +41,7 @@ internal sealed class ExcelDiffOp
         var oldKeyDict = oldDataKeys.ToDictionary(x => x.PrimaryKey, stringComparer);
         var oldSecondaryKeyDict = oldDataKeys.ToDictionary(x => x.SecondaryKey, stringComparer);
         var newKeyDict = newDataKeys.ToDictionary(x => x.PrimaryKey, stringComparer);
-        var usedDataKeys = newDataKeys.Select(x => x.PrimaryKey).ToHashSet(stringComparer);
+        var usedDataKeys = oldDataKeys.Where(x => newKeyDict.ContainsKey(x.PrimaryKey)).Select(x => x.PrimaryKey).ToHashSet(stringComparer);
         List<(int? oldRow, int? newRow, int group)> diff = [];
         int group = 0;
         string lastGroupKey = "";
@@ -65,7 +65,8 @@ internal sealed class ExcelDiffOp
             {
                 diff.Add((oldRow.RowNumber, newRow.RowNumber, group));
             }
-            else if (!usedDataKeys.Contains(dataKey.PrimaryKey) && oldSecondaryKeyDict.TryGetValue(newRow.SecondaryKey, out oldRow))
+            else if (config.SecondaryKeyColumns.Count > 0 && !usedDataKeys.Contains(dataKey.PrimaryKey)
+                && oldSecondaryKeyDict.TryGetValue(newRow.SecondaryKey, out oldRow))
             {
                 diff.Add((oldRow.RowNumber, newRow.RowNumber, group));
                 _ = usedDataKeys.Add(oldRow.PrimaryKey);

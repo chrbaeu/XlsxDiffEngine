@@ -136,7 +136,7 @@ public sealed class ExcelDiffWriter
         CellStyle? cellStyle = null;
         if (config.ColumnsToTextCompareOnly.Contains(columnName, stringComparer))
         {
-            if ((oldDstCell is null && oldValue?.ToString() != newValue?.ToString())
+            if ((oldDstCell is null && !stringComparer.Equals(oldValue?.ToString(), newValue?.ToString()))
                 || (oldDstCell is not null && oldDstCell.Text != newDstCell.Text))
             {
                 cellStyle = config.ChangedCellStyle;
@@ -160,7 +160,7 @@ public sealed class ExcelDiffWriter
         {
             cellStyle = config.ValueChangedMarkers[^1].CellStyle;
         }
-        else if (oldValue?.ToString() != newValue?.ToString())
+        else if (!stringComparer.Equals(oldValue?.ToString(), newValue?.ToString()))
         {
             cellStyle = config.ChangedCellStyle;
         }

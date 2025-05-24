@@ -758,4 +758,75 @@ internal class ExcelDiffBuilderBasicTests
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[5, 3, 5, 4], DefaultCellStyles.ChangedCell);
         ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
     }
+
+    [Test]
+    public void Diff_WithIgnoreCase()
+    {
+        object?[][] oldFile = [
+            ["Title", "Value"],
+            ["A", 1],
+            ["b", 2],
+        ];
+        object?[][] newFile = [
+            ["title", "value"],
+            ["A", 1],
+            ["B", 2],
+        ];
+        using var oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFile);
+        using var newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFile);
+        using var oldFileStream = oldExcelPackage.ToMemoryStream();
+        using var newFileStream = newExcelPackage.ToMemoryStream();
+
+        // Act
+        using ExcelPackage result = excelDiffBuilder
+            .AddFiles(x => x
+                .SetOldFile(oldFileStream, "OldFile.xlsx")
+                .SetNewFile(newFileStream, "NewFile.xlsx"))
+            .IgnoreCase(true)
+            .Build();
+
+        // Assert
+        using var expectedResult = ExcelTestHelper.ConvertToExcelPackage([
+                ["title", "title", "value", "value"],
+                ["A", "A", 1, 1],
+                ["b", "B", 2, 2],
+            ]);
+        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+    }
+
+    [Test]
+    public void Diff_WithoutIgnoreCase()
+    {
+        object?[][] oldFile = [
+            ["Title", "Value"],
+            ["A", 1],
+            ["b", 2],
+        ];
+        object?[][] newFile = [
+            ["Title", "Value"],
+            ["A", 1],
+            ["B", 2],
+        ];
+        using var oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFile);
+        using var newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFile);
+        using var oldFileStream = oldExcelPackage.ToMemoryStream();
+        using var newFileStream = newExcelPackage.ToMemoryStream();
+
+        // Act
+        using ExcelPackage result = excelDiffBuilder
+            .AddFiles(x => x
+                .SetOldFile(oldFileStream, "OldFile.xlsx")
+                .SetNewFile(newFileStream, "NewFile.xlsx"))
+            .IgnoreCase(false)
+            .Build();
+
+        // Assert
+        using var expectedResult = ExcelTestHelper.ConvertToExcelPackage([
+                ["title", "title", "value", "value"],
+                ["A", "A", 1, 1],
+                ["b", "B", 2, 2],
+            ]);
+
+        Assert.Throws<ArgumentException>(() => ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true));
+    }
 }
