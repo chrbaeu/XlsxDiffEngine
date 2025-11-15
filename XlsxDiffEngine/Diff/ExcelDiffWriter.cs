@@ -22,9 +22,9 @@ public sealed class ExcelDiffWriter
     /// <param name="config">Configuration options for comparing and styling differences.</param>
     public ExcelDiffWriter(IExcelDataSource oldDataSource, IExcelDataSource newDataSource, ExcelDiffConfig config)
     {
-        ArgumentNullThrowHelper.ThrowIfNull(oldDataSource, nameof(oldDataSource));
-        ArgumentNullThrowHelper.ThrowIfNull(newDataSource, nameof(newDataSource));
-        ArgumentNullThrowHelper.ThrowIfNull(config, nameof(config));
+        ArgumentNullException.ThrowIfNull(oldDataSource);
+        ArgumentNullException.ThrowIfNull(newDataSource);
+        ArgumentNullException.ThrowIfNull(config);
         this.oldDataSource = oldDataSource;
         this.newDataSource = newDataSource;
         this.config = config;
@@ -41,7 +41,7 @@ public sealed class ExcelDiffWriter
     /// <returns>A tuple indicating the end row and column where data was written.</returns>
     public (int endRow, int endColumn) WriteDiff(ExcelWorksheet worksheet, int row = 1, int column = 1)
     {
-        ArgumentNullThrowHelper.ThrowIfNull(worksheet, nameof(worksheet));
+        ArgumentNullException.ThrowIfNull(worksheet);
 #if NET8_0_OR_GREATER
         ArgumentOutOfRangeException.ThrowIfLessThan(row, 1);
         ArgumentOutOfRangeException.ThrowIfLessThan(column, 1);

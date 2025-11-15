@@ -45,7 +45,7 @@ public class ExcelDiffBuilder
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder AddFiles(Action<ExcelDiffXlsxFileConfigBuilder> builderAction)
     {
-        ArgumentNullThrowHelper.ThrowIfNull(builderAction);
+        ArgumentNullException.ThrowIfNull(builderAction);
         ExcelDiffXlsxFileConfigBuilder configBuilder = new();
         builderAction.Invoke(configBuilder);
         (XlsxFileInfo oldFile, XlsxFileInfo newFile) = configBuilder.Build();
@@ -62,8 +62,8 @@ public class ExcelDiffBuilder
     /// <returns></returns>
     public ExcelDiffBuilder AddFiles(XlsxFileInfo oldFile, XlsxFileInfo newFile)
     {
-        ArgumentNullThrowHelper.ThrowIfNull(oldFile);
-        ArgumentNullThrowHelper.ThrowIfNull(newFile);
+        ArgumentNullException.ThrowIfNull(oldFile);
+        ArgumentNullException.ThrowIfNull(newFile);
         oldFiles.Add(oldFile);
         newFiles.Add(newFile);
         return this;
@@ -489,7 +489,6 @@ public class ExcelDiffBuilder
     public ExcelDiffBuilder SetColumnSize(int column, double size)
         => UpdateConfig(x => x with { ColumnSizeDict = x.ColumnSizeDict.Concat([new(column, size)]).ToDictionary(y => y.Key, y => y.Value) });
 
-
     /// <summary>
     /// Sets a custom width for a specific column in the output worksheet.
     /// </summary>
@@ -498,7 +497,6 @@ public class ExcelDiffBuilder
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetColumnSize(string columnName, double size)
         => UpdateConfig(x => x with { ColumnSizeDict = x.ColumnSizeDict.Concat([new(columnName, size)]).ToDictionary(y => y.Key, y => y.Value) });
-
 
     /// <summary>
     /// Sets custom widths for multiple columns in the output worksheet.

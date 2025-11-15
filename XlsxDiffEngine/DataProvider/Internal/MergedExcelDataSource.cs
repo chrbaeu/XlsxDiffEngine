@@ -161,6 +161,6 @@ internal sealed class MergedExcelDataSource : IExcelDataSource
             object?[] cellValues = excelDataSources.SelectMany(x => x.GetColumn(columnName)).ToArray();
             return cellValues;
         }
-        return Enumerable.Range(1, DataRows).Select(x => (object?)null).ToArray(); ;
+        return Enumerable.Range(1, DataRows).Select(x => (object?)null).ToArray();
     }
 }

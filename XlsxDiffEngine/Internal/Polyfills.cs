@@ -3,21 +3,24 @@ using System.Runtime.CompilerServices;
 
 namespace XlsxDiffEngine;
 
+#if NETSTANDARD2_0
+
 internal static class ArgumentNullThrowHelper
 {
-    /// <summary>Throws an <see cref="ArgumentNullException"/> if <paramref name="argument"/> is null.</summary>
-    /// <param name="argument">The reference type argument to validate as non-null.</param>
-    /// <param name="paramName">The name of the parameter with which <paramref name="argument"/> corresponds.</param>
-    public static void ThrowIfNull([NotNull] object? argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+    extension(ArgumentNullException)
     {
-        if (argument is null)
+        /// <summary>Throws an <see cref="ArgumentNullException"/> if <paramref name="argument"/> is null.</summary>
+        /// <param name="argument">The reference type argument to validate as non-null.</param>
+        /// <param name="paramName">The name of the parameter with which <paramref name="argument"/> corresponds.</param>
+        public static void ThrowIfNull([NotNull] object? argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
         {
-            throw new ArgumentNullException(paramName);
+            if (argument is null)
+            {
+                throw new ArgumentNullException(paramName);
+            }
         }
     }
 }
-
-#if NETSTANDARD2_0
 
 internal sealed class UnreachableException : Exception
 {
@@ -58,7 +61,7 @@ internal static class IEnumerableExtensions
 
     public static HashSet<TSource> ToHashSet<TSource>(this IEnumerable<TSource> source, IEqualityComparer<TSource>? comparer)
     {
-        ArgumentNullThrowHelper.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(source);
         return new HashSet<TSource>(source, comparer);
     }
 
@@ -66,7 +69,7 @@ internal static class IEnumerableExtensions
         this IEnumerable<TSource> source,
         Func<TSource, TKey> keySelector)
     {
-        HashSet<TKey> seenKeys = new HashSet<TKey>();
+        HashSet<TKey> seenKeys = [];
         foreach (var element in source)
         {
             if (seenKeys.Add(keySelector(element)))

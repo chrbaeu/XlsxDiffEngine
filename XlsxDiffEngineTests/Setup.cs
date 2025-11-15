@@ -5,6 +5,6 @@ internal class Setup
     [Before(Assembly)]
     public static void Initialize()
     {
-        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+        ExcelPackage.License.SetNonCommercialPersonal("Christian Baeumlisberger");
     }
 }

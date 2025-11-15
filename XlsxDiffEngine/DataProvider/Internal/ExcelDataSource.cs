@@ -144,7 +144,7 @@ internal sealed class ExcelDataSource : IExcelDataSource
             object?[] cellValues = worksheet.Cells[section.Start.Row + 1, column, section.End.Row, column].GetValue<object?[]>();
             return cellValues;
         }
-        return Enumerable.Range(1, DataRows).Select(x => (object?)null).ToArray(); ;
+        return Enumerable.Range(1, DataRows).Select(x => (object?)null).ToArray();
     }
 
 }

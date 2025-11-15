@@ -35,7 +35,6 @@ public sealed partial class MainViewModel(
 
     public AppStateModel AppStateModel { get; } = appStateModel;
 
-
     [RelayCommand]
     private async Task SaveConfig()
     {

@@ -1,5 +1,4 @@
-﻿using System.Data;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text;
 
 namespace XlsxDiffEngine;

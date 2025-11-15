@@ -9,7 +9,7 @@ internal class Program
     {
         Console.WriteLine("ExcelDiff Sample");
 
-        //ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+        //ExcelPackage.License.SetNonCommercialPersonal("<Your Name>");
 
         using ExcelPackage excelPackage = new();
         ExcelWorksheet excelWorksheet = excelPackage.Workbook.Worksheets.Add("Table");

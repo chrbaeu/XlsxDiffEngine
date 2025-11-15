@@ -40,7 +40,7 @@ public partial class App : Application
         await appHost.StartAsync();
 
         // Static configurations
-        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+        ExcelPackage.License.SetNonCommercialPersonal("Christian Baeumlisberger");
         ViewConverter.ViewFactory = appHost.Services.GetRequiredService<ViewFactory>();
         TranslateExtension.Localizer = appHost.Services.GetRequiredService<IStringLocalizer<Resources.Resources>>();
 

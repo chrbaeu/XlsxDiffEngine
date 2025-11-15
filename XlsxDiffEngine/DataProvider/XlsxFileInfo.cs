@@ -18,7 +18,7 @@ public sealed record class XlsxFileInfo
     /// <param name="fileName">The name or path of the Excel file.</param>
     public XlsxFileInfo(string fileName)
     {
-        ArgumentNullThrowHelper.ThrowIfNull(fileName);
+        ArgumentNullException.ThrowIfNull(fileName);
         fileInfo = new(fileName);
         DocumentName = fileInfo.Name;
     }
@@ -29,7 +29,7 @@ public sealed record class XlsxFileInfo
     /// <param name="fileInfo">The <see cref="FileInfo"/> object representing the Excel file.</param>
     public XlsxFileInfo(FileInfo fileInfo)
     {
-        ArgumentNullThrowHelper.ThrowIfNull(fileInfo);
+        ArgumentNullException.ThrowIfNull(fileInfo);
         this.fileInfo = fileInfo;
         DocumentName = fileInfo.Name;
     }
@@ -41,8 +41,8 @@ public sealed record class XlsxFileInfo
     /// <param name="documentName">The name of the Excel file.</param>
     public XlsxFileInfo(Stream excelFileDataStream, string documentName = "StreamedDocument.xlsx")
     {
-        ArgumentNullThrowHelper.ThrowIfNull(excelFileDataStream);
-        ArgumentNullThrowHelper.ThrowIfNull(documentName);
+        ArgumentNullException.ThrowIfNull(excelFileDataStream);
+        ArgumentNullException.ThrowIfNull(documentName);
         this.excelFileDataStream = excelFileDataStream;
         DocumentName = documentName;
     }
