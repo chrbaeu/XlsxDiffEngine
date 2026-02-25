@@ -131,6 +131,11 @@ public sealed partial class ExcelDiffService(
         {
             builder.SetColumnsToTextCompareOnly(columnsToTextCompareOnly);
         }
+        var columnsToCompareAsNumbers = optionsModel.Columns.Where(x => x.Mode == ColumnMode.NumberCompare).Select(x => x.Name).ToArray();
+        if (columnsToCompareAsNumbers.Length > 0)
+        {
+            builder.SetColumnsToCompareAsNumbers(columnsToCompareAsNumbers);
+        }
         var columnsToIgnore = optionsModel.Columns.Where(x => x.Mode == ColumnMode.Ignore).Select(x => x.Name).ToArray();
         if (columnsToIgnore.Length > 0)
         {

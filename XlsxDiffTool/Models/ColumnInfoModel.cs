@@ -11,6 +11,7 @@ public enum ColumnMode
     Ignore,
     Omit,
     TextCompare,
+    NumberCompare,
 }
 
 public enum ColumnKind

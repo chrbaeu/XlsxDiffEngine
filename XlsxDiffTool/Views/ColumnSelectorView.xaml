@@ -84,6 +84,7 @@
                                 <ComboBoxItem Content="{s:Translate ColumnModeIgnore}" Tag="{x:Static models:ColumnMode.Ignore}" />
                                 <ComboBoxItem Content="{s:Translate ColumnModeOmit}" Tag="{x:Static models:ColumnMode.Omit}" />
                                 <ComboBoxItem Content="{s:Translate ColumnModeTextCompare}" Tag="{x:Static models:ColumnMode.TextCompare}" />
+                                <ComboBoxItem Content="{s:Translate ColumnModeNumberCompare}" Tag="{x:Static models:ColumnMode.NumberCompare}" />
                             </ComboBox>
                             <Button
                                 Grid.Column="6"

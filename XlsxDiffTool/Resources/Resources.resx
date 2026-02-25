@@ -363,4 +363,7 @@
   <data name="OptionsSettingsIgnoreColumnsNotInBoth" xml:space="preserve">
     <value>Ignore columns that are not in both files</value>
   </data>
+  <data name="ColumnModeNumberCompare" xml:space="preserve">
+    <value>Compare as numbers</value>
+  </data>
 </root>

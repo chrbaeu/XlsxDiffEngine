@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Serilog;
+using Serilog.Settings.Configuration;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using XlsxDiffTool.Common;
@@ -18,7 +19,13 @@ internal static class ServiceCollectionExtensions
     public static void AddAllServices(this IServiceCollection services)
     {
         services.AddSerilog((services, loggerConfiguration) =>
-            loggerConfiguration.ReadFrom.Configuration(services.GetRequiredService<IConfiguration>()));
+        {
+            var cfg = services.GetRequiredService<IConfiguration>();
+            var options = new ConfigurationReaderOptions(
+                typeof(FileLoggerConfigurationExtensions).Assembly
+            );
+            loggerConfiguration.ReadFrom.Configuration(cfg, options);
+        });
 
         services.AddSingleton<AppInfo>(new AppInfo(
             "XlsxDiffTool",
