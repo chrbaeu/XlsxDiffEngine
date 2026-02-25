@@ -1,4 +1,5 @@
 ﻿using OfficeOpenXml;
+using System.Globalization;
 
 namespace XlsxDiffEngine;
 
@@ -72,12 +73,13 @@ public sealed class ExcelDiffWriter
                 {
                     continue;
                 }
+                bool parseNumbers = config.ColumnsToCompareAsNumbers.Contains(columnName, stringComparer);
                 ExcelRange? oldDstCell = worksheet.Cells[row, column];
-                object? oldValue = SetCell(oldDstCell, columnName, oldRow, ruleHandler, DataKind.Old);
+                object? oldValue = SetCell(oldDstCell, columnName, oldRow, ruleHandler, DataKind.Old, parseNumbers);
                 string oldText = config.AddOldValueAsComment ? oldDstCell.Text : "";
                 if (config.ShowOldDataColumn) { column++; } else { oldDstCell = null; }
                 ExcelRange newDstCell = worksheet.Cells[row, column];
-                object? newValue = SetCell(newDstCell, columnName, newRow, ruleHandler, DataKind.New);
+                object? newValue = SetCell(newDstCell, columnName, newRow, ruleHandler, DataKind.New, parseNumbers);
                 if (config.AddOldValueAsComment && oldText != newDstCell.Text)
                 {
                     string? comment = config.OldValueCommentPrefix is { } prefix ? prefix + oldText : oldText;
@@ -136,7 +138,7 @@ public sealed class ExcelDiffWriter
         CellStyle? cellStyle = null;
         if (config.ColumnsToTextCompareOnly.Contains(columnName, stringComparer))
         {
-            if ((oldDstCell is null && !stringComparer.Equals(oldValue?.ToString(), newValue?.ToString()))
+            if ((oldDstCell is null && !stringComparer.Equals(oldValue?.ToString() ?? "", newValue?.ToString() ?? ""))
                 || (oldDstCell is not null && oldDstCell.Text != newDstCell.Text))
             {
                 cellStyle = config.ChangedCellStyle;
@@ -160,7 +162,7 @@ public sealed class ExcelDiffWriter
         {
             cellStyle = config.ValueChangedMarkers[^1].CellStyle;
         }
-        else if (!stringComparer.Equals(oldValue?.ToString(), newValue?.ToString()))
+        else if (!stringComparer.Equals(oldValue?.ToString() ?? "", newValue?.ToString() ?? ""))
         {
             cellStyle = config.ChangedCellStyle;
         }
@@ -181,9 +183,14 @@ public sealed class ExcelDiffWriter
         return (value, srcCell);
     }
 
-    private object? SetCell(ExcelRange dstCell, string columnName, int? oldRow, ModificationRuleHandler ruleHandler, DataKind dataKind)
+    private object? SetCell(ExcelRange dstCell, string columnName, int? oldRow, ModificationRuleHandler ruleHandler, DataKind dataKind, bool parseNumbers)
     {
         (object? value, ExcelRange? srcCell) = GetValueAndCell(columnName, oldRow, dataKind.HasFlag(DataKind.Old) ? oldDataSource : newDataSource);
+        if (parseNumbers && value is string s
+            && double.TryParse(s, NumberStyles.Number | NumberStyles.AllowCurrencySymbol, CultureInfo.CurrentCulture, out double d))
+        {
+            value = d;
+        }
         if (!dataKind.HasFlag(DataKind.Old) || config.ShowOldDataColumn)
         {
             dstCell.Value = value;

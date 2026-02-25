@@ -126,6 +126,14 @@ public class ExcelDiffBuilder
         => UpdateConfig(x => x with { ColumnsToTextCompareOnly = columnsToTextCompareOnly });
 
     /// <summary>
+    /// Specifies columns to be compared as numbers, even if saved as strings.
+    /// </summary>
+    /// <param name="columnsToCompareAsNumbers">Array of column names for as numbers comparison.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
+    public ExcelDiffBuilder SetColumnsToCompareAsNumbers(params string[] columnsToCompareAsNumbers)
+        => UpdateConfig(x => x with { ColumnsToCompareAsNumbers = columnsToCompareAsNumbers });
+
+    /// <summary>
     /// Specifies columns to sort by in the comparison output.
     /// </summary>
     /// <param name="columnsToSortBy">Array of column names to sort by.</param>

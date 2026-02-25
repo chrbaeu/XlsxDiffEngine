@@ -48,6 +48,11 @@ public record class ExcelDiffConfig
     public IReadOnlyCollection<string> ColumnsToTextCompareOnly { get; init; } = [];
 
     /// <summary>
+    /// The columns that should be compared as numbers, even if saved as text.
+    /// </summary>
+    public IReadOnlyCollection<string> ColumnsToCompareAsNumbers { get; init; } = [];
+
+    /// <summary>
     /// The columns to sort by in the comparison output.
     /// </summary>
     public IReadOnlyCollection<string> ColumnsToSortBy { get; init; } = [];

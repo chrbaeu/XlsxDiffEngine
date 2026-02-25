@@ -19,6 +19,10 @@ internal static class ExcelPackageExtensions
             for (int column = 0; column < rowData.Length; column++)
             {
                 excelWorksheet.Cells[row + 1, column + 1].Value = rowData[column];
+                if (rowData[column] is DateTime dateTimeValue)
+                {
+                    excelWorksheet.Cells[row + 1, column + 1].Style.Numberformat.Format = "yyyy-mm-dd";
+                }
                 if (row == 0)
                 {
                     excelWorksheet.Cells[row + 1, column + 1].Style.Font.Bold = true;
