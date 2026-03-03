@@ -34,6 +34,8 @@ public abstract partial class InputSelectorViewModel(
     IDialogService dialogService,
     FileConfigModel fileConfig) : ObservableObject, IViewModel
 {
+    private static Guid uuid = Guid.NewGuid();
+
     [ObservableProperty]
     public partial string Title { get; set; } = "File:";
 
@@ -41,7 +43,6 @@ public abstract partial class InputSelectorViewModel(
     public partial bool EnableSaveFileMode { get; set; }
 
     public FileConfigModel FileConfig { get; } = fileConfig;
-
 
     [RelayCommand]
     public void ChooseFile()
@@ -54,7 +55,14 @@ public abstract partial class InputSelectorViewModel(
         }
         else
         {
-            filePath = dialogService.ShowOpenFileDialog(this, "Excel (*.xlsx)|*.xlsx", initialDirectory);
+            if (!string.IsNullOrWhiteSpace(FileConfig.FilePath))
+            {
+                filePath = dialogService.ShowOpenFileDialog(this, "Excel (*.xlsx)|*.xlsx", initialDirectory);
+            }
+            else
+            {
+                filePath = dialogService.ShowOpenFileDialog(this, uuid, "Excel (*.xlsx)|*.xlsx", initialDirectory);
+            }
         }
         if (!string.IsNullOrEmpty(filePath))
         {

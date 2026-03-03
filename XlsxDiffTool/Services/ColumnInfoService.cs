@@ -50,6 +50,11 @@ public sealed class ColumnInfoService : IDisposable
         }
     }
 
+    public void ClearColumns()
+    {
+        Columns.Clear();
+    }
+
     public async Task ReloadColumns()
     {
         var columnNames = await Task.Run(excelDiffService.GetColumnNames);

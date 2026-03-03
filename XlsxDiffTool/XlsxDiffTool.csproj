@@ -10,7 +10,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AnalysisMode>Recommended</AnalysisMode>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Version>0.3.2</Version>
+    <Version>0.3.4</Version>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
 

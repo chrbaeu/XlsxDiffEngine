@@ -309,6 +309,12 @@
   <data name="OptionsMergingDocuments" xml:space="preserve">
     <value>Merge Dokumente</value>
   </data>
+  <data name="OptionsSpecificWorksheet" xml:space="preserve">
+    <value>Spezifisches Arbeitsblatt</value>
+  </data>
+  <data name="OptionsSpecificWorksheetTooltip" xml:space="preserve">
+    <value>Wenn aktiviert, wird nur dieses Arbeitsblatt für den Vergleich verwendet</value>
+  </data>
   <data name="FileAddTimestampTooltip" xml:space="preserve">
     <value>Datum zum Dateinamen der Ausgabedatei hinzufügen</value>
   </data>
@@ -356,6 +362,9 @@
   </data>
   <data name="ColumnConfigReload" xml:space="preserve">
     <value>Aktualisiert die Spalten basierend auf den ausgewählten Dateien</value>
+  </data>
+  <data name="ColumnConfigClear" xml:space="preserve">
+    <value>Leert die Spaltenliste</value>
   </data>
   <data name="OptionsScript" xml:space="preserve">
     <value>Skript</value>

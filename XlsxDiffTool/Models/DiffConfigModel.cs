@@ -65,6 +65,12 @@ public sealed partial class DiffConfigModel : ObservableObject
     public partial string MergedDocumentName { get; set; } = "";
 
     [ObservableProperty]
+    public partial bool UseSpecificWorksheet { get; set; }
+
+    [ObservableProperty]
+    public partial string SpecificWorksheetName { get; set; } = "";
+
+    [ObservableProperty]
     public partial bool SkipEmptyRows { get; set; }
 
     [ObservableProperty]

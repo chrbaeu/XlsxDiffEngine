@@ -31,6 +31,13 @@ public partial class ColumnSelectorViewModel(ColumnInfoService columnInfoService
     }
 
     [RelayCommand]
+    public void ClearColumns()
+    {
+        columnInfoService.ClearColumns();
+        ColumnName = "";
+    }
+
+    [RelayCommand]
     public async Task ReloadColumns()
     {
         appStateModel.IsBusy = true;

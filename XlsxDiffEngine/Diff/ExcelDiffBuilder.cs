@@ -362,6 +362,21 @@ public class ExcelDiffBuilder
     }
 
     /// <summary>
+    /// Limits the comparison to a specific set of worksheet names. If no names are provided (or all are empty), all worksheets are included.
+    /// </summary>
+    /// <param name="worksheetNames">Worksheet names to include (case handling depends on <see cref="IgnoreCase"/> configuration).</param>
+    /// <returns>The current builder instance for method chaining.</returns>
+    public ExcelDiffBuilder SetWorksheetNames(params string[] worksheetNames)
+    {
+        var names = (worksheetNames ?? [])
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+        xlsxConfig = xlsxConfig with { WorksheetNames = names.Length > 0 ? names : null };
+        return this;
+    }
+
+    /// <summary>
     /// Adds a column to the output containing the row numbers.
     /// </summary>
     /// <param name="rowNumberColumnName">The name of the row number column.</param>

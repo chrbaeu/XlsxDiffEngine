@@ -95,6 +95,10 @@ public sealed partial class ExcelDiffService(
         }
         builder.MergeWorksheets(optionsModel.MergeWorksheets);
         builder.MergeDocuments(optionsModel.MergeDocuments);
+        if (optionsModel.UseSpecificWorksheet && !string.IsNullOrWhiteSpace(optionsModel.SpecificWorksheetName))
+        {
+            builder.SetWorksheetNames(optionsModel.SpecificWorksheetName);
+        }
         if (!string.IsNullOrEmpty(optionsModel.MergedDocumentName))
         {
             builder.SetMergedDocumentName(optionsModel.MergedDocumentName);
