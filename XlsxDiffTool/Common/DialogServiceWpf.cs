@@ -29,19 +29,6 @@ internal sealed class DialogServiceWpf(IServiceProvider serviceProvider, ViewFac
         return "";
     }
 
-    public string ShowOpenFileDialog(object? owner, Guid uuid, string? extensions = null, string? initialDirectory = null, string? fileName = null, string? title = null)
-    {
-        OpenFileDialog openFileDialog = new();
-        openFileDialog.RestoreDirectory = true;
-        openFileDialog.ClientGuid = uuid;
-        if (!string.IsNullOrEmpty(fileName)) { openFileDialog.FileName = fileName; }
-        if (!string.IsNullOrEmpty(extensions)) { openFileDialog.Filter = extensions; }
-        if (!string.IsNullOrEmpty(title)) { openFileDialog.Title = title; }
-        if (!string.IsNullOrEmpty(initialDirectory) && Directory.Exists(initialDirectory)) { openFileDialog.InitialDirectory = initialDirectory; }
-        if (openFileDialog.ShowDialog(GetParentWindow(owner)) == true) { return openFileDialog.FileName ?? string.Empty; }
-        return "";
-    }
-
     public string[] ShowOpenFileMultiselectDialog(object? owner, string? extensions = null, string? initialDirectory = null, string? fileName = null, string? title = null)
     {
         OpenFileDialog openFileDialog = new() { Multiselect = true };

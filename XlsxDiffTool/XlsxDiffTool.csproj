@@ -10,7 +10,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AnalysisMode>Recommended</AnalysisMode>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Version>0.3.4</Version>
+    <Version>0.3.6</Version>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
 
@@ -24,10 +24,10 @@
     <PackageReference Include="EPPlus" Version="*" />
     <PackageReference Include="CliFx" Version="2.3.6" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.3" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.3" />
-    <PackageReference Include="Microsoft.Extensions.Localization" Version="10.0.3" />
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Localization" Version="10.0.5" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.142" />
     <PackageReference Include="Serilog" Version="4.3.1" />
     <PackageReference Include="Serilog.Extensions.Hosting" Version="10.0.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="10.0.0" />

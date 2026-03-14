@@ -34,7 +34,7 @@ public abstract partial class InputSelectorViewModel(
     IDialogService dialogService,
     FileConfigModel fileConfig) : ObservableObject, IViewModel
 {
-    private static Guid uuid = Guid.NewGuid();
+    private static string lastFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
     [ObservableProperty]
     public partial string Title { get; set; } = "File:";
@@ -47,7 +47,7 @@ public abstract partial class InputSelectorViewModel(
     [RelayCommand]
     public void ChooseFile()
     {
-        var initialDirectory = Path.GetDirectoryName(FileConfig.FilePath) ?? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        var initialDirectory = Path.GetDirectoryName(FileConfig.FilePath) ?? lastFolder;
         string filePath;
         if (FileConfig.IsFolderConfig)
         {
@@ -55,17 +55,11 @@ public abstract partial class InputSelectorViewModel(
         }
         else
         {
-            if (!string.IsNullOrWhiteSpace(FileConfig.FilePath))
-            {
-                filePath = dialogService.ShowOpenFileDialog(this, "Excel (*.xlsx)|*.xlsx", initialDirectory);
-            }
-            else
-            {
-                filePath = dialogService.ShowOpenFileDialog(this, uuid, "Excel (*.xlsx)|*.xlsx", initialDirectory);
-            }
+            filePath = dialogService.ShowOpenFileDialog(this, "Excel (*.xlsx)|*.xlsx", initialDirectory);
         }
         if (!string.IsNullOrEmpty(filePath))
         {
+            lastFolder = Path.GetDirectoryName(filePath) ?? lastFolder;
             FileConfig.FilePath = filePath;
         }
     }

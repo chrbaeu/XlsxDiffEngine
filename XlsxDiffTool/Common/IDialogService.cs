@@ -26,7 +26,6 @@ public interface IDialogService
     public DialogResult ShowMessageBox(object? owner, string title, string text, DialogButton buttons = DialogButton.OK);
 
     public string ShowOpenFileDialog(object? owner, string? extensions = null, string? initialDirectory = null, string? fileName = null, string? title = null);
-    public string ShowOpenFileDialog(object? owner, Guid uuid, string? extensions = null, string? initialDirectory = null, string? fileName = null, string? title = null);
     public string[] ShowOpenFileMultiselectDialog(object? owner, string? extensions = null, string? initialDirectory = null, string? fileName = null, string? title = null);
     public string ShowSaveFileDialog(object? owner, string? extensions = null, string? initialDirectory = null, string? fileName = null, string? title = null);
     public string ShowOpenFolderDialog(object? owner, string? initialDirectory = null, string? title = null);
