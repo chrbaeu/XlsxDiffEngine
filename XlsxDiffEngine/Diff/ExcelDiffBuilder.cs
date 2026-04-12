@@ -551,15 +551,22 @@ public class ExcelDiffBuilder
         {
             throw new InvalidOperationException("The new excel files to compare must contain unique worksheet names!");
         }
-        if (!newDataSources.Any(x => oldDataSourcesDict.ContainsKey(x.Name)))
-        {
-            throw new InvalidOperationException("The excel files to compare must contain worksheets with the same name!");
-        }
 
         ExcelPackage? excelPackage = null;
         try
         {
             excelPackage = new();
+            if (oldDataSources.Count == 0 || newDataSources.Count == 0)
+            {
+                postProcessingAction?.Invoke(excelPackage);
+                var emptyResult = excelPackage;
+                excelPackage = null;
+                return emptyResult;
+            }
+            if (!newDataSources.Any(x => oldDataSourcesDict.ContainsKey(x.Name)))
+            {
+                throw new InvalidOperationException("The excel files to compare must contain worksheets with the same name!");
+            }
             foreach (var newDataSource in newDataSources)
             {
                 if (!oldDataSourcesDict.TryGetValue(newDataSource.Name, out var oldDataSource))

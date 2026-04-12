@@ -42,7 +42,10 @@ public abstract partial class FileConfigModel : ObservableObject
 
     public bool IsValidPath() => !string.IsNullOrWhiteSpace(FilePath);
 
-    public bool IsExisitingFile() => IsValidPath() && File.Exists(FilePath);
+    public bool IsExistingFile() => IsValidPath() && File.Exists(FilePath);
+
+    [Obsolete("Use IsExistingFile instead.")]
+    public bool IsExisitingFile() => IsExistingFile();
 
     //partial void OnFilePathChanged(string value) => messenger.Send<FileConfigChangedEvent>(new(this));
     //partial void OnStartRowChanged(int value) => messenger.Send<FileConfigChangedEvent>(new(this));

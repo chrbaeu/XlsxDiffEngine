@@ -43,7 +43,7 @@ public sealed partial class MainViewModel(
         {
             if (Options.DiffOptions.SaveAndRestoreInputFilePaths is null)
             {
-                var result = dialogService.ShowMessageBox(this, localizer["MsgBoxTitleQuestion"], localizer["SaveAndRestoreInputFilePathsMg"], DialogButton.YesNo);
+                var result = dialogService.ShowMessageBox(this, localizer["MsgBoxTitleQuestion"], localizer["SaveAndRestoreInputFilePathsMsg"], DialogButton.YesNo);
                 Options.DiffOptions.SaveAndRestoreInputFilePaths = result switch
                 {
                     DialogResult.Yes => true,

@@ -258,20 +258,20 @@
   <data name="OptionsColumnsOldValueComment" xml:space="preserve">
     <value>Old value as comment</value>
   </data>
-  <data name="OptionsChangeMakerHeader" xml:space="preserve">
+  <data name="OptionsChangeMarkerHeader" xml:space="preserve">
     <value>Change highlighting</value>
   </data>
-  <data name="OptionsChangeMakerValue" xml:space="preserve">
+  <data name="OptionsChangeMarkerValue" xml:space="preserve">
     <value>Value:</value>
   </data>
-  <data name="OptionsChangeMakerValueTooltip" xml:space="preserve">
+  <data name="OptionsChangeMarkerValueTooltip" xml:space="preserve">
     <value>Min. deviation absolute</value>
   </data>
-  <data name="OptionsChangeMakerPercentTooltip" xml:space="preserve">
+  <data name="OptionsChangeMarkerPercentTooltip" xml:space="preserve">
     <value>Min. deviation in %</value>
   </data>
   <data name="OptionsModRuleHeader" xml:space="preserve">
-    <value>Modifications ruls</value>
+    <value>Modification rules</value>
   </data>
   <data name="OptionsModRuleTarget" xml:space="preserve">
     <value>Target:</value>
@@ -324,7 +324,7 @@
   <data name="MergedDocumentNameTooltip" xml:space="preserve">
     <value>Name of the merged document</value>
   </data>
-  <data name="SaveAndRestoreInputFilePathsMg" xml:space="preserve">
+  <data name="SaveAndRestoreInputFilePathsMsg" xml:space="preserve">
     <value>Do you want to save the selected file paths as well?</value>
   </data>
   <data name="MsgBoxTitleQuestion" xml:space="preserve">

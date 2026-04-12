@@ -9,7 +9,7 @@ public sealed partial class ModificationRuleModel : ObservableObject
     public partial string Name { get; set; } = "";
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsAktive))]
+    [NotifyPropertyChangedFor(nameof(IsActive))]
     public partial DataKind? Target { get; set; }
 
     [ObservableProperty]
@@ -24,6 +24,6 @@ public sealed partial class ModificationRuleModel : ObservableObject
     [ObservableProperty]
     public partial string? AdditionalValue { get; set; }
 
-    public bool IsAktive => Target is not null;
+    public bool IsActive => Target is not null;
 
 }

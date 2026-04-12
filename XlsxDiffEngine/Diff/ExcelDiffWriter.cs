@@ -57,7 +57,8 @@ public sealed class ExcelDiffWriter
     {
         ModificationRuleHandler ruleHandler = new(config.ModificationRules, config.IgnoreCase);
         int lastGroup = 0;
-        foreach ((int? oldRow, int? newRow, int group) in diffOp.GetMergedRows())
+        var mergedRows = diffOp.GetMergedRows();
+        foreach ((int? oldRow, int? newRow, int group) in mergedRows)
         {
             if (lastGroup != group && config.AddEmptyRowAfterGroups)
             {
@@ -228,7 +229,10 @@ public sealed class ExcelDiffWriter
             column++;
         }
         column--;
-        ExcelHelper.SetCellStyle(worksheet.Cells[startRow, startColumn, startRow, column], config.HeaderStyle);
+        if (column >= startColumn)
+        {
+            ExcelHelper.SetCellStyle(worksheet.Cells[startRow, startColumn, startRow, column], config.HeaderStyle);
+        }
         return column;
     }
 
@@ -256,7 +260,7 @@ public sealed class ExcelDiffWriter
                 }
             }
         }
-        if (config.AutoFilter)
+        if (config.AutoFilter && endRow >= startRow && endColumn >= startColumn)
         {
             worksheet.Cells[startRow, startColumn, endRow, endColumn].AutoFilter = true;
         }

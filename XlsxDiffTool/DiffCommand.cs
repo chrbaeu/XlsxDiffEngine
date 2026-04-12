@@ -15,23 +15,23 @@ internal sealed class DiffCommand(
     ) : ICommand
 {
 
-    [CommandOption("oldPath", 'o', IsRequired = true, Description = "Path for the older src xlsx data.")]
+    [CommandOption("oldPath", 'o', IsRequired = true, Description = "Path for the older source .xlsx file.")]
     public string OldPath { get; init; } = "";
 
-    [CommandOption("newPath", 'n', IsRequired = true, Description = "Path for the newer src xlsx data.")]
+    [CommandOption("newPath", 'n', IsRequired = true, Description = "Path for the newer source .xlsx file.")]
     public string NewPath { get; init; } = "";
 
     [CommandOption("configPath", 'c', Description = "Path for the configuration to be used for the diff process.")]
     public string ConfigPath { get; init; } = "";
 
-    [CommandOption("diffResultPath", 'd', Description = "Path for the resutlig diff xlsx file.")]
+    [CommandOption("diffResultPath", 'd', Description = "Path for the resulting diff .xlsx file.")]
     public string DiffPath { get; init; } = ".";
 
     public async ValueTask ExecuteAsync(IConsole console)
     {
         if (!File.Exists(OldPath))
         {
-            throw new FileNotFoundException($"The file {OldPath} was not found.”");
+            throw new FileNotFoundException($"The file {OldPath} was not found.");
         }
         if (!File.Exists(NewPath))
         {

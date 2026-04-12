@@ -126,7 +126,7 @@
                         </WrapPanel>
                     </Expander>
 
-                    <Expander Header="{s:Translate OptionsChangeMakerHeader}" IsExpanded="False">
+                    <Expander Header="{s:Translate OptionsChangeMarkerHeader}" IsExpanded="False">
                         <ItemsControl ItemsSource="{Binding DiffOptions.ValueChangedMarkers}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -144,14 +144,14 @@
                                         <TextBlock
                                             Margin="5,0,5,0"
                                             VerticalAlignment="Center"
-                                            Text="{s:Translate OptionsChangeMakerValue}"
-                                            ToolTip="{s:Translate OptionsChangeMakerValueTooltip}" />
+                                            Text="{s:Translate OptionsChangeMarkerValue}"
+                                            ToolTip="{s:Translate OptionsChangeMarkerValueTooltip}" />
                                         <TextBox
                                             Width="80"
                                             Margin="0,0,5,0"
                                             VerticalAlignment="Center"
                                             Text="{Binding MinDeviationAbsolute, StringFormat=N2, Mode=TwoWay}"
-                                            ToolTip="{s:Translate OptionsChangeMakerValueTooltip}">
+                                            ToolTip="{s:Translate OptionsChangeMarkerValueTooltip}">
                                             <i:Interaction.Behaviors>
                                                 <behaviors:DecimalNumberInputBehavior />
                                             </i:Interaction.Behaviors>
@@ -160,13 +160,13 @@
                                             Margin="5,0,5,0"
                                             VerticalAlignment="Center"
                                             Text="% :"
-                                            ToolTip="{s:Translate OptionsChangeMakerPercentTooltip}" />
+                                            ToolTip="{s:Translate OptionsChangeMarkerPercentTooltip}" />
                                         <TextBox
                                             Width="80"
                                             Margin="0,0,5,0"
                                             VerticalAlignment="Center"
                                             Text="{Binding MinDeviationInPercent, StringFormat=N2, Mode=TwoWay}"
-                                            ToolTip="{s:Translate OptionsChangeMakerPercentTooltip}">
+                                            ToolTip="{s:Translate OptionsChangeMarkerPercentTooltip}">
                                             <i:Interaction.Behaviors>
                                                 <behaviors:DecimalNumberInputBehavior />
                                             </i:Interaction.Behaviors>
@@ -204,7 +204,7 @@
                                                 <ComboBoxItem Content="{s:Translate OptionsModRuleTargetAllNonEmpty}" Tag="{x:Static XlsxDiffEngine:DataKind.AllNonEmpty}" />
                                             </ComboBox>
                                         </StackPanel>
-                                        <StackPanel Margin="5,0,5,0" IsEnabled="{Binding IsAktive, Mode=OneWay}" Orientation="Horizontal">
+                                        <StackPanel Margin="5,0,5,0" IsEnabled="{Binding IsActive, Mode=OneWay}" Orientation="Horizontal">
                                             <TextBlock Margin="0,0,5,0" VerticalAlignment="Center" Text="{s:Translate OptionsModRulePattern}" />
                                             <TextBox MinWidth="100" VerticalAlignment="Center" Text="{Binding RegexPattern}" />
                                         </StackPanel>
@@ -212,13 +212,13 @@
                                             Width="110"
                                             Margin="5,0,5,0"
                                             VerticalAlignment="Center"
-                                            IsEnabled="{Binding IsAktive, Mode=OneWay}"
+                                            IsEnabled="{Binding IsActive, Mode=OneWay}"
                                             SelectedValue="{Binding ModificationKind, Mode=TwoWay}"
                                             SelectedValuePath="Tag">
                                             <ComboBoxItem Content="{s:Translate OptionsModRuleKindFormula}" Tag="{x:Static XlsxDiffEngine:ModificationKind.Formula}" />
                                             <ComboBoxItem Content="{s:Translate OptionsModRuleKindFormat}" Tag="{x:Static XlsxDiffEngine:ModificationKind.NumberFormat}" />
                                         </ComboBox>
-                                        <StackPanel Margin="5,0,5,0" IsEnabled="{Binding IsAktive, Mode=OneWay}" Orientation="Horizontal">
+                                        <StackPanel Margin="5,0,5,0" IsEnabled="{Binding IsActive, Mode=OneWay}" Orientation="Horizontal">
                                             <TextBlock Margin="0,0,5,0" VerticalAlignment="Center" Text="{s:Translate OptionsModRuleValue}" />
                                             <TextBox MinWidth="100" VerticalAlignment="Center" Text="{Binding Value}" />
                                         </StackPanel>

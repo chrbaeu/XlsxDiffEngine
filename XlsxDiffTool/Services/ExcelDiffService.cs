@@ -22,7 +22,7 @@ public sealed partial class ExcelDiffService(
         }
         else if (!optionsModel.OldFileConfig.IsFolderConfig && !optionsModel.NewFileConfig.IsFolderConfig)
         {
-            if (!optionsModel.OldFileConfig.IsExisitingFile() || !optionsModel.NewFileConfig.IsExisitingFile()) { return false; }
+            if (!optionsModel.OldFileConfig.IsExistingFile() || !optionsModel.NewFileConfig.IsExistingFile()) { return false; }
         }
         if (!optionsModel.OutputFileConfig.IsValidPath()) { return false; }
 
@@ -103,10 +103,10 @@ public sealed partial class ExcelDiffService(
         {
             builder.SetMergedDocumentName(optionsModel.MergedDocumentName);
         }
-        foreach (var valueChangedMaker in optionsModel.ValueChangedMarkers)
+        foreach (var valueChangedMarker in optionsModel.ValueChangedMarkers)
         {
-            CellStyle cellStyle = new() { BackgroundColor = ColorTranslator.FromHtml(valueChangedMaker.Color) };
-            builder.AddValueChangedMarker(valueChangedMaker.MinDeviationInPercent, valueChangedMaker.MinDeviationAbsolute, cellStyle);
+            CellStyle cellStyle = new() { BackgroundColor = ColorTranslator.FromHtml(valueChangedMarker.Color) };
+            builder.AddValueChangedMarker(valueChangedMarker.MinDeviationInPercent, valueChangedMarker.MinDeviationAbsolute, cellStyle);
         }
         foreach (var modificationRuleModel in optionsModel.ModificationRules)
         {
@@ -220,11 +220,11 @@ public sealed partial class ExcelDiffService(
         }
         else
         {
-            if (optionsModel.OldFileConfig.IsExisitingFile())
+            if (optionsModel.OldFileConfig.IsExistingFile())
             {
                 oldFiles.Add(CreateXlsxFileInfo(optionsModel.OldFileConfig));
             }
-            if (optionsModel.NewFileConfig.IsExisitingFile())
+            if (optionsModel.NewFileConfig.IsExistingFile())
             {
                 newFiles.Add(CreateXlsxFileInfo(optionsModel.NewFileConfig));
             }

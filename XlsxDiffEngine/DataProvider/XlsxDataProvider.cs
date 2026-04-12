@@ -111,14 +111,14 @@ public sealed class XlsxDataProvider : IDisposable
         foreach (ExcelWorksheet excelWorksheet in excelPackage.Workbook.Worksheets)
         {
             if (workSheetNames is not null && !workSheetNames.Contains(excelWorksheet.Name)) { continue; }
-            ExcelAddress excelAddress = excelWorksheet.Dimension;
-            if (wsInfoDict.TryGetValue(excelWorksheet.Name, out XlsxWorksheetInfo? xlsxWorksheetInfo))
+            ExcelAddress? excelAddress = excelWorksheet.Dimension;
+            if (excelAddress is not null && wsInfoDict.TryGetValue(excelWorksheet.Name, out XlsxWorksheetInfo? xlsxWorksheetInfo))
             {
                 excelAddress = new(xlsxWorksheetInfo.FromRow, xlsxWorksheetInfo.FromColumn,
                     xlsxWorksheetInfo.ToRow ?? excelAddress.End.Row,
                     xlsxWorksheetInfo.ToColumn ?? excelAddress.End.Column);
             }
-            else if (xlsxFileInfo.FromRow != 1 || xlsxFileInfo.FromColumn != 1 || xlsxFileInfo.ToRow != null || xlsxFileInfo.ToColumn != null)
+            else if (excelAddress is not null && (xlsxFileInfo.FromRow != 1 || xlsxFileInfo.FromColumn != 1 || xlsxFileInfo.ToRow != null || xlsxFileInfo.ToColumn != null))
             {
                 excelAddress = new(xlsxFileInfo.FromRow, xlsxFileInfo.FromColumn,
                     xlsxFileInfo.ToRow ?? excelAddress.End.Row,

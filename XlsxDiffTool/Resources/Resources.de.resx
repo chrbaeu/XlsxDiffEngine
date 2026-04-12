@@ -157,7 +157,7 @@
     <value>Config laden</value>
   </data>
   <data name="ConfigReset" xml:space="preserve">
-    <value>Zurücksetzten</value>
+    <value>Zurücksetzen</value>
   </data>
   <data name="OptionsAddColumnRowName" xml:space="preserve">
     <value>Zeile</value>
@@ -178,7 +178,7 @@
     <value>Datei/Ordner auswählen</value>
   </data>
   <data name="FileFolderMode" xml:space="preserve">
-    <value>Ordermodus</value>
+    <value>Ordnermodus</value>
   </data>
   <data name="FileFolderModeTooltip" xml:space="preserve">
     <value>Einen Ordner statt eines Dateipfads verwenden</value>
@@ -244,7 +244,7 @@
     <value>Breite anpassen</value>
   </data>
   <data name="OptionsColumnsAutoFilter" xml:space="preserve">
-    <value>Filter setzten</value>
+    <value>Filter setzen</value>
   </data>
   <data name="OptionsColumnsCopyFormat" xml:space="preserve">
     <value>Format kopieren</value>
@@ -258,16 +258,16 @@
   <data name="OptionsColumnsOldValueComment" xml:space="preserve">
     <value>Alten Wert als Kommentar</value>
   </data>
-  <data name="OptionsChangeMakerHeader" xml:space="preserve">
+  <data name="OptionsChangeMarkerHeader" xml:space="preserve">
     <value>Änderungshervorhebung</value>
   </data>
-  <data name="OptionsChangeMakerValue" xml:space="preserve">
+  <data name="OptionsChangeMarkerValue" xml:space="preserve">
     <value>Wert:</value>
   </data>
-  <data name="OptionsChangeMakerValueTooltip" xml:space="preserve">
+  <data name="OptionsChangeMarkerValueTooltip" xml:space="preserve">
     <value>Min. Abweichung absolut</value>
   </data>
-  <data name="OptionsChangeMakerPercentTooltip" xml:space="preserve">
+  <data name="OptionsChangeMarkerPercentTooltip" xml:space="preserve">
     <value>Min. Abweichung in %</value>
   </data>
   <data name="OptionsModRuleHeader" xml:space="preserve">
@@ -322,9 +322,9 @@
     <value>Name des zusammengeführten Arbeitsblatts</value>
   </data>
   <data name="MergedDocumentNameTooltip" xml:space="preserve">
-    <value>Name des zusammengeführten Documents</value>
+    <value>Name des zusammengeführten Dokuments</value>
   </data>
-  <data name="SaveAndRestoreInputFilePathsMg" xml:space="preserve">
+  <data name="SaveAndRestoreInputFilePathsMsg" xml:space="preserve">
     <value>Möchten Sie die ausgewählten Dateipfade ebenfalls speichern?</value>
   </data>
   <data name="MsgBoxTitleQuestion" xml:space="preserve">
