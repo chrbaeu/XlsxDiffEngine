@@ -21,11 +21,13 @@ internal class ExcelDiffBuilderBasicTests
     [Test]
     public void Diff_WithEmptyWorksheets()
     {
+        // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(Array.Empty<object?[]>());
         using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(Array.Empty<object?[]>());
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
+        // Act
         using ExcelPackage result = excelDiffBuilder
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
@@ -33,6 +35,7 @@ internal class ExcelDiffBuilderBasicTests
                 )
             .Build();
 
+        // Assert
         using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage(Array.Empty<object?[]>());
         ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult);
     }
@@ -40,11 +43,13 @@ internal class ExcelDiffBuilderBasicTests
     [Test]
     public void Diff_FullAgainstEmptyWorksheets()
     {
+        // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
         using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(Array.Empty<object?[]>());
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
+        // Act
         using ExcelPackage result = excelDiffBuilder
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
@@ -53,6 +58,7 @@ internal class ExcelDiffBuilderBasicTests
             .SetKeyColumns("Title")
             .Build();
 
+        // Assert
         using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Title", "Title", "Value", "Value"],
             ["A", null, 1, null],
@@ -67,11 +73,13 @@ internal class ExcelDiffBuilderBasicTests
     [Test]
     public void Diff_EmptyAgainstFullWorksheets()
     {
+        // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(Array.Empty<object?[]>());
         using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
+        // Act
         using ExcelPackage result = excelDiffBuilder
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
@@ -80,6 +88,7 @@ internal class ExcelDiffBuilderBasicTests
             .SetKeyColumns("Title")
             .Build();
 
+        // Assert
         using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Title", "Title", "Value", "Value"],
             [null, "A", null, 1],
@@ -94,6 +103,7 @@ internal class ExcelDiffBuilderBasicTests
     [Test]
     public void Diff_WithRecalculation()
     {
+        // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
         using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
         newExcelPackage.Workbook.Worksheets[0].Cells[2, 2].Value = null;
@@ -103,6 +113,7 @@ internal class ExcelDiffBuilderBasicTests
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
+        // Act
         using ExcelPackage result = excelDiffBuilder
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
@@ -111,6 +122,7 @@ internal class ExcelDiffBuilderBasicTests
                 )
             .Build();
 
+        // Assert
         using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Title", "Title", "Value", "Value"],
             ["A", "A", 1, 1],
@@ -125,12 +137,14 @@ internal class ExcelDiffBuilderBasicTests
     [Test]
     public void Diff_WithEmptyWorksheet()
     {
+        // Arrange
         using ExcelPackage oldExcelPackage = new();
         oldExcelPackage.Workbook.Worksheets.Add("Table");
         using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
+        // Act
         using ExcelPackage result = excelDiffBuilder
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
@@ -138,6 +152,7 @@ internal class ExcelDiffBuilderBasicTests
                 )
             .Build();
 
+        // Assert
         using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Title", "Title", "Value", "Value"],
             [null, "A", null, 1],

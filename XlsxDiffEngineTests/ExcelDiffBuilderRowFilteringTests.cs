@@ -21,11 +21,13 @@ internal class ExcelDiffBuilderRowFilteringTests
     [Test]
     public void Diff_WithoutUnchangedRows()
     {
+        // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
         using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
+        // Act
         using ExcelPackage result = excelDiffBuilder
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
@@ -34,6 +36,7 @@ internal class ExcelDiffBuilderRowFilteringTests
             .SkipUnchangedRows()
             .Build();
 
+        // Assert
         using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Title", "Title", "Value", "Value"],
             ["B", "B", 2, 4],
@@ -43,8 +46,9 @@ internal class ExcelDiffBuilderRowFilteringTests
     }
 
     [Test]
-    public void Diff_RowbasedWithoutRemovedRows()
+    public void Diff_SkipRemovedRows_WithoutKeyColumns()
     {
+        // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
         using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
         newExcelPackage.Workbook.Worksheets[0].Cells[4, 1].Value = "D";
@@ -52,6 +56,7 @@ internal class ExcelDiffBuilderRowFilteringTests
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
+        // Act
         using ExcelPackage result = excelDiffBuilder
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
@@ -60,6 +65,7 @@ internal class ExcelDiffBuilderRowFilteringTests
             .SkipRemovedRows()
             .Build();
 
+        // Assert
         using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Title", "Title", "Value", "Value"],
             ["A", "A", 1, 1],
@@ -72,8 +78,9 @@ internal class ExcelDiffBuilderRowFilteringTests
     }
 
     [Test]
-    public void Diff_KeyedWithoutRemovedRows()
+    public void Diff_SkipRemovedRows_WithKeyColumns()
     {
+        // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
         using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
         newExcelPackage.Workbook.Worksheets[0].Cells[4, 1].Value = "D";
@@ -81,6 +88,7 @@ internal class ExcelDiffBuilderRowFilteringTests
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
+        // Act
         using ExcelPackage result = excelDiffBuilder
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
@@ -90,6 +98,7 @@ internal class ExcelDiffBuilderRowFilteringTests
             .SkipRemovedRows()
             .Build();
 
+        // Assert
         using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Title", "Title", "Value", "Value"],
             ["A", "A", 1, 1],
@@ -104,11 +113,13 @@ internal class ExcelDiffBuilderRowFilteringTests
     [Test]
     public void Diff_WithSkippedRows()
     {
+        // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
         using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
+        // Act
         using ExcelPackage result = excelDiffBuilder
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
@@ -117,6 +128,7 @@ internal class ExcelDiffBuilderRowFilteringTests
             .SetSkipRowRule((dataSource, row) => dataSource.GetCellText("Title", row) == "A")
             .Build();
 
+        // Assert
         using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Title", "Title", "Value", "Value"],
             ["B", "B", 2, 4],

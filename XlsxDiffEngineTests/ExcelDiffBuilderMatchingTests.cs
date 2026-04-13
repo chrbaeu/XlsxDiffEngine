@@ -21,11 +21,13 @@ internal class ExcelDiffBuilderMatchingTests
     [Test]
     public void Diff_WithHighlighting()
     {
+        // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
         using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
+        // Act
         using ExcelPackage result = excelDiffBuilder
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
@@ -33,6 +35,7 @@ internal class ExcelDiffBuilderMatchingTests
                 )
             .Build();
 
+        // Assert
         using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Title", "Title", "Value", "Value"],
             ["A", "A", 1, 1],
@@ -47,11 +50,13 @@ internal class ExcelDiffBuilderMatchingTests
     [Test]
     public void Diff_WithHighlightingAndKeyColumn()
     {
+        // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
         using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
+        // Act
         using ExcelPackage result = excelDiffBuilder
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
@@ -60,6 +65,7 @@ internal class ExcelDiffBuilderMatchingTests
             .SetKeyColumns("Title")
             .Build();
 
+        // Assert
         using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Title", "Title", "Value", "Value"],
             ["A", "A", 1, 1],
@@ -75,12 +81,14 @@ internal class ExcelDiffBuilderMatchingTests
     [Test]
     public void Diff_WithHighlightingAndKeyColumnAndInsertAndDelete()
     {
+        // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
         using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
         oldExcelPackage.Workbook.Worksheets[0].Cells[4, 1].Value = "D";
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
+        // Act
         using ExcelPackage result = excelDiffBuilder
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
@@ -89,6 +97,7 @@ internal class ExcelDiffBuilderMatchingTests
             .SetKeyColumns("Title")
             .Build();
 
+        // Assert
         using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Title", "Title", "Value", "Value"],
             ["A", "A", 1, 1],
@@ -107,6 +116,7 @@ internal class ExcelDiffBuilderMatchingTests
     [Test]
     public void Diff_WithColumnsToCompare()
     {
+        // Arrange
         object?[][] oldFile = [
             ["Title", "Value", "Other"],
             ["A", 1, "x"],
@@ -122,6 +132,7 @@ internal class ExcelDiffBuilderMatchingTests
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
+        // Act
         using var result = new ExcelDiffBuilder()
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
@@ -130,6 +141,7 @@ internal class ExcelDiffBuilderMatchingTests
             .SetColumnsToCompare("Value")
             .Build();
 
+        // Assert
         using var expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Title", "Title", "Value", "Value", "Other", "Other"],
             ["A", "A", 1, 1, "x", "x"],
@@ -143,11 +155,13 @@ internal class ExcelDiffBuilderMatchingTests
     [Test]
     public void Diff_WithSort()
     {
+        // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
         using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
+        // Act
         using ExcelPackage result = excelDiffBuilder
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
@@ -156,6 +170,7 @@ internal class ExcelDiffBuilderMatchingTests
             .SetColumnsToSortBy("Value")
             .Build();
 
+        // Assert
         using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Title", "Title", "Value", "Value"],
             ["A", "A", 1, 1],
@@ -170,12 +185,14 @@ internal class ExcelDiffBuilderMatchingTests
     [Test]
     public void Diff_WithOldValueFallback()
     {
+        // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
         using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
         newExcelPackage.Workbook.Worksheets[0].Cells[4, 1].Value = "D";
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
+        // Act
         using ExcelPackage result = excelDiffBuilder
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
@@ -185,6 +202,7 @@ internal class ExcelDiffBuilderMatchingTests
             .SetColumnsToFillWithOldValueIfNoNewValueExists("Title")
             .Build();
 
+        // Assert
         using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Title", "Title", "Value", "Value"],
             ["A", "A", 1, 1],
@@ -205,6 +223,7 @@ internal class ExcelDiffBuilderMatchingTests
     [Test]
     public void Diff_WithIgnoreCase()
     {
+        // Arrange
         object?[][] oldFile = [
             ["Title", "Value"],
             ["A", 1],
@@ -220,6 +239,7 @@ internal class ExcelDiffBuilderMatchingTests
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
+        // Act
         using ExcelPackage result = excelDiffBuilder
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
@@ -227,6 +247,7 @@ internal class ExcelDiffBuilderMatchingTests
             .IgnoreCase(true)
             .Build();
 
+        // Assert
         using var expectedResult = ExcelTestHelper.ConvertToExcelPackage([
                 ["title", "title", "value", "value"],
                 ["A", "A", 1, 1],
@@ -238,6 +259,7 @@ internal class ExcelDiffBuilderMatchingTests
     [Test]
     public void Diff_WithoutIgnoreCase()
     {
+        // Arrange
         object?[][] oldFile = [
             ["Title", "Value"],
             ["A", 1],
@@ -253,6 +275,7 @@ internal class ExcelDiffBuilderMatchingTests
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
+        // Act
         using ExcelPackage result = excelDiffBuilder
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
@@ -260,12 +283,13 @@ internal class ExcelDiffBuilderMatchingTests
             .IgnoreCase(false)
             .Build();
 
+        // Assert
         using var expectedResult = ExcelTestHelper.ConvertToExcelPackage([
-                ["title", "title", "value", "value"],
+                ["Title", "Title", "Value", "Value"],
                 ["A", "A", 1, 1],
                 ["b", "B", 2, 2],
             ]);
-
-        Assert.Throws<ArgumentException>(() => ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true));
+        ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[3, 1, 3, 2], DefaultCellStyles.ChangedCell);
+        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
     }
 }

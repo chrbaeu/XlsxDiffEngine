@@ -148,7 +148,6 @@ internal class ExcelDiffBuilderMergingTests
         using var newFileStream1 = oldExcelPackage.ToMemoryStream();
         using var newFileStream2 = oldExcelPackage.ToMemoryStream();
 
-        // Act
         ExcelDiffBuilder builder = excelDiffBuilder
             .AddFiles(x => x
                 .SetOldFile(oldFileStream1, "OldFile1.xlsx")
@@ -159,11 +158,11 @@ internal class ExcelDiffBuilderMergingTests
                 .SetNewFile(newFileStream2, "NewFile2.xlsx")
                 );
 
+        // Act
+        void act() => builder.Build();
+
         // Assert
-        Assert.Throws<InvalidOperationException>(() =>
-        {
-            builder.Build();
-        });
+        Assert.Throws<InvalidOperationException>(act);
     }
 
 }

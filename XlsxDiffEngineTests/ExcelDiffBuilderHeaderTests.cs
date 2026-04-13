@@ -21,11 +21,13 @@ internal class ExcelDiffBuilderHeaderTests
     [Test]
     public void Diff_WithColumnHeaderPostfix()
     {
+        // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
         using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
+        // Act
         using ExcelPackage result = excelDiffBuilder
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
@@ -35,6 +37,7 @@ internal class ExcelDiffBuilderHeaderTests
             .SetOldHeaderColumnPostfix("Old")
             .Build();
 
+        // Assert
         using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["TitleOld", "TitleNew", "ValueOld", "ValueNew"],
             ["A", "A", 1, 1],
@@ -48,11 +51,13 @@ internal class ExcelDiffBuilderHeaderTests
     [Test]
     public void Diff_WithCustomHeaderRows()
     {
+        // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
         using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
+        // Act
         using ExcelPackage result = excelDiffBuilder
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
@@ -61,6 +66,7 @@ internal class ExcelDiffBuilderHeaderTests
             .SetHeader("Custom1", "Custom2")
             .Build();
 
+        // Assert
         using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Custom1", null, null, null],
             ["Custom2", null, null, null],
@@ -78,11 +84,13 @@ internal class ExcelDiffBuilderHeaderTests
     [Test]
     public void Diff_WithCustomHeaderRowsAndColumns()
     {
+        // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
         using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
+        // Act
         using ExcelPackage result = excelDiffBuilder
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
@@ -94,6 +102,7 @@ internal class ExcelDiffBuilderHeaderTests
             ])
             .Build();
 
+        // Assert
         using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Top1", "Top2", "Top3", "Top4"],
             ["Sub1", "Sub2", "Sub3", "Sub4"],

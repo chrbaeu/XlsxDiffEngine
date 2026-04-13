@@ -21,8 +21,9 @@ internal class ExcelDiffBuilderCopyOptionsTests
     ];
 
     [Test]
-    public void Diff_WithNumberFormatCopyCellFormatTrue()
+    public void Diff_WithCopyCellFormat_CopiesNumberFormats()
     {
+        // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
         using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
         oldExcelPackage.Workbook.Worksheets[0].Cells[2, 2, 4, 2].Style.Numberformat.Format = "0.00";
@@ -30,6 +31,7 @@ internal class ExcelDiffBuilderCopyOptionsTests
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
+        // Act
         using ExcelPackage result = excelDiffBuilder
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
@@ -38,6 +40,7 @@ internal class ExcelDiffBuilderCopyOptionsTests
             .CopyCellFormat(true)
             .Build();
 
+        // Assert
         using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Title", "Title", "Value", "Value"],
             ["A", "A", 1, 1],
@@ -50,8 +53,9 @@ internal class ExcelDiffBuilderCopyOptionsTests
     }
 
     [Test]
-    public void Diff_WithNumberFormatAndCopyCellFormatFalse()
+    public void Diff_WithoutCopyCellFormat_DoesNotCopyNumberFormats()
     {
+        // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
         using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
         oldExcelPackage.Workbook.Worksheets[0].Cells[2, 2, 4, 2].Style.Numberformat.Format = "0.00";
@@ -59,6 +63,7 @@ internal class ExcelDiffBuilderCopyOptionsTests
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
+        // Act
         using ExcelPackage result = excelDiffBuilder
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
@@ -67,6 +72,7 @@ internal class ExcelDiffBuilderCopyOptionsTests
             .CopyCellFormat(false)
             .Build();
 
+        // Assert
         using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Title", "Title", "Value", "Value"],
             ["A", "A", 1, 1],
@@ -78,8 +84,9 @@ internal class ExcelDiffBuilderCopyOptionsTests
     }
 
     [Test]
-    public void Diff_WithStyleAndCopyCellStyleTrue()
+    public void Diff_WithCopyCellStyle_CopiesSourceStyles()
     {
+        // Arrange
         CellStyle cellStyle = new()
         {
             Bold = true,
@@ -95,6 +102,7 @@ internal class ExcelDiffBuilderCopyOptionsTests
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
+        // Act
         using ExcelPackage result = excelDiffBuilder
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
@@ -103,6 +111,7 @@ internal class ExcelDiffBuilderCopyOptionsTests
             .CopyCellStyle(true)
             .Build();
 
+        // Assert
         using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Title", "Title", "Value", "Value"],
             ["A", "A", 1, 1],
@@ -115,8 +124,9 @@ internal class ExcelDiffBuilderCopyOptionsTests
     }
 
     [Test]
-    public void Diff_WithStyleAndCopyCellStyleFalse()
+    public void Diff_WithoutCopyCellStyle_DoesNotCopySourceStyles()
     {
+        // Arrange
         CellStyle cellStyle = new()
         {
             Bold = true,
@@ -132,6 +142,7 @@ internal class ExcelDiffBuilderCopyOptionsTests
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
+        // Act
         using ExcelPackage result = excelDiffBuilder
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
@@ -140,6 +151,7 @@ internal class ExcelDiffBuilderCopyOptionsTests
             .CopyCellStyle(false)
             .Build();
 
+        // Assert
         using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Title", "Title", "Value", "Value"],
             ["A", "A", 1, 1],
