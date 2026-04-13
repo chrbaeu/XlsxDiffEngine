@@ -1,6 +1,6 @@
 namespace XlsxDiffEngineTests;
 
-internal class ExcelDiffBuilderBasicTests
+internal class ExcelDiffBuilderRowFilteringTests
 {
     private readonly ExcelDiffBuilder excelDiffBuilder = new();
 
@@ -19,10 +19,10 @@ internal class ExcelDiffBuilderBasicTests
     ];
 
     [Test]
-    public void Diff_WithEmptyWorksheets()
+    public void Diff_WithoutUnchangedRows()
     {
-        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(Array.Empty<object?[]>());
-        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(Array.Empty<object?[]>());
+        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
+        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
@@ -31,75 +31,24 @@ internal class ExcelDiffBuilderBasicTests
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
                 .SetNewFile(newFileStream, "NewFile.xlsx")
                 )
+            .SkipUnchangedRows()
             .Build();
 
-        using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage(Array.Empty<object?[]>());
+        using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
+            ["Title", "Title", "Value", "Value"],
+            ["B", "B", 2, 4],
+            ]);
+
         ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult);
     }
 
     [Test]
-    public void Diff_FullAgainstEmptyWorksheets()
-    {
-        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
-        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(Array.Empty<object?[]>());
-        using var oldFileStream = oldExcelPackage.ToMemoryStream();
-        using var newFileStream = newExcelPackage.ToMemoryStream();
-
-        using ExcelPackage result = excelDiffBuilder
-            .AddFiles(x => x
-                .SetOldFile(oldFileStream, "OldFile.xlsx")
-                .SetNewFile(newFileStream, "NewFile.xlsx")
-                )
-            .SetKeyColumns("Title")
-            .Build();
-
-        using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
-            ["Title", "Title", "Value", "Value"],
-            ["A", null, 1, null],
-            ["B", null, 2, null],
-            ["C", null, 3, null],
-            ]);
-        ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[2, 1, 4, 4], DefaultCellStyles.RemovedRow);
-
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
-    }
-
-    [Test]
-    public void Diff_EmptyAgainstFullWorksheets()
-    {
-        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(Array.Empty<object?[]>());
-        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
-        using var oldFileStream = oldExcelPackage.ToMemoryStream();
-        using var newFileStream = newExcelPackage.ToMemoryStream();
-
-        using ExcelPackage result = excelDiffBuilder
-            .AddFiles(x => x
-                .SetOldFile(oldFileStream, "OldFile.xlsx")
-                .SetNewFile(newFileStream, "NewFile.xlsx")
-                )
-            .SetKeyColumns("Title")
-            .Build();
-
-        using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
-            ["Title", "Title", "Value", "Value"],
-            [null, "A", null, 1],
-            [null, "B", null, 2],
-            [null, "C", null, 3],
-            ]);
-        ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[2, 1, 4, 4], DefaultCellStyles.AddedRow);
-
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
-    }
-
-    [Test]
-    public void Diff_WithRecalculation()
+    public void Diff_RowbasedWithoutRemovedRows()
     {
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
         using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
-        newExcelPackage.Workbook.Worksheets[0].Cells[2, 2].Value = null;
-        newExcelPackage.Workbook.Worksheets[0].Cells[2, 2].Formula = "=10-9";
-        newExcelPackage.Workbook.Worksheets[0].Cells[3, 2].Value = null;
-        newExcelPackage.Workbook.Worksheets[0].Cells[3, 2].Formula = "=10-6";
+        newExcelPackage.Workbook.Worksheets[0].Cells[4, 1].Value = "D";
+        newExcelPackage.Workbook.Worksheets[0].Cells[5, 1].Value = "E";
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
@@ -107,26 +56,55 @@ internal class ExcelDiffBuilderBasicTests
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
                 .SetNewFile(newFileStream, "NewFile.xlsx")
-                .RecalculateFormulas()
                 )
+            .SkipRemovedRows()
             .Build();
 
         using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Title", "Title", "Value", "Value"],
             ["A", "A", 1, 1],
             ["B", "B", 2, 4],
-            ["C", "C", 3, 3],
+            ["C", "D", 3, 3],
+            [null, "E", null, null],
             ]);
-        ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[3, 3, 3, 4], DefaultCellStyles.ChangedCell);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult);
     }
 
     [Test]
-    public void Diff_WithEmptyWorksheet()
+    public void Diff_KeyedWithoutRemovedRows()
     {
-        using ExcelPackage oldExcelPackage = new();
-        oldExcelPackage.Workbook.Worksheets.Add("Table");
+        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
+        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
+        newExcelPackage.Workbook.Worksheets[0].Cells[4, 1].Value = "D";
+        newExcelPackage.Workbook.Worksheets[0].Cells[5, 1].Value = "E";
+        using var oldFileStream = oldExcelPackage.ToMemoryStream();
+        using var newFileStream = newExcelPackage.ToMemoryStream();
+
+        using ExcelPackage result = excelDiffBuilder
+            .AddFiles(x => x
+                .SetOldFile(oldFileStream, "OldFile.xlsx")
+                .SetNewFile(newFileStream, "NewFile.xlsx")
+                )
+            .SetKeyColumns("Title")
+            .SkipRemovedRows()
+            .Build();
+
+        using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
+            ["Title", "Title", "Value", "Value"],
+            ["A", "A", 1, 1],
+            ["B", "B", 2, 4],
+            [null, "D", null, 3],
+            [null, "E", null, null],
+            ]);
+
+        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult);
+    }
+
+    [Test]
+    public void Diff_WithSkippedRows()
+    {
+        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
         using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
@@ -136,15 +114,15 @@ internal class ExcelDiffBuilderBasicTests
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
                 .SetNewFile(newFileStream, "NewFile.xlsx")
                 )
+            .SetSkipRowRule((dataSource, row) => dataSource.GetCellText("Title", row) == "A")
             .Build();
 
         using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Title", "Title", "Value", "Value"],
-            [null, "A", null, 1],
-            [null, "B", null, 4],
-            [null, "C", null, 3],
+            ["B", "B", 2, 4],
+            ["C", "C", 3, 3],
             ]);
-        ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[2, 1, 4, 4], DefaultCellStyles.AddedRow);
+        ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[2, 3, 2, 4], DefaultCellStyles.ChangedCell);
 
         ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
     }

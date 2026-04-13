@@ -56,6 +56,35 @@ internal class ExcelDiffBuilderColumnOptionsTests
     }
 
     [Test]
+    public void Diff_WithOmittedColumn()
+    {
+        // Arrange
+        using var oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
+        using var newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
+        using var oldFileStream = oldExcelPackage.ToMemoryStream();
+        using var newFileStream = newExcelPackage.ToMemoryStream();
+
+        // Act
+        using var result = excelDiffBuilder
+            .AddFiles(x => x
+                .SetOldFile(oldFileStream, "OldFile.xlsx")
+                .SetNewFile(newFileStream, "NewFile.xlsx")
+            )
+            .SetColumnsToOmit("Title")
+            .Build();
+
+        // Assert
+        using var expectedResult = ExcelTestHelper.ConvertToExcelPackage([
+            ["Value", "Value"],
+            [1, 1],
+            [2, 4],
+            [3, 3],
+        ]);
+
+        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult);
+    }
+
+    [Test]
     public async Task Diff_WithShowHideOldColumnsAndShowColumns()
     {
         // Arrange

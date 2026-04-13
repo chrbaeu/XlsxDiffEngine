@@ -1,6 +1,8 @@
+using System.Drawing;
+
 namespace XlsxDiffEngineTests;
 
-internal class ExcelDiffBuilderBasicTests
+internal class ExcelDiffBuilderCopyOptionsTests
 {
     private readonly ExcelDiffBuilder excelDiffBuilder = new();
 
@@ -19,87 +21,12 @@ internal class ExcelDiffBuilderBasicTests
     ];
 
     [Test]
-    public void Diff_WithEmptyWorksheets()
-    {
-        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(Array.Empty<object?[]>());
-        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(Array.Empty<object?[]>());
-        using var oldFileStream = oldExcelPackage.ToMemoryStream();
-        using var newFileStream = newExcelPackage.ToMemoryStream();
-
-        using ExcelPackage result = excelDiffBuilder
-            .AddFiles(x => x
-                .SetOldFile(oldFileStream, "OldFile.xlsx")
-                .SetNewFile(newFileStream, "NewFile.xlsx")
-                )
-            .Build();
-
-        using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage(Array.Empty<object?[]>());
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult);
-    }
-
-    [Test]
-    public void Diff_FullAgainstEmptyWorksheets()
-    {
-        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
-        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(Array.Empty<object?[]>());
-        using var oldFileStream = oldExcelPackage.ToMemoryStream();
-        using var newFileStream = newExcelPackage.ToMemoryStream();
-
-        using ExcelPackage result = excelDiffBuilder
-            .AddFiles(x => x
-                .SetOldFile(oldFileStream, "OldFile.xlsx")
-                .SetNewFile(newFileStream, "NewFile.xlsx")
-                )
-            .SetKeyColumns("Title")
-            .Build();
-
-        using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
-            ["Title", "Title", "Value", "Value"],
-            ["A", null, 1, null],
-            ["B", null, 2, null],
-            ["C", null, 3, null],
-            ]);
-        ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[2, 1, 4, 4], DefaultCellStyles.RemovedRow);
-
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
-    }
-
-    [Test]
-    public void Diff_EmptyAgainstFullWorksheets()
-    {
-        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(Array.Empty<object?[]>());
-        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
-        using var oldFileStream = oldExcelPackage.ToMemoryStream();
-        using var newFileStream = newExcelPackage.ToMemoryStream();
-
-        using ExcelPackage result = excelDiffBuilder
-            .AddFiles(x => x
-                .SetOldFile(oldFileStream, "OldFile.xlsx")
-                .SetNewFile(newFileStream, "NewFile.xlsx")
-                )
-            .SetKeyColumns("Title")
-            .Build();
-
-        using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
-            ["Title", "Title", "Value", "Value"],
-            [null, "A", null, 1],
-            [null, "B", null, 2],
-            [null, "C", null, 3],
-            ]);
-        ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[2, 1, 4, 4], DefaultCellStyles.AddedRow);
-
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
-    }
-
-    [Test]
-    public void Diff_WithRecalculation()
+    public void Diff_WithNumberFormatCopyCellFormatTrue()
     {
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
         using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
-        newExcelPackage.Workbook.Worksheets[0].Cells[2, 2].Value = null;
-        newExcelPackage.Workbook.Worksheets[0].Cells[2, 2].Formula = "=10-9";
-        newExcelPackage.Workbook.Worksheets[0].Cells[3, 2].Value = null;
-        newExcelPackage.Workbook.Worksheets[0].Cells[3, 2].Formula = "=10-6";
+        oldExcelPackage.Workbook.Worksheets[0].Cells[2, 2, 4, 2].Style.Numberformat.Format = "0.00";
+        newExcelPackage.Workbook.Worksheets[0].Cells[2, 2, 4, 2].Style.Numberformat.Format = "0.00";
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
@@ -107,8 +34,8 @@ internal class ExcelDiffBuilderBasicTests
             .AddFiles(x => x
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
                 .SetNewFile(newFileStream, "NewFile.xlsx")
-                .RecalculateFormulas()
                 )
+            .CopyCellFormat(true)
             .Build();
 
         using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
@@ -117,17 +44,18 @@ internal class ExcelDiffBuilderBasicTests
             ["B", "B", 2, 4],
             ["C", "C", 3, 3],
             ]);
-        ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[3, 3, 3, 4], DefaultCellStyles.ChangedCell);
+        expectedResult.Workbook.Worksheets[0].Cells[2, 3, 4, 4].Style.Numberformat.Format = "0.00";
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult);
     }
 
     [Test]
-    public void Diff_WithEmptyWorksheet()
+    public void Diff_WithNumberFormatAndCopyCellFormatFalse()
     {
-        using ExcelPackage oldExcelPackage = new();
-        oldExcelPackage.Workbook.Worksheets.Add("Table");
+        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
         using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
+        oldExcelPackage.Workbook.Worksheets[0].Cells[2, 2, 4, 2].Style.Numberformat.Format = "0.00";
+        newExcelPackage.Workbook.Worksheets[0].Cells[2, 2, 4, 2].Style.Numberformat.Format = "0.00";
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
@@ -136,16 +64,89 @@ internal class ExcelDiffBuilderBasicTests
                 .SetOldFile(oldFileStream, "OldFile.xlsx")
                 .SetNewFile(newFileStream, "NewFile.xlsx")
                 )
+            .CopyCellFormat(false)
             .Build();
 
         using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Title", "Title", "Value", "Value"],
-            [null, "A", null, 1],
-            [null, "B", null, 4],
-            [null, "C", null, 3],
+            ["A", "A", 1, 1],
+            ["B", "B", 2, 4],
+            ["C", "C", 3, 3],
             ]);
-        ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[2, 1, 4, 4], DefaultCellStyles.AddedRow);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult);
+    }
+
+    [Test]
+    public void Diff_WithStyleAndCopyCellStyleTrue()
+    {
+        CellStyle cellStyle = new()
+        {
+            Bold = true,
+            Italic = true,
+            Underline = true,
+            FontColor = Color.Red,
+            BackgroundColor = Color.Blue
+        };
+        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
+        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
+        ExcelHelper.SetCellStyle(oldExcelPackage.Workbook.Worksheets[0].Cells[2, 1, 4, 2], cellStyle);
+        ExcelHelper.SetCellStyle(newExcelPackage.Workbook.Worksheets[0].Cells[2, 1, 4, 2], cellStyle);
+        using var oldFileStream = oldExcelPackage.ToMemoryStream();
+        using var newFileStream = newExcelPackage.ToMemoryStream();
+
+        using ExcelPackage result = excelDiffBuilder
+            .AddFiles(x => x
+                .SetOldFile(oldFileStream, "OldFile.xlsx")
+                .SetNewFile(newFileStream, "NewFile.xlsx")
+                )
+            .CopyCellStyle(true)
+            .Build();
+
+        using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
+            ["Title", "Title", "Value", "Value"],
+            ["A", "A", 1, 1],
+            ["B", "B", 2, 4],
+            ["C", "C", 3, 3],
+            ]);
+        ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[2, 1, 4, 4], cellStyle);
+
+        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult);
+    }
+
+    [Test]
+    public void Diff_WithStyleAndCopyCellStyleFalse()
+    {
+        CellStyle cellStyle = new()
+        {
+            Bold = true,
+            Italic = true,
+            Underline = true,
+            FontColor = Color.Red,
+            BackgroundColor = Color.Blue
+        };
+        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
+        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
+        ExcelHelper.SetCellStyle(oldExcelPackage.Workbook.Worksheets[0].Cells[2, 1, 4, 2], cellStyle);
+        ExcelHelper.SetCellStyle(newExcelPackage.Workbook.Worksheets[0].Cells[2, 1, 4, 2], cellStyle);
+        using var oldFileStream = oldExcelPackage.ToMemoryStream();
+        using var newFileStream = newExcelPackage.ToMemoryStream();
+
+        using ExcelPackage result = excelDiffBuilder
+            .AddFiles(x => x
+                .SetOldFile(oldFileStream, "OldFile.xlsx")
+                .SetNewFile(newFileStream, "NewFile.xlsx")
+                )
+            .CopyCellStyle(false)
+            .Build();
+
+        using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
+            ["Title", "Title", "Value", "Value"],
+            ["A", "A", 1, 1],
+            ["B", "B", 2, 4],
+            ["C", "C", 3, 3],
+            ]);
+
+        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult);
     }
 }
