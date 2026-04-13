@@ -210,4 +210,56 @@ internal class ExcelDiffBuilderColumnOptionsTests
         var worksheet = result.Workbook.Worksheets[0];
         await Assert.That(worksheet.Column(3).Width).IsEqualTo(width);
     }
+
+    [Test]
+    public async Task Diff_WithDuplicateSetColumnSizeByName_UsesLastValue()
+    {
+        // Arrange
+        using var oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
+        using var newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
+        using var oldFileStream = oldExcelPackage.ToMemoryStream();
+        using var newFileStream = newExcelPackage.ToMemoryStream();
+        double firstWidth = 22.2;
+        double secondWidth = 44.4;
+
+        // Act
+        using var result = new ExcelDiffBuilder()
+            .AddFiles(x => x
+                .SetOldFile(oldFileStream, "OldFile.xlsx")
+                .SetNewFile(newFileStream, "NewFile.xlsx")
+            )
+            .SetColumnSize("Value", firstWidth)
+            .SetColumnSize("Value", secondWidth)
+            .Build();
+
+        // Assert
+        var worksheet = result.Workbook.Worksheets[0];
+        await Assert.That(worksheet.Column(3).Width).IsEqualTo(secondWidth);
+    }
+
+    [Test]
+    public async Task Diff_WithDuplicateSetColumnSizeByIndex_UsesLastValue()
+    {
+        // Arrange
+        using var oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
+        using var newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
+        using var oldFileStream = oldExcelPackage.ToMemoryStream();
+        using var newFileStream = newExcelPackage.ToMemoryStream();
+        double firstWidth = 12.5;
+        double secondWidth = 25.0;
+
+        // Act
+        using var result = new ExcelDiffBuilder()
+            .AddFiles(x => x
+                .SetOldFile(oldFileStream, "OldFile.xlsx")
+                .SetNewFile(newFileStream, "NewFile.xlsx")
+            )
+            .SetColumnSize(2, firstWidth)
+            .SetColumnSize(2, secondWidth)
+            .Build();
+
+        // Assert
+        var worksheet = result.Workbook.Worksheets[0];
+        await Assert.That(worksheet.Column(2).Width).IsEqualTo(secondWidth);
+    }
 }

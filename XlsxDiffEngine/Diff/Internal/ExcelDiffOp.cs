@@ -84,16 +84,23 @@ internal sealed class ExcelDiffOp
             .Select(item => item.GroupKey)
             .Union(oldDataKeys.Select(item => item.GroupKey))
             .ToList();
-        List<DataKey> combinedKeyList = groupKeys
-            .SelectMany(group => newDataKeys
-                .Where(item => item.GroupKey == group)
-                .Union(oldDataKeys.Where(item => item.GroupKey == group)))
-            .DistinctBy(x => x.PrimaryKey)
-            .ToList();
-        if (config.ColumnsToSortBy.Count > 0)
-        {
-            combinedKeyList = combinedKeyList.OrderByList(x => x.SortData).ToList();
-        }
+
+        List<DataKey> combinedKeyList = [.. groupKeys
+            .SelectMany(group =>
+            {
+                var items = newDataKeys
+                    .Where(item => item.GroupKey == group)
+                    .Union(oldDataKeys.Where(item => item.GroupKey == group))
+                    .DistinctBy(x => x.PrimaryKey);
+
+                if (config.ColumnsToSortBy.Count > 0)
+                {
+                    items = items.OrderByList(x => x.SortData);
+                }
+
+                return items;
+            })];
+
         return combinedKeyList;
     }
 

@@ -1,4 +1,5 @@
 ﻿using OfficeOpenXml;
+using System.Globalization;
 
 namespace XlsxDiffEngine;
 
@@ -510,7 +511,12 @@ public class ExcelDiffBuilder
     /// <param name="size">The width size for the column.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetColumnSize(int column, double size)
-        => UpdateConfig(x => x with { ColumnSizeDict = x.ColumnSizeDict.Concat([new(column, size)]).ToDictionary(y => y.Key, y => y.Value) });
+        => UpdateConfig(x => x with
+        {
+            ColumnSizeDict = x.ColumnSizeDict.Where(y => column.ToString(CultureInfo.InvariantCulture) != y.Key.ToString())
+                   .Concat([new(column, size)])
+                   .ToDictionary(y => y.Key, y => y.Value)
+        });
 
     /// <summary>
     /// Sets a custom width for a specific column in the output worksheet.
@@ -519,7 +525,12 @@ public class ExcelDiffBuilder
     /// <param name="size">The width size for the column.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetColumnSize(string columnName, double size)
-        => UpdateConfig(x => x with { ColumnSizeDict = x.ColumnSizeDict.Concat([new(columnName, size)]).ToDictionary(y => y.Key, y => y.Value) });
+        => UpdateConfig(x => x with
+        {
+            ColumnSizeDict = x.ColumnSizeDict.Where(y => columnName != y.Key.ToString())
+            .Concat([new(columnName, size)])
+            .ToDictionary(y => y.Key, y => y.Value)
+        });
 
     /// <summary>
     /// Sets custom widths for multiple columns in the output worksheet.

@@ -99,4 +99,46 @@ internal class ExcelDiffBuilderGroupingTests
         ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
     }
 
+    [Test]
+    public void Diff_WithKeyGroupKeyAndSort_KeepsGroupsTogether()
+    {
+        // Arrange
+        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
+        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFileContent);
+        using var oldFileStream = oldExcelPackage.ToMemoryStream();
+        using var newFileStream = newExcelPackage.ToMemoryStream();
+
+        // Act
+        using ExcelPackage result = new ExcelDiffBuilder()
+            .AddFiles(x => x
+                .SetOldFile(oldFileStream, "OldFile.xlsx")
+                .SetNewFile(newFileStream, "NewFile.xlsx")
+                )
+            .SetKeyColumns("Title")
+            .SetGroupKeyColumns("Group")
+            .SetColumnsToSortBy("Value")
+            .AddEmptyRowAfterGroups()
+            .Build();
+
+        // Assert
+        using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
+            ["Title", "Title", "Group", "Group", "Value", "Value"],
+            [null, null, null, null, null, null],
+            ["A", "A", "1", "1", 1, 1],
+            ["B", null, "1", null, 2, null],
+            [null, "E", null, "1", null, 5],
+            [null, null, null, null, null, null],
+            ["C", "C", "2", "2", 3, 3],
+            ["D", null, "2", null, 4, null],
+            [null, "F", null, "2", null, 6],
+        ]);
+
+        ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[4, 1, 4, 6], DefaultCellStyles.RemovedRow);
+        ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[5, 1, 5, 6], DefaultCellStyles.AddedRow);
+        ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[8, 1, 8, 6], DefaultCellStyles.RemovedRow);
+        ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[9, 1, 9, 6], DefaultCellStyles.AddedRow);
+
+        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+    }
+
 }
