@@ -35,8 +35,6 @@ internal class ExcelDiffBuilderTypesTests
                 )
             .Build();
 
-        result.SaveAs(@"C:\Users\CBaeu\Desktop\Result.xlsx");
-
         // Assert
         using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
             ["Title", "Title", "Value", "Value"],

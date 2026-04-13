@@ -38,7 +38,7 @@ internal sealed class ExcelDiffOp
         List<DataKey> oldDataKeys = GetDataKeys(oldDataSource);
         List<DataKey> newDataKeys = GetDataKeys(newDataSource);
         var oldKeyDict = oldDataKeys.ToDictionary(x => x.PrimaryKey, stringComparer);
-        var oldSecondaryKeyDict = oldDataKeys.ToDictionary(x => x.SecondaryKey, stringComparer);
+        var oldSecondaryKeyDict = config.SecondaryKeyColumns.Count > 0 ? oldDataKeys.ToDictionary(x => x.SecondaryKey, stringComparer) : null;
         var newKeyDict = newDataKeys.ToDictionary(x => x.PrimaryKey, stringComparer);
         var usedDataKeys = oldDataKeys.Where(x => newKeyDict.ContainsKey(x.PrimaryKey)).Select(x => x.PrimaryKey).ToHashSet(stringComparer);
         List<(int? oldRow, int? newRow, int group)> diff = [];
@@ -64,7 +64,7 @@ internal sealed class ExcelDiffOp
             {
                 diff.Add((oldRow.RowNumber, newRow.RowNumber, group));
             }
-            else if (config.SecondaryKeyColumns.Count > 0 && !usedDataKeys.Contains(dataKey.PrimaryKey)
+            else if (oldSecondaryKeyDict is not null && !usedDataKeys.Contains(dataKey.PrimaryKey)
                 && oldSecondaryKeyDict.TryGetValue(newRow.SecondaryKey, out oldRow))
             {
                 diff.Add((oldRow.RowNumber, newRow.RowNumber, group));

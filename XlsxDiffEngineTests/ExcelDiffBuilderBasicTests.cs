@@ -383,6 +383,45 @@ internal class ExcelDiffBuilderBasicTests
     }
 
     [Test]
+    public void Diff_WithColumnsToCompare()
+    {
+        // Arrange
+        object?[][] oldFile = [
+            ["Title", "Value", "Other"],
+            ["A", 1, "x"],
+            ["B", 2, "y"],
+        ];
+        object?[][] newFile = [
+            ["Title", "Value", "Other"],
+            ["A", 1, "x"],
+            ["C", 4, "z"],
+        ];
+        using var oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFile);
+        using var newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFile);
+        using var oldFileStream = oldExcelPackage.ToMemoryStream();
+        using var newFileStream = newExcelPackage.ToMemoryStream();
+
+        // Act
+        using var result = new ExcelDiffBuilder()
+            .AddFiles(x => x
+                .SetOldFile(oldFileStream, "OldFile.xlsx")
+                .SetNewFile(newFileStream, "NewFile.xlsx")
+                )
+            .SetColumnsToCompare("Value")
+            .Build();
+
+        // Assert
+        using var expectedResult = ExcelTestHelper.ConvertToExcelPackage([
+            ["Title", "Title", "Value", "Value", "Other", "Other"],
+            ["A", "A", 1, 1, "x", "x"],
+            ["B", "C", 2, 4, "y", "z"],
+        ]);
+        ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[3, 3, 3, 4], DefaultCellStyles.ChangedCell);
+
+        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+    }
+
+    [Test]
     public void Diff_WithRowNumber()
     {
         // Arrange

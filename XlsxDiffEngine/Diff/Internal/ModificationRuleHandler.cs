@@ -13,7 +13,7 @@ internal sealed class ModificationRuleHandler
         RegexOptions options = ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None;
         foreach (ModificationRule rule in rules)
         {
-            regexRules.Add((new Regex(rule.RegexPattern, options), rule));
+            regexRules.Add((new Regex(rule.RegexPattern, options | RegexOptions.Compiled), rule));
         }
     }
 
