@@ -28,9 +28,9 @@ public static class MappingHelper
         ConstructorInfo constructor = typeof(TDst).GetConstructor([]) ?? throw new NotImplementedException($"No default constructor for type {typeof(TDst).Name} found!");
         NewExpression newObject = Expression.New(constructor);
         BinaryExpression assignObject = Expression.Assign(dstParam, newObject);
-        Expression asignNewObjectIfNeededExpression = Expression.IfThen(wasDstParamNullVar, assignObject);
+        Expression assignNewObjectIfNeededExpression = Expression.IfThen(wasDstParamNullVar, assignObject);
 
-        List<Expression> expressions = [assignWasDstParamNullVar, asignNewObjectIfNeededExpression];
+        List<Expression> expressions = [assignWasDstParamNullVar, assignNewObjectIfNeededExpression];
 
         var dstPropertyDict = typeof(TDst).GetProperties().Where(x => x.CanWrite).ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
         foreach (PropertyInfo? srcProperty in typeof(TSrc).GetProperties().Where(x => x.CanRead))

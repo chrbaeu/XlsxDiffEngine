@@ -48,4 +48,4 @@ For more examples, take a look at the tests, or try out the functions via the Xl
 
 ## Dependencies
 
-- [EPPlus](https://github.com/EPPlusSoftware/EPPlus) - for Excel file handling in .NET (Depending on the usage, a paid license can be required)
+- [EPPlus](https://github.com/EPPlusSoftware/EPPlus) - for Excel file handling in .NET (Depending on the usage, a paid license may be required)

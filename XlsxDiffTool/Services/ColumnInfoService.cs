@@ -20,12 +20,12 @@ public sealed class ColumnInfoService : IDisposable
         optionsModel.OldFileConfig.PropertyChanged += InputFileConfig_PropertyChanged;
     }
 
-    public async Task LoadColumnsFromConfig(params ICollection<ColumnInfoModel> columsFromConfig)
+    public async Task LoadColumnsFromConfig(params ICollection<ColumnInfoModel> columnsFromConfig)
     {
         var columnNames = await Task.Run(excelDiffService.GetColumnNames);
         var existingColumns = columnNames.ToDictionary(x => x, StringComparer.OrdinalIgnoreCase);
         Columns.Clear();
-        foreach (ColumnInfoModel column in columsFromConfig)
+        foreach (ColumnInfoModel column in columnsFromConfig)
         {
             column.IsNotMapped = !existingColumns.ContainsKey(column.Name);
             Columns.Add(column);
@@ -97,11 +97,11 @@ public sealed class ColumnInfoService : IDisposable
         }
     }
 
-    private void UpdateWithColumnsFromFiles(ICollection<string> colomNamesFromFiles)
+    private void UpdateWithColumnsFromFiles(ICollection<string> columnNamesFromFiles)
     {
         var existingColumns = Columns.ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
         Columns.Clear();
-        foreach (var columnName in colomNamesFromFiles)
+        foreach (var columnName in columnNamesFromFiles)
         {
             if (!existingColumns.TryGetValue(columnName, out ColumnInfoModel? column))
             {

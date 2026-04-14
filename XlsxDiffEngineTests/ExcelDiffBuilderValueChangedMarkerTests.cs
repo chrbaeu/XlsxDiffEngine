@@ -83,7 +83,7 @@ internal class ExcelDiffBuilderValueChangedMarkerTests
     }
 
     [Test]
-    public void Diff_WithMultipleAbsolutMarkers()
+    public void Diff_WithMultipleAbsoluteMarkers()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);

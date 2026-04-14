@@ -59,7 +59,7 @@ public class ExcelDiffBuilder
     /// Adds files for comparison, specifying the "old" and "new" <see cref="XlsxFileInfo"/>.
     /// </summary>
     /// <param name="oldFile">The <see cref="XlsxFileInfo"/> for the old data.</param>
-    /// <param name="newFile">The <see cref="XlsxFileInfo"/> for the old data.</param>
+    /// <param name="newFile">The <see cref="XlsxFileInfo"/> for the new data.</param>
     /// <returns></returns>
     public ExcelDiffBuilder AddFiles(XlsxFileInfo oldFile, XlsxFileInfo newFile)
     {
@@ -129,7 +129,7 @@ public class ExcelDiffBuilder
     /// <summary>
     /// Specifies columns to be compared as numbers, even if saved as strings.
     /// </summary>
-    /// <param name="columnsToCompareAsNumbers">Array of column names for as numbers comparison.</param>
+    /// <param name="columnsToCompareAsNumbers">Array of column names for comparison as numbers.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetColumnsToCompareAsNumbers(params string[] columnsToCompareAsNumbers)
         => UpdateConfig(x => x with { ColumnsToCompareAsNumbers = columnsToCompareAsNumbers });
@@ -486,7 +486,7 @@ public class ExcelDiffBuilder
         => UpdateConfig(x => x with { AutoFitColumns = autoFitColumns });
 
     /// <summary>
-    /// Configures whether an filter should be applied to the output worksheet.
+    /// Configures whether a filter should be applied to the output worksheet.
     /// </summary>
     /// <param name="autoFilter">Whether to apply an auto-filter (default is true).</param>
     /// <returns>The current builder instance for method chaining.</returns>

@@ -148,7 +148,7 @@
     <value>Zeilennummer</value>
   </data>
   <data name="ConfigExportFailedMsg" xml:space="preserve">
-    <value>Config Datei  '{0}' konnte nicht gespeichert werden!</value>
+    <value>Config Datei '{0}' konnte nicht gespeichert werden!</value>
   </data>
   <data name="ConfigImportFailedMsg" xml:space="preserve">
     <value>Config Datei '{0}' konnte nicht geladen werden!</value>
@@ -223,7 +223,7 @@
     <value>Arbeitsblatt</value>
   </data>
   <data name="OptionsAddColumnWorksheetTooltip" xml:space="preserve">
-    <value>Name der Spalte für den Arbeitsblattname</value>
+    <value>Name der Spalte für den Arbeitsblattnamen</value>
   </data>
   <data name="OptionsAddColumnDocumentAdd" xml:space="preserve">
     <value>Dokumentname</value>
@@ -232,7 +232,7 @@
     <value>Dokument</value>
   </data>
   <data name="OptionsAddColumnDocumentTooltip" xml:space="preserve">
-    <value>Name der Spalte für den Dokumentname</value>
+    <value>Name der Spalte für den Dokumentnamen</value>
   </data>
   <data name="OptionsAddColumnHeader" xml:space="preserve">
     <value>Zusätzliche Spalten</value>
