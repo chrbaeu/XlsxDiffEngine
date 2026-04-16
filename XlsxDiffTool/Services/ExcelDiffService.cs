@@ -4,7 +4,6 @@ using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
 using XlsxDiffEngine;
-using XlsxDiffEngine.Diff;
 using XlsxDiffTool.Models;
 
 namespace XlsxDiffTool.Services;

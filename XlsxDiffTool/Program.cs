@@ -23,15 +23,15 @@ internal static class Program
         if (args.Length > 0)
         {
             ConsoleHelper.InitConsole();
-            return new CliApplicationBuilder()
+            return new CommandLineApplicationBuilder()
                 .AddCommandsFromThisAssembly()
-                .UseTypeActivator(commandTypes =>
+                .UseTypeInstantiator(commands =>
                 {
                     ServiceCollection services = new();
                     services.AddAllServices();
-                    foreach (var commandType in commandTypes)
+                    foreach (var command in commands)
                     {
-                        services.AddTransient(commandType);
+                        services.AddTransient(command.Type);
                     }
                     return services.BuildServiceProvider();
                 })

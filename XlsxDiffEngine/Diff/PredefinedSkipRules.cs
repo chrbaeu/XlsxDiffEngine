@@ -1,4 +1,4 @@
-﻿namespace XlsxDiffEngine.Diff;
+namespace XlsxDiffEngine;
 
 /// <summary>
 /// Specifies predefined rules for skipping rows during comparison.

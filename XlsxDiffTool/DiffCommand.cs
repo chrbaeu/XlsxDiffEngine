@@ -1,5 +1,5 @@
 ﻿using CliFx;
-using CliFx.Attributes;
+using CliFx.Binding;
 using CliFx.Infrastructure;
 using System.IO;
 using XlsxDiffTool.Models;
@@ -8,24 +8,24 @@ using XlsxDiffTool.Services;
 namespace XlsxDiffTool;
 
 [Command("diff", Description = "Compares two Excel files and saves the differences in an output file.")]
-internal sealed class DiffCommand(
+internal sealed partial class DiffCommand(
     DiffConfigModel diffConfigModel,
     DiffConfigService diffConfigService,
     ExcelDiffService excelDiffService
     ) : ICommand
 {
 
-    [CommandOption("oldPath", 'o', IsRequired = true, Description = "Path for the older source .xlsx file.")]
-    public string OldPath { get; init; } = "";
+    [CommandOption("oldPath", 'o', Description = "Path for the older source .xlsx file.")]
+    public required string OldPath { get; set; } = "";
 
-    [CommandOption("newPath", 'n', IsRequired = true, Description = "Path for the newer source .xlsx file.")]
-    public string NewPath { get; init; } = "";
+    [CommandOption("newPath", 'n', Description = "Path for the newer source .xlsx file.")]
+    public required string NewPath { get; set; } = "";
 
     [CommandOption("configPath", 'c', Description = "Path for the configuration to be used for the diff process.")]
-    public string ConfigPath { get; init; } = "";
+    public string ConfigPath { get; set; } = "";
 
     [CommandOption("diffResultPath", 'd', Description = "Path for the resulting diff .xlsx file.")]
-    public string DiffPath { get; init; } = ".";
+    public string DiffPath { get; set; } = ".";
 
     public async ValueTask ExecuteAsync(IConsole console)
     {
