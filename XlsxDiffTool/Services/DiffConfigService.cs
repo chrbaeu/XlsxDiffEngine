@@ -49,12 +49,14 @@ public class DiffConfigService(
     {
         try
         {
-            if (diffConfigModel.SaveAndRestoreInputFilePaths != true)
+            DiffConfigModel exportConfigModel = JsonSerializer.Deserialize<DiffConfigModel>(JsonSerializer.Serialize(diffConfigModel))
+            ?? throw new InvalidOperationException("Creating export configuration snapshot failed.");
+            if (exportConfigModel.SaveAndRestoreInputFilePaths != true)
             {
-                diffConfigModel.OldFileConfig.FilePath = "";
-                diffConfigModel.NewFileConfig.FilePath = "";
+                exportConfigModel.OldFileConfig.FilePath = "";
+                exportConfigModel.NewFileConfig.FilePath = "";
             }
-            string json = JsonSerializer.Serialize<DiffConfigModel>(diffConfigModel, jsonSerializerOptions);
+            string json = JsonSerializer.Serialize(exportConfigModel, jsonSerializerOptions);
             await File.WriteAllTextAsync(filePath, json);
             return true;
         }

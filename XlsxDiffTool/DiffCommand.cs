@@ -51,6 +51,11 @@ internal sealed partial class DiffCommand(
         }
         diffConfigModel.OldFileConfig.FilePath = OldPath;
         diffConfigModel.NewFileConfig.FilePath = NewPath;
+        if (!string.IsNullOrWhiteSpace(DiffPath))
+        {
+            diffConfigModel.OutputFileConfig.FilePath = DiffPath;
+            diffConfigModel.OutputFileConfig.IsFolderConfig = !string.Equals(Path.GetExtension(DiffPath), ".xlsx", StringComparison.OrdinalIgnoreCase);
+        }
         try
         {
             if (excelDiffService.SaveDiff())
