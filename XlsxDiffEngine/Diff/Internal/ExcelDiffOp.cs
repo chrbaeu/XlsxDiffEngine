@@ -46,7 +46,7 @@ internal sealed class ExcelDiffOp
         string lastGroupKey = "";
         foreach (DataKey dataKey in GetCombinedKeyList(oldDataKeys, newDataKeys))
         {
-            if (lastGroupKey != dataKey.GroupKey)
+            if (!stringComparer.Equals(lastGroupKey, dataKey.GroupKey))
             {
                 group++;
                 lastGroupKey = dataKey.GroupKey;
@@ -82,16 +82,16 @@ internal sealed class ExcelDiffOp
     {
         var groupKeys = newDataKeys
             .Select(item => item.GroupKey)
-            .Union(oldDataKeys.Select(item => item.GroupKey))
+            .Union(oldDataKeys.Select(item => item.GroupKey), stringComparer)
             .ToList();
 
         List<DataKey> combinedKeyList = [.. groupKeys
             .SelectMany(group =>
             {
-                var items = newDataKeys
-                    .Where(item => item.GroupKey == group)
-                    .Union(oldDataKeys.Where(item => item.GroupKey == group))
-                    .DistinctBy(x => x.PrimaryKey);
+                IEnumerable<DataKey> items = newDataKeys
+                    .Where(item => stringComparer.Equals(item.GroupKey, group))
+                    .Union(oldDataKeys.Where(item => stringComparer.Equals(item.GroupKey, group)))
+                    .DistinctBy(x => x.PrimaryKey, stringComparer);
 
                 if (config.ColumnsToSortBy.Count > 0)
                 {

@@ -266,14 +266,15 @@ public sealed class ExcelDiffWriter
         }
         if (config.HideOldColumns || config.ColumnsToHide.Count > 0)
         {
-            for (int col = 1; col <= endColumn; col++)
+            for (int col = startColumn; col <= endColumn; col++)
             {
                 var cellText = worksheet.Cells[startRow, col].Text;
                 if (config.ColumnsToShow.Contains(cellText, stringComparer))
                 {
                     continue;
                 }
-                if (config.HideOldColumns && config.ShowOldDataColumn && col % 2 != 0)
+                int relativeColumn = col - startColumn;
+                if (config.HideOldColumns && config.ShowOldDataColumn && relativeColumn % 2 == 0)
                 {
                     worksheet.Column(col).Hidden = true;
                 }

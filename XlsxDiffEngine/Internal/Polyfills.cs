@@ -69,7 +69,17 @@ internal static class IEnumerableExtensions
         this IEnumerable<TSource> source,
         Func<TSource, TKey> keySelector)
     {
-        HashSet<TKey> seenKeys = [];
+        return source.DistinctBy(keySelector, null);
+    }
+
+    public static IEnumerable<TSource> DistinctBy<TSource, TKey>(
+        this IEnumerable<TSource> source,
+        Func<TSource, TKey> keySelector,
+        IEqualityComparer<TKey>? comparer)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(keySelector);
+        HashSet<TKey> seenKeys = new(comparer);
         foreach (var element in source)
         {
             if (seenKeys.Add(keySelector(element)))
@@ -95,7 +105,6 @@ internal static class StringExtensions
             _ => throw new ArgumentException("The string comparison type passed in is currently not supported.", nameof(comparisonType)),
         };
     }
-
 }
 
 #endif
