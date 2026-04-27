@@ -7,10 +7,16 @@
 public record class ExcelDiffConfig
 {
     /// <summary>
-    /// Indicates whether comparisons should ignore case sensitivity. 
+    /// Indicates whether header, column, and worksheet name matching should ignore case sensitivity.
     /// Default is true.
     /// </summary>
-    public bool IgnoreCase { get; init; } = true;
+    public bool IgnoreHeaderCase { get; init; } = true;
+
+    /// <summary>
+    /// Indicates whether data and key comparisons should ignore case sensitivity.
+    /// Default is true.
+    /// </summary>
+    public bool IgnoreDataCase { get; init; } = true;
 
     /// <summary>
     /// The primary key columns for matching rows between sheets.

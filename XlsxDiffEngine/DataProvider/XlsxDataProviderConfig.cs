@@ -7,10 +7,10 @@
 public record class XlsxDataProviderConfig
 {
     /// <summary>
-    /// Specifies whether comparisons should be case-insensitive. 
+    /// Specifies whether header, column, and worksheet name matching should be case-insensitive.
     /// Default is true.
     /// </summary>
-    public bool IgnoreCase { get; init; } = true;
+    public bool IgnoreHeaderCase { get; init; } = true;
 
     /// <summary>
     /// Indicates whether multiple worksheets should be merged into a single worksheet.

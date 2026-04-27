@@ -8,9 +8,9 @@ internal sealed class ModificationRuleHandler
 {
     private readonly List<(Regex regex, ModificationRule)> regexRules = [];
 
-    internal ModificationRuleHandler(IReadOnlyList<ModificationRule> rules, bool ignoreCase)
+    internal ModificationRuleHandler(IReadOnlyList<ModificationRule> rules, bool ignoreHeaderCase)
     {
-        RegexOptions options = ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None;
+        RegexOptions options = ignoreHeaderCase ? RegexOptions.IgnoreCase : RegexOptions.None;
         foreach (ModificationRule rule in rules)
         {
             regexRules.Add((new Regex(rule.RegexPattern, options | RegexOptions.Compiled), rule));

@@ -262,4 +262,40 @@ internal class ExcelDiffBuilderColumnOptionsTests
         var worksheet = result.Workbook.Worksheets[0];
         await Assert.That(worksheet.Column(2).Width).IsEqualTo(secondWidth);
     }
+
+    [Test]
+    public void Diff_WithCaseSensitiveHeaders_DoesNotIgnoreMismatchedColumnName()
+    {
+        // Arrange
+        object?[][] oldFile = [
+            ["Title", "Value"],
+            ["A", 1],
+        ];
+        object?[][] newFile = [
+            ["title", "Value"],
+            ["A", 1],
+        ];
+        using var oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFile);
+        using var newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFile);
+        using var oldFileStream = oldExcelPackage.ToMemoryStream();
+        using var newFileStream = newExcelPackage.ToMemoryStream();
+
+        // Act
+        using var result = new ExcelDiffBuilder()
+            .AddFiles(x => x
+                .SetOldFile(oldFileStream, "OldFile.xlsx")
+                .SetNewFile(newFileStream, "NewFile.xlsx")
+            )
+            .IgnoreHeaderCase(false)
+            .SetColumnsToIgnore("title")
+            .Build();
+
+        // Assert
+        using var expectedResult = ExcelTestHelper.ConvertToExcelPackage([
+            ["title", "title", "Value", "Value", "Title", "Title"],
+            [null, "A", 1, 1, "A", null],
+        ]);
+        ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[2, 5, 2, 6], DefaultCellStyles.ChangedCell);
+        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+    }
 }

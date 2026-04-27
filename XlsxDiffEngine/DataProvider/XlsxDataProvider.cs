@@ -46,7 +46,7 @@ public sealed class XlsxDataProvider : IDisposable
         this.config = config ?? new XlsxDataProviderConfig();
         excelDataSourceConfig = new()
         {
-            StringComparer = this.config.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal,
+            StringComparer = this.config.IgnoreHeaderCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal,
             RowNumberColumnName = this.config.RowNumberColumnName,
             WorksheetNameColumnName = this.config.WorksheetNameColumnName,
             MergedWorksheetNameColumnName = this.config.MergedWorksheetNameColumnName,

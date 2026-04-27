@@ -329,14 +329,37 @@ public class ExcelDiffBuilder
         => UpdateConfig(x => x with { ChangedRowKeyColumnsStyle = changedRowKeyColumnsStyle });
 
     /// <summary>
-    /// Configures whether comparisons should ignore case sensitivity.
+    /// Configures whether both header/name matching and data comparisons should ignore case sensitivity.
     /// </summary>
     /// <param name="ignoreCase">Whether to ignore case sensitivity (default is true).</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder IgnoreCase(bool ignoreCase = true)
     {
-        diffConfig = diffConfig with { IgnoreCase = ignoreCase };
-        xlsxConfig = xlsxConfig with { IgnoreCase = ignoreCase };
+        diffConfig = diffConfig with { IgnoreHeaderCase = ignoreCase, IgnoreDataCase = ignoreCase };
+        xlsxConfig = xlsxConfig with { IgnoreHeaderCase = ignoreCase };
+        return this;
+    }
+
+    /// <summary>
+    /// Configures whether header, column, and worksheet name matching should ignore case sensitivity.
+    /// </summary>
+    /// <param name="ignoreCase">Whether to ignore header case sensitivity (default is true).</param>
+    /// <returns>The current builder instance for method chaining.</returns>
+    public ExcelDiffBuilder IgnoreHeaderCase(bool ignoreCase = true)
+    {
+        diffConfig = diffConfig with { IgnoreHeaderCase = ignoreCase };
+        xlsxConfig = xlsxConfig with { IgnoreHeaderCase = ignoreCase };
+        return this;
+    }
+
+    /// <summary>
+    /// Configures whether data and key comparisons should ignore case sensitivity.
+    /// </summary>
+    /// <param name="ignoreCase">Whether to ignore data case sensitivity (default is true).</param>
+    /// <returns>The current builder instance for method chaining.</returns>
+    public ExcelDiffBuilder IgnoreDataCase(bool ignoreCase = true)
+    {
+        diffConfig = diffConfig with { IgnoreDataCase = ignoreCase };
         return this;
     }
 
@@ -365,13 +388,13 @@ public class ExcelDiffBuilder
     /// <summary>
     /// Limits the comparison to a specific set of worksheet names. If no names are provided (or all are empty), all worksheets are included.
     /// </summary>
-    /// <param name="worksheetNames">Worksheet names to include (case handling depends on <see cref="IgnoreCase"/> configuration).</param>
+    /// <param name="worksheetNames">Worksheet names to include (case handling depends on <see cref="IgnoreHeaderCase(bool)"/> configuration).</param>
     /// <returns>The current builder instance for method chaining.</returns>
     public ExcelDiffBuilder SetWorksheetNames(params string[] worksheetNames)
     {
         var names = (worksheetNames ?? [])
             .Where(x => !string.IsNullOrWhiteSpace(x))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Distinct(xlsxConfig.IgnoreHeaderCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal)
             .ToArray();
         xlsxConfig = xlsxConfig with { WorksheetNames = names.Length > 0 ? names : null };
         return this;
@@ -547,7 +570,7 @@ public class ExcelDiffBuilder
     /// <returns>The generated <see cref="ExcelPackage"/> containing the comparison output.</returns>
     public ExcelPackage Build(Action<ExcelPackage>? postProcessingAction = null)
     {
-        StringComparer stringComparer = diffConfig.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+        StringComparer stringComparer = diffConfig.IgnoreHeaderCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
 
         using var oldDataProvider = new XlsxDataProvider(oldFiles, xlsxConfig);
         using var newDataProvider = new XlsxDataProvider(newFiles, xlsxConfig);

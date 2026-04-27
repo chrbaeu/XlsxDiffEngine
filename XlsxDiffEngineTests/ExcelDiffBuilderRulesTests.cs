@@ -230,4 +230,44 @@ internal class ExcelDiffBuilderRulesTests
         ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
     }
 
+    [Test]
+    public void Diff_WithCaseSensitiveHeaderRules_DoesNotApplyOnDifferentHeaderCase()
+    {
+        // Arrange
+        object[][] oldFile = [
+            ["Title", "Value"],
+            ["A", 100.00],
+        ];
+        object[][] newFile = [
+            ["title", "Value"],
+            ["A", 100.00],
+        ];
+        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFile);
+        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFile);
+        using var oldFileStream = oldExcelPackage.ToMemoryStream();
+        using var newFileStream = newExcelPackage.ToMemoryStream();
+
+        // Act
+        using ExcelPackage result = new ExcelDiffBuilder()
+            .AddFiles(x => x
+                .SetOldFile(oldFileStream, "OldFile.xlsx")
+                .SetNewFile(newFileStream, "NewFile.xlsx")
+                )
+            .IgnoreHeaderCase(false)
+            .AddModificationRules([
+                new("title", ModificationKind.RegexReplace, "A", DataKind.All, "X"),
+                ])
+            .Build();
+
+        // Assert
+        using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
+            ["title", "title", "Value", "Value", "Title", "Title"],
+            [null, "X", 100.00, 100.00, "A", null],
+        ]);
+        ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[2, 1, 2, 2], DefaultCellStyles.ChangedCell);
+        ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[2, 5, 2, 6], DefaultCellStyles.ChangedCell);
+
+        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+    }
+
 }

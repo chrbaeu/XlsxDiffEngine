@@ -12,7 +12,8 @@ public sealed class ExcelDiffWriter
     private readonly IExcelDataSource oldDataSource;
     private readonly IExcelDataSource newDataSource;
     private readonly ExcelDiffConfig config;
-    private readonly StringComparer stringComparer;
+    private readonly StringComparer headerComparer;
+    private readonly StringComparer dataComparer;
     private readonly ExcelDiffOp diffOp;
 
     /// <summary>
@@ -29,7 +30,8 @@ public sealed class ExcelDiffWriter
         this.oldDataSource = oldDataSource;
         this.newDataSource = newDataSource;
         this.config = config;
-        stringComparer = config.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+        headerComparer = config.IgnoreHeaderCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+        dataComparer = config.IgnoreDataCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
         diffOp = new(oldDataSource, newDataSource, config);
     }
 
@@ -55,7 +57,7 @@ public sealed class ExcelDiffWriter
 
     private int WriteData(ExcelWorksheet worksheet, int row, int startColumn)
     {
-        ModificationRuleHandler ruleHandler = new(config.ModificationRules, config.IgnoreCase);
+        ModificationRuleHandler ruleHandler = new(config.ModificationRules, config.IgnoreHeaderCase);
         int lastGroup = 0;
         var mergedRows = diffOp.GetMergedRows();
         foreach ((int? oldRow, int? newRow, int group) in mergedRows)
@@ -70,11 +72,11 @@ public sealed class ExcelDiffWriter
             List<ExcelRange> keyCells = [], fallbackValueCells = [];
             foreach (string columnName in diffOp.MergedColumnNames)
             {
-                if (config.ColumnsToOmit.Contains(columnName, stringComparer))
+                if (config.ColumnsToOmit.Contains(columnName, headerComparer))
                 {
                     continue;
                 }
-                bool parseNumbers = config.ColumnsToCompareAsNumbers.Contains(columnName, stringComparer);
+                bool parseNumbers = config.ColumnsToCompareAsNumbers.Contains(columnName, headerComparer);
                 ExcelRange? oldDstCell = worksheet.Cells[row, column];
                 object? oldValue = SetCell(oldDstCell, columnName, oldRow, ruleHandler, DataKind.Old, parseNumbers);
                 string oldText = config.AddOldValueAsComment ? oldDstCell.Text : "";
@@ -88,12 +90,12 @@ public sealed class ExcelDiffWriter
                 }
                 column++;
                 isChanged |= GetAndHandleChangedState(columnName, oldDstCell, oldValue, newDstCell, newValue);
-                if (config.KeyColumns.Contains(columnName, stringComparer))
+                if (config.KeyColumns.Contains(columnName, headerComparer))
                 {
                     if (oldDstCell is not null) { keyCells.Add(oldDstCell); }
                     keyCells.Add(newDstCell);
                 }
-                if (config.ColumnsToFillWithOldValueIfNoNewValueExists.Contains(columnName, stringComparer)
+                if (config.ColumnsToFillWithOldValueIfNoNewValueExists.Contains(columnName, headerComparer)
                     && newRow is null)
                 {
                     newDstCell.Value = oldValue;
@@ -128,18 +130,18 @@ public sealed class ExcelDiffWriter
 
     private bool GetAndHandleChangedState(string columnName, ExcelRange? oldDstCell, object? oldValue, ExcelRange newDstCell, object? newValue)
     {
-        if (config.ColumnsToCompare is not null && !config.ColumnsToCompare.Contains(columnName, stringComparer))
+        if (config.ColumnsToCompare is not null && !config.ColumnsToCompare.Contains(columnName, headerComparer))
         {
             return false;
         }
-        if (config.ColumnsToIgnore is not null && config.ColumnsToIgnore.Contains(columnName, stringComparer))
+        if (config.ColumnsToIgnore is not null && config.ColumnsToIgnore.Contains(columnName, headerComparer))
         {
             return false;
         }
         CellStyle? cellStyle = null;
-        if (config.ColumnsToTextCompareOnly.Contains(columnName, stringComparer))
+        if (config.ColumnsToTextCompareOnly.Contains(columnName, headerComparer))
         {
-            if ((oldDstCell is null && !stringComparer.Equals(oldValue?.ToString() ?? "", newValue?.ToString() ?? ""))
+            if ((oldDstCell is null && !dataComparer.Equals(oldValue?.ToString() ?? "", newValue?.ToString() ?? ""))
                 || (oldDstCell is not null && oldDstCell.Text != newDstCell.Text))
             {
                 cellStyle = config.ChangedCellStyle;
@@ -163,7 +165,7 @@ public sealed class ExcelDiffWriter
         {
             cellStyle = config.ValueChangedMarkers[^1].CellStyle;
         }
-        else if (!stringComparer.Equals(oldValue?.ToString() ?? "", newValue?.ToString() ?? ""))
+        else if (!dataComparer.Equals(oldValue?.ToString() ?? "", newValue?.ToString() ?? ""))
         {
             cellStyle = config.ChangedCellStyle;
         }
@@ -208,7 +210,7 @@ public sealed class ExcelDiffWriter
         int column = startColumn;
         foreach (string columnName in diffOp.MergedColumnNames)
         {
-            if (config.ColumnsToOmit.Contains(columnName, stringComparer))
+            if (config.ColumnsToOmit.Contains(columnName, headerComparer))
             {
                 continue;
             }
@@ -252,7 +254,7 @@ public sealed class ExcelDiffWriter
             {
                 for (int i = startColumn; i <= endColumn; i++)
                 {
-                    if (stringComparer.Equals(worksheet.Cells[startRow, i].Text, columnName))
+                    if (headerComparer.Equals(worksheet.Cells[startRow, i].Text, columnName))
                     {
                         worksheet.Column(i).Width = item.Value;
                         break;
@@ -269,7 +271,7 @@ public sealed class ExcelDiffWriter
             for (int col = startColumn; col <= endColumn; col++)
             {
                 var cellText = worksheet.Cells[startRow, col].Text;
-                if (config.ColumnsToShow.Contains(cellText, stringComparer))
+                if (config.ColumnsToShow.Contains(cellText, headerComparer))
                 {
                     continue;
                 }
@@ -278,7 +280,7 @@ public sealed class ExcelDiffWriter
                 {
                     worksheet.Column(col).Hidden = true;
                 }
-                if (config.ColumnsToHide.Contains(cellText, stringComparer))
+                if (config.ColumnsToHide.Contains(cellText, headerComparer))
                 {
                     worksheet.Column(col).Hidden = true;
                 }

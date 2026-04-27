@@ -187,4 +187,50 @@ internal class ExcelDiffBuilderGroupingTests
         ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
     }
 
+    [Test]
+    public void Diff_WithIgnoreDataCase_GroupKeysAreMergedCaseInsensitively()
+    {
+        // Arrange
+        object[][] oldFile = [
+            ["Title", "Group", "Value"],
+            ["A", "Sales", 1],
+            ["B", "sales", 2],
+        ];
+        object[][] newFile = [
+            ["Title", "Group", "Value"],
+            ["A", "sales", 1],
+            ["C", "SALES", 3],
+        ];
+        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFile);
+        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFile);
+        using var oldFileStream = oldExcelPackage.ToMemoryStream();
+        using var newFileStream = newExcelPackage.ToMemoryStream();
+
+        // Act
+        using ExcelPackage result = new ExcelDiffBuilder()
+            .AddFiles(x => x
+                .SetOldFile(oldFileStream, "OldFile.xlsx")
+                .SetNewFile(newFileStream, "NewFile.xlsx")
+                )
+            .SetKeyColumns("Title")
+            .SetGroupKeyColumns("Group")
+            .AddEmptyRowAfterGroups()
+            .IgnoreDataCase()
+            .Build();
+
+        // Assert
+        using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage([
+            ["Title", "Title", "Group", "Group", "Value", "Value"],
+            [null, null, null, null, null, null],
+            ["A", "A", "Sales", "sales", 1, 1],
+            [null, "C", null, "SALES", null, 3],
+            ["B", null, "sales", null, 2, null],
+        ]);
+
+        ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[4, 1, 4, 6], DefaultCellStyles.AddedRow);
+        ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[5, 1, 5, 6], DefaultCellStyles.RemovedRow);
+
+        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+    }
+
 }

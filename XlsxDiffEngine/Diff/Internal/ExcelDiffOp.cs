@@ -8,7 +8,8 @@ internal sealed class ExcelDiffOp
     private readonly IExcelDataSource oldDataSource;
     private readonly IExcelDataSource newDataSource;
     private readonly ExcelDiffConfig config;
-    private readonly StringComparer stringComparer;
+    private readonly StringComparer headerComparer;
+    private readonly StringComparer dataComparer;
     private readonly StringBuilder stringBuilder = new();
 
     public IReadOnlyList<string> MergedColumnNames { get; }
@@ -18,17 +19,18 @@ internal sealed class ExcelDiffOp
         this.oldDataSource = oldDataSource;
         this.newDataSource = newDataSource;
         this.config = config;
-        stringComparer = config.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+        headerComparer = config.IgnoreHeaderCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+        dataComparer = config.IgnoreDataCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
         if (config.IgnoreColumnsNotInBoth)
         {
             MergedColumnNames = newDataSource.GetColumnNames()
-                .Intersect(oldDataSource.GetColumnNames(), stringComparer)
+                .Intersect(oldDataSource.GetColumnNames(), headerComparer)
                 .ToList().AsReadOnly();
         }
         else
         {
             MergedColumnNames = newDataSource.GetColumnNames()
-                .Union(oldDataSource.GetColumnNames(), stringComparer)
+                .Union(oldDataSource.GetColumnNames(), headerComparer)
                 .ToList().AsReadOnly();
         }
     }
@@ -37,16 +39,16 @@ internal sealed class ExcelDiffOp
     {
         List<DataKey> oldDataKeys = GetDataKeys(oldDataSource);
         List<DataKey> newDataKeys = GetDataKeys(newDataSource);
-        var oldKeyDict = oldDataKeys.ToDictionary(x => x.PrimaryKey, stringComparer);
-        var oldSecondaryKeyDict = config.SecondaryKeyColumns.Count > 0 ? oldDataKeys.ToDictionary(x => x.SecondaryKey, stringComparer) : null;
-        var newKeyDict = newDataKeys.ToDictionary(x => x.PrimaryKey, stringComparer);
-        var usedDataKeys = oldDataKeys.Where(x => newKeyDict.ContainsKey(x.PrimaryKey)).Select(x => x.PrimaryKey).ToHashSet(stringComparer);
+        var oldKeyDict = oldDataKeys.ToDictionary(x => x.PrimaryKey, dataComparer);
+        var oldSecondaryKeyDict = config.SecondaryKeyColumns.Count > 0 ? oldDataKeys.ToDictionary(x => x.SecondaryKey, dataComparer) : null;
+        var newKeyDict = newDataKeys.ToDictionary(x => x.PrimaryKey, dataComparer);
+        var usedDataKeys = oldDataKeys.Where(x => newKeyDict.ContainsKey(x.PrimaryKey)).Select(x => x.PrimaryKey).ToHashSet(dataComparer);
         List<(int? oldRow, int? newRow, int group)> diff = [];
         int group = 0;
         string lastGroupKey = "";
         foreach (DataKey dataKey in GetCombinedKeyList(oldDataKeys, newDataKeys))
         {
-            if (!stringComparer.Equals(lastGroupKey, dataKey.GroupKey))
+            if (!dataComparer.Equals(lastGroupKey, dataKey.GroupKey))
             {
                 group++;
                 lastGroupKey = dataKey.GroupKey;
@@ -82,16 +84,16 @@ internal sealed class ExcelDiffOp
     {
         var groupKeys = newDataKeys
             .Select(item => item.GroupKey)
-            .Union(oldDataKeys.Select(item => item.GroupKey), stringComparer)
+            .Union(oldDataKeys.Select(item => item.GroupKey), dataComparer)
             .ToList();
 
         List<DataKey> combinedKeyList = [.. groupKeys
             .SelectMany(group =>
             {
                 IEnumerable<DataKey> items = newDataKeys
-                    .Where(item => stringComparer.Equals(item.GroupKey, group))
-                    .Union(oldDataKeys.Where(item => stringComparer.Equals(item.GroupKey, group)))
-                    .DistinctBy(x => x.PrimaryKey, stringComparer);
+                    .Where(item => dataComparer.Equals(item.GroupKey, group))
+                    .Union(oldDataKeys.Where(item => dataComparer.Equals(item.GroupKey, group)))
+                    .DistinctBy(x => x.PrimaryKey, dataComparer);
 
                 if (config.ColumnsToSortBy.Count > 0)
                 {
