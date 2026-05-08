@@ -21,7 +21,7 @@ internal class ExcelDiffBuilderCopyOptionsTests
     ];
 
     [Test]
-    public void Diff_WithCopyCellFormat_CopiesNumberFormats()
+    public async Task Diff_WithCopyCellFormat_CopiesNumberFormats()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -49,11 +49,11 @@ internal class ExcelDiffBuilderCopyOptionsTests
             ]);
         expectedResult.Workbook.Worksheets[0].Cells[2, 3, 4, 4].Style.Numberformat.Format = "0.00";
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult);
     }
 
     [Test]
-    public void Diff_WithoutCopyCellFormat_DoesNotCopyNumberFormats()
+    public async Task Diff_WithoutCopyCellFormat_DoesNotCopyNumberFormats()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -80,11 +80,11 @@ internal class ExcelDiffBuilderCopyOptionsTests
             ["C", "C", 3, 3],
             ]);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult);
     }
 
     [Test]
-    public void Diff_WithCopyCellStyle_CopiesSourceStyles()
+    public async Task Diff_WithCopyCellStyle_CopiesSourceStyles()
     {
         // Arrange
         CellStyle cellStyle = new()
@@ -120,11 +120,11 @@ internal class ExcelDiffBuilderCopyOptionsTests
             ]);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[2, 1, 4, 4], cellStyle);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult);
     }
 
     [Test]
-    public void Diff_WithoutCopyCellStyle_DoesNotCopySourceStyles()
+    public async Task Diff_WithoutCopyCellStyle_DoesNotCopySourceStyles()
     {
         // Arrange
         CellStyle cellStyle = new()
@@ -159,6 +159,6 @@ internal class ExcelDiffBuilderCopyOptionsTests
             ["C", "C", 3, 3],
             ]);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult);
     }
 }

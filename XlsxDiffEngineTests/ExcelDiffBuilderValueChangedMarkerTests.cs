@@ -1,4 +1,4 @@
-﻿namespace XlsxDiffEngineTests;
+namespace XlsxDiffEngineTests;
 
 internal class ExcelDiffBuilderValueChangedMarkerTests
 {
@@ -21,7 +21,7 @@ internal class ExcelDiffBuilderValueChangedMarkerTests
     ];
 
     [Test]
-    public void Diff_WithSingleAbsoluteMarker()
+    public async Task Diff_WithSingleAbsoluteMarker()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -48,11 +48,11 @@ internal class ExcelDiffBuilderValueChangedMarkerTests
             ]);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[3, 3, 4, 4], DefaultCellStyles.YellowValueChangedMarker);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public void Diff_WithSingleProzentualMarker()
+    public async Task Diff_WithSingleProzentualMarker()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -79,11 +79,11 @@ internal class ExcelDiffBuilderValueChangedMarkerTests
             ]);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[3, 3, 4, 4], DefaultCellStyles.YellowValueChangedMarker);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public void Diff_WithMultipleAbsoluteMarkers()
+    public async Task Diff_WithMultipleAbsoluteMarkers()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -114,11 +114,11 @@ internal class ExcelDiffBuilderValueChangedMarkerTests
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[3, 3, 3, 4], DefaultCellStyles.OrangeValueChangedMarker);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[4, 3, 4, 4], DefaultCellStyles.RedValueChangedMarker);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public void Diff_WithMultipleProzentualMarkers()
+    public async Task Diff_WithMultipleProzentualMarkers()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -149,7 +149,7 @@ internal class ExcelDiffBuilderValueChangedMarkerTests
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[3, 3, 3, 4], DefaultCellStyles.OrangeValueChangedMarker);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[4, 3, 4, 4], DefaultCellStyles.RedValueChangedMarker);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
 }

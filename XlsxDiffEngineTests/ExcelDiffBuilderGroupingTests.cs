@@ -1,4 +1,4 @@
-﻿namespace XlsxDiffEngineTests;
+namespace XlsxDiffEngineTests;
 
 internal class ExcelDiffBuilderGroupingTests
 {
@@ -21,7 +21,7 @@ internal class ExcelDiffBuilderGroupingTests
     ];
 
     [Test]
-    public void Diff_WithKeyAndGroupKey()
+    public async Task Diff_WithKeyAndGroupKey()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -55,11 +55,11 @@ internal class ExcelDiffBuilderGroupingTests
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[6, 1, 6, 6], DefaultCellStyles.AddedRow);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[7, 1, 7, 6], DefaultCellStyles.RemovedRow);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public void Diff_WithKeyAndGroupKeyAndEmptyRowBetweenGroups()
+    public async Task Diff_WithKeyAndGroupKeyAndEmptyRowBetweenGroups()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -96,11 +96,11 @@ internal class ExcelDiffBuilderGroupingTests
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[8, 1, 8, 6], DefaultCellStyles.AddedRow);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[9, 1, 9, 6], DefaultCellStyles.RemovedRow);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public void Diff_WithKeyGroupKeyAndSort_KeepsGroupsTogether()
+    public async Task Diff_WithKeyGroupKeyAndSort_KeepsGroupsTogether()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -138,11 +138,11 @@ internal class ExcelDiffBuilderGroupingTests
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[8, 1, 8, 6], DefaultCellStyles.RemovedRow);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[9, 1, 9, 6], DefaultCellStyles.AddedRow);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public void Diff_WithIgnoreCase_GroupKeysAreMergedCaseInsensitively()
+    public async Task Diff_WithIgnoreCase_GroupKeysAreMergedCaseInsensitively()
     {
         // Arrange
         object[][] oldFile = [
@@ -184,11 +184,11 @@ internal class ExcelDiffBuilderGroupingTests
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[4, 1, 4, 6], DefaultCellStyles.AddedRow);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[5, 1, 5, 6], DefaultCellStyles.RemovedRow);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public void Diff_WithIgnoreDataCase_GroupKeysAreMergedCaseInsensitively()
+    public async Task Diff_WithIgnoreDataCase_GroupKeysAreMergedCaseInsensitively()
     {
         // Arrange
         object[][] oldFile = [
@@ -230,7 +230,7 @@ internal class ExcelDiffBuilderGroupingTests
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[4, 1, 4, 6], DefaultCellStyles.AddedRow);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[5, 1, 5, 6], DefaultCellStyles.RemovedRow);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
 }

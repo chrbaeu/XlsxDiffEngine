@@ -1,11 +1,11 @@
-﻿namespace XlsxDiffEngineTests;
+namespace XlsxDiffEngineTests;
 
 internal class ExcelDiffBuilderSecondaryKeyColumnsTests
 {
     private readonly ExcelDiffBuilder excelDiffBuilder = new();
 
     [Test]
-    public void Diff_WithSecondaryKeyColumns_MatchesOnSecondaryKey()
+    public async Task Diff_WithSecondaryKeyColumns_MatchesOnSecondaryKey()
     {
         // Arrange
         object?[][] oldFile = [
@@ -41,7 +41,7 @@ internal class ExcelDiffBuilderSecondaryKeyColumnsTests
         ]);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[2, 1, 3, 2], DefaultCellStyles.ChangedRowKeyColumns);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[3, 5, 3, 6], DefaultCellStyles.ChangedCell);
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 }
 

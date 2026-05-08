@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+using System.Drawing;
 
 namespace XlsxDiffEngineTests;
 
@@ -40,7 +40,7 @@ internal class ExcelDiffBuilderStylesTests
 
 
     [Test]
-    public void Diff_WithDefaultStyles()
+    public async Task Diff_WithDefaultStyles()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -64,11 +64,11 @@ internal class ExcelDiffBuilderStylesTests
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[5, 1, 5, 4], DefaultCellStyles.AddedRow);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[6, 1, 6, 4], DefaultCellStyles.RemovedRow);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public void Diff_WithCustomStyles()
+    public async Task Diff_WithCustomStyles()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -100,11 +100,11 @@ internal class ExcelDiffBuilderStylesTests
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[5, 1, 5, 4], myAddedRow);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[6, 1, 6, 4], myRemovedRow);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public void Diff_WithCopyCellStyles()
+    public async Task Diff_WithCopyCellStyles()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -135,7 +135,7 @@ internal class ExcelDiffBuilderStylesTests
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[2, 2, 5, 2], new CellStyle() { Italic = true });
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[2, 4, 5, 4], new CellStyle() { Italic = true });
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
 }

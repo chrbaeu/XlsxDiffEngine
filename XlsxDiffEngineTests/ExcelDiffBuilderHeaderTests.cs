@@ -19,7 +19,7 @@ internal class ExcelDiffBuilderHeaderTests
     ];
 
     [Test]
-    public void Diff_WithColumnHeaderPostfix()
+    public async Task Diff_WithColumnHeaderPostfix()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -45,11 +45,11 @@ internal class ExcelDiffBuilderHeaderTests
             ["C", "C", 3, 3],
             ]);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult);
     }
 
     [Test]
-    public void Diff_WithCustomHeaderRows()
+    public async Task Diff_WithCustomHeaderRows()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -78,11 +78,11 @@ internal class ExcelDiffBuilderHeaderTests
         expectedResult.Workbook.Worksheets[0].Cells[1, 1, 1, 4].Style.Font.Bold = false;
         expectedResult.Workbook.Worksheets[0].Cells[3, 1, 3, 4].Style.Font.Bold = true;
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[5, 3, 5, 4], DefaultCellStyles.ChangedCell);
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public void Diff_WithCustomHeaderRowsAndColumns()
+    public async Task Diff_WithCustomHeaderRowsAndColumns()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -114,6 +114,6 @@ internal class ExcelDiffBuilderHeaderTests
         expectedResult.Workbook.Worksheets[0].Cells[1, 1, 1, 4].Style.Font.Bold = false;
         expectedResult.Workbook.Worksheets[0].Cells[3, 1, 3, 4].Style.Font.Bold = true;
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[5, 3, 5, 4], DefaultCellStyles.ChangedCell);
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 }

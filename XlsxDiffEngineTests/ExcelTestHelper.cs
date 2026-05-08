@@ -1,4 +1,4 @@
-﻿using OfficeOpenXml.Style;
+using OfficeOpenXml.Style;
 
 namespace XlsxDiffEngineTests;
 
@@ -11,32 +11,32 @@ internal static class ExcelTestHelper
         return excelPackage;
     }
 
-    public static void CheckIfExcelPackagesIdentical(ExcelPackage excelPackageA, ExcelPackage excelPackageB, bool compareCellBackground = false)
+    public static async Task AssertExcelPackagesIdentical(ExcelPackage excelPackageA, ExcelPackage excelPackageB, bool compareCellBackground = false)
     {
-        if (excelPackageA.Workbook.Worksheets.Count != excelPackageB.Workbook.Worksheets.Count)
-        {
-            throw new ArgumentException($"The number of worksheets is different: " +
-                                         $"{excelPackageA.Workbook.Worksheets.Count} vs {excelPackageB.Workbook.Worksheets.Count}.");
-        }
+        await AssertEqual(
+            excelPackageA.Workbook.Worksheets.Count,
+            excelPackageB.Workbook.Worksheets.Count,
+            "the number of worksheets is different");
 
         for (int i = 0; i < excelPackageA.Workbook.Worksheets.Count; i++)
         {
             ExcelWorksheet worksheetA = excelPackageA.Workbook.Worksheets[i];
             ExcelWorksheet worksheetB = excelPackageB.Workbook.Worksheets[i];
 
-            if (worksheetA.Name != worksheetB.Name)
-            {
-                throw new ArgumentException($"Worksheet names do not match: '{worksheetA.Name}' vs '{worksheetB.Name}'.");
-            }
+            await AssertEqual(
+                worksheetA.Name,
+                worksheetB.Name,
+                $"worksheet names do not match at index {i + 1}");
+            await AssertEqual(
+                worksheetA.Dimension?.Rows,
+                worksheetB.Dimension?.Rows,
+                $"worksheet row count in '{worksheetA.Name}' does not match");
+            await AssertEqual(
+                worksheetA.Dimension?.Columns,
+                worksheetB.Dimension?.Columns,
+                $"worksheet column count in '{worksheetA.Name}' does not match");
 
-            if (worksheetA.Dimension?.Rows != worksheetB.Dimension?.Rows || worksheetA.Dimension?.Columns != worksheetB.Dimension?.Columns)
-            {
-                throw new ArgumentException($"Worksheet dimensions in '{worksheetA.Name}' do not match: " +
-                                             $"{worksheetA.Dimension?.Rows}x{worksheetA.Dimension?.Columns} vs " +
-                                             $"{worksheetB.Dimension?.Rows}x{worksheetB.Dimension?.Columns}.");
-            }
-
-            if (worksheetA.Dimension is null) { return; }
+            if (worksheetA.Dimension is null) { continue; }
             for (int row = 1; row <= worksheetA.Dimension.Rows; row++)
             {
                 for (int col = 1; col <= worksheetA.Dimension.Columns; col++)
@@ -44,54 +44,124 @@ internal static class ExcelTestHelper
                     string cellA = worksheetA.Cells[row, col].Text;
                     string cellB = worksheetB.Cells[row, col].Text;
 
-                    if (cellA != cellB)
-                    {
-                        throw new ArgumentException($"Cell content in worksheet '{worksheetA.Name}' differs at position [{row}, {col}]: '{cellA}' vs '{cellB}'.");
-                    }
+                    await AssertEqual(
+                        cellA,
+                        cellB,
+                        $"cell content in worksheet '{worksheetA.Name}' differs at position [{row}, {col}]");
 
                     ExcelNumberFormat formatA = worksheetA.Cells[row, col].Style.Numberformat;
                     ExcelNumberFormat formatB = worksheetB.Cells[row, col].Style.Numberformat;
 
-                    if (formatA.NumFmtID != formatB.NumFmtID || formatA.Format != formatB.Format)
+                    using (Assert.Multiple())
                     {
-                        throw new ArgumentException($"Number format in worksheet '{worksheetA.Name}' differs at position [{row}, {col}].");
+                        await AssertEqual(
+                            formatA.NumFmtID,
+                            formatB.NumFmtID,
+                            $"number format ID in worksheet '{worksheetA.Name}' differs at position [{row}, {col}]");
+                        await AssertEqual(
+                            formatA.Format,
+                            formatB.Format,
+                            $"number format string in worksheet '{worksheetA.Name}' differs at position [{row}, {col}]");
                     }
 
                     ExcelStyle styleA = worksheetA.Cells[row, col].Style;
                     ExcelStyle styleB = worksheetB.Cells[row, col].Style;
 
-                    if (styleA.Font.Bold != styleB.Font.Bold || styleA.Font.Italic != styleB.Font.Italic
-                        || styleA.Font.UnderLine != styleB.Font.UnderLine || styleA.Font.Size != styleB.Font.Size
-                        || styleA.Font.Strike != styleB.Font.Strike || !IsSameColor(styleA.Font.Color, styleB.Font.Color))
+                    string fontColorA = GetColorValue(styleA.Font.Color);
+                    string fontColorB = GetColorValue(styleB.Font.Color);
+                    using (Assert.Multiple())
                     {
-                        throw new ArgumentException($"Font style in worksheet '{worksheetA.Name}' differs at position [{row}, {col}].");
+                        await AssertEqual(
+                            styleA.Font.Bold,
+                            styleB.Font.Bold,
+                            $"font bold flag in worksheet '{worksheetA.Name}' differs at position [{row}, {col}]");
+                        await AssertEqual(
+                            styleA.Font.Italic,
+                            styleB.Font.Italic,
+                            $"font italic flag in worksheet '{worksheetA.Name}' differs at position [{row}, {col}]");
+                        await AssertEqual(
+                            styleA.Font.UnderLine,
+                            styleB.Font.UnderLine,
+                            $"font underline flag in worksheet '{worksheetA.Name}' differs at position [{row}, {col}]");
+                        await AssertEqual(
+                            styleA.Font.Size,
+                            styleB.Font.Size,
+                            $"font size in worksheet '{worksheetA.Name}' differs at position [{row}, {col}]");
+                        await AssertEqual(
+                            styleA.Font.Strike,
+                            styleB.Font.Strike,
+                            $"font strike flag in worksheet '{worksheetA.Name}' differs at position [{row}, {col}]");
+                        await AssertEqual(
+                            fontColorA,
+                            fontColorB,
+                            $"font color in worksheet '{worksheetA.Name}' differs at position [{row}, {col}]");
                     }
 
-                    if (compareCellBackground && (styleA.Fill.PatternType != styleB.Fill.PatternType
-                                                  || !IsSameColor(styleA.Fill.BackgroundColor, styleB.Fill.BackgroundColor)))
+                    if (compareCellBackground)
                     {
-                        throw new ArgumentException($"Cell background in worksheet '{worksheetA.Name}' differs at position [{row}, {col}].");
+                        string backgroundColorA = GetFillBackgroundColorValue(styleA.Fill.PatternType, styleA.Fill.BackgroundColor);
+                        string backgroundColorB = GetFillBackgroundColorValue(styleB.Fill.PatternType, styleB.Fill.BackgroundColor);
+                        using (Assert.Multiple())
+                        {
+                            await AssertEqual(
+                                styleA.Fill.PatternType,
+                                styleB.Fill.PatternType,
+                                $"cell background pattern in worksheet '{worksheetA.Name}' differs at position [{row}, {col}]");
+                            await AssertEqual(
+                                backgroundColorA,
+                                backgroundColorB,
+                                $"cell background color in worksheet '{worksheetA.Name}' differs at position [{row}, {col}]");
+                        }
                     }
                 }
             }
         }
     }
 
-    private static bool IsSameColor(ExcelColor excelColorA, ExcelColor excelColorB)
+    private static Task AssertEqual<T>(T actual, T expected, string because)
     {
-        if (!string.IsNullOrEmpty(excelColorA.Rgb))
+        if (EqualityComparer<T>.Default.Equals(actual, expected))
         {
-            return excelColorA.Rgb == excelColorB.Rgb;
+            return Task.CompletedTask;
         }
-        else if (excelColorA.Theme != null)
+
+        Assert.Fail($"{because}. Expected: {FormatValue(expected)}. Actual: {FormatValue(actual)}.");
+        return Task.CompletedTask;
+    }
+
+    private static string FormatValue<T>(T value)
+    {
+        return value switch
         {
-            return excelColorB.Theme == excelColorA.Theme && excelColorB.Tint == excelColorA.Tint;
-        }
-        else if (excelColorA.Indexed != int.MinValue)
+            null => "<null>",
+            string text => $"'{text}'",
+            _ => value.ToString() ?? "<null>",
+        };
+    }
+
+    private static string GetColorValue(ExcelColor excelColor)
+    {
+        if (!string.IsNullOrEmpty(excelColor.Rgb))
         {
-            return excelColorB.Indexed == excelColorA.Indexed;
+            return $"Rgb={excelColor.Rgb}";
         }
-        return true;
+
+        if (excelColor.Theme != null)
+        {
+            return $"Theme={excelColor.Theme}; Tint={excelColor.Tint}";
+        }
+
+        if (excelColor.Indexed > 0)
+        {
+            return $"Indexed={excelColor.Indexed}";
+        }
+
+        return "<none>";
+    }
+
+    private static string GetFillBackgroundColorValue(ExcelFillStyle patternType, ExcelColor backgroundColor)
+    {
+        return patternType == ExcelFillStyle.None ? "<none>" : GetColorValue(backgroundColor);
     }
 
 }

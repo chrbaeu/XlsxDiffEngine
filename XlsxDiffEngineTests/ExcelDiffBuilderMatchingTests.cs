@@ -19,7 +19,7 @@ internal class ExcelDiffBuilderMatchingTests
     ];
 
     [Test]
-    public void Diff_WithHighlighting()
+    public async Task Diff_WithHighlighting()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -44,11 +44,11 @@ internal class ExcelDiffBuilderMatchingTests
             ]);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[3, 3, 3, 4], DefaultCellStyles.ChangedCell);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public void Diff_WithHighlightingAndKeyColumn()
+    public async Task Diff_WithHighlightingAndKeyColumn()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -75,11 +75,11 @@ internal class ExcelDiffBuilderMatchingTests
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[3, 1, 3, 2], DefaultCellStyles.ChangedRowKeyColumns);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[3, 3, 3, 4], DefaultCellStyles.ChangedCell);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public void Diff_WithHighlightingAndKeyColumnAndInsertAndDelete()
+    public async Task Diff_WithHighlightingAndKeyColumnAndInsertAndDelete()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -110,11 +110,11 @@ internal class ExcelDiffBuilderMatchingTests
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[4, 1, 4, 4], DefaultCellStyles.AddedRow);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[5, 1, 5, 4], DefaultCellStyles.RemovedRow);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public void Diff_WithColumnsToCompare()
+    public async Task Diff_WithColumnsToCompare()
     {
         // Arrange
         object?[][] oldFile = [
@@ -149,11 +149,11 @@ internal class ExcelDiffBuilderMatchingTests
         ]);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[3, 3, 3, 4], DefaultCellStyles.ChangedCell);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public void Diff_WithSort()
+    public async Task Diff_WithSort()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -179,11 +179,11 @@ internal class ExcelDiffBuilderMatchingTests
             ]);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[4, 3, 4, 4], DefaultCellStyles.ChangedCell);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public void Diff_WithOldValueFallback()
+    public async Task Diff_WithOldValueFallback()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -217,11 +217,11 @@ internal class ExcelDiffBuilderMatchingTests
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[5, 1, 5, 4], DefaultCellStyles.RemovedRow);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[5, 2], DefaultCellStyles.FallbackValue);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public void Diff_WithIgnoreCase()
+    public async Task Diff_WithIgnoreCase()
     {
         // Arrange
         object?[][] oldFile = [
@@ -253,11 +253,11 @@ internal class ExcelDiffBuilderMatchingTests
                 ["A", "A", 1, 1],
                 ["b", "B", 2, 2],
             ]);
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public void Diff_WithoutIgnoreCase()
+    public async Task Diff_WithoutIgnoreCase()
     {
         // Arrange
         object?[][] oldFile = [
@@ -290,11 +290,11 @@ internal class ExcelDiffBuilderMatchingTests
                 ["b", "B", 2, 2],
             ]);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[3, 1, 3, 2], DefaultCellStyles.ChangedCell);
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public void Diff_WithIgnoreHeaderCaseAndCaseSensitiveData()
+    public async Task Diff_WithIgnoreHeaderCaseAndCaseSensitiveData()
     {
         // Arrange
         object[][] oldFile = [
@@ -325,11 +325,11 @@ internal class ExcelDiffBuilderMatchingTests
                 ["b", "B", 2, 2],
             ]);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[2, 1, 2, 2], DefaultCellStyles.ChangedCell);
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public void Diff_WithCaseSensitiveHeadersAndIgnoreDataCase()
+    public async Task Diff_WithCaseSensitiveHeadersAndIgnoreDataCase()
     {
         // Arrange
         object[][] oldFile = [
@@ -361,11 +361,11 @@ internal class ExcelDiffBuilderMatchingTests
             ]);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[2, 1, 2, 2], DefaultCellStyles.ChangedCell);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[2, 5, 2, 6], DefaultCellStyles.ChangedCell);
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public void Diff_WithIgnoreDataCase_KeyColumnsAreMatchedCaseInsensitively()
+    public async Task Diff_WithIgnoreDataCase_KeyColumnsAreMatchedCaseInsensitively()
     {
         // Arrange
         object[][] oldFile = [
@@ -395,6 +395,6 @@ internal class ExcelDiffBuilderMatchingTests
                 ["Title", "Title", "Value", "Value"],
                 ["b", "B", 2, 2],
             ]);
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 }

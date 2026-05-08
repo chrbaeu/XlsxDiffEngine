@@ -1,4 +1,4 @@
-﻿namespace XlsxDiffEngineTests;
+namespace XlsxDiffEngineTests;
 
 internal class ExcelDiffBuilderColumnOptionsTests
 {
@@ -19,7 +19,7 @@ internal class ExcelDiffBuilderColumnOptionsTests
     ];
 
     [Test]
-    public void Diff_WithIgnoreColumnsNotInBoth()
+    public async Task Diff_WithIgnoreColumnsNotInBoth()
     {
         // Arrange
         object?[][] oldFile = [
@@ -52,11 +52,11 @@ internal class ExcelDiffBuilderColumnOptionsTests
             ["A", "A", 1, 1],
             ["B", "B", 2, 2],
         ]);
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public void Diff_WithOmittedColumn()
+    public async Task Diff_WithOmittedColumn()
     {
         // Arrange
         using var oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -81,7 +81,7 @@ internal class ExcelDiffBuilderColumnOptionsTests
             [3, 3],
         ]);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult);
     }
 
     [Test]
@@ -264,7 +264,7 @@ internal class ExcelDiffBuilderColumnOptionsTests
     }
 
     [Test]
-    public void Diff_WithCaseSensitiveHeaders_DoesNotIgnoreMismatchedColumnName()
+    public async Task Diff_WithCaseSensitiveHeaders_DoesNotIgnoreMismatchedColumnName()
     {
         // Arrange
         object?[][] oldFile = [
@@ -296,6 +296,6 @@ internal class ExcelDiffBuilderColumnOptionsTests
             [null, "A", 1, 1, "A", null],
         ]);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[2, 5, 2, 6], DefaultCellStyles.ChangedCell);
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 }

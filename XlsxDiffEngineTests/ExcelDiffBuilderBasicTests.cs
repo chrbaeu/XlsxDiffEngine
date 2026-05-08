@@ -19,7 +19,7 @@ internal class ExcelDiffBuilderBasicTests
     ];
 
     [Test]
-    public void Diff_WithEmptyWorksheets()
+    public async Task Diff_WithEmptyWorksheets()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(Array.Empty<object?[]>());
@@ -37,11 +37,11 @@ internal class ExcelDiffBuilderBasicTests
 
         // Assert
         using ExcelPackage expectedResult = ExcelTestHelper.ConvertToExcelPackage(Array.Empty<object?[]>());
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult);
     }
 
     [Test]
-    public void Diff_FullAgainstEmptyWorksheets()
+    public async Task Diff_FullAgainstEmptyWorksheets()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -67,11 +67,11 @@ internal class ExcelDiffBuilderBasicTests
             ]);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[2, 1, 4, 4], DefaultCellStyles.RemovedRow);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public void Diff_EmptyAgainstFullWorksheets()
+    public async Task Diff_EmptyAgainstFullWorksheets()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(Array.Empty<object?[]>());
@@ -97,11 +97,11 @@ internal class ExcelDiffBuilderBasicTests
             ]);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[2, 1, 4, 4], DefaultCellStyles.AddedRow);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public void Diff_WithRecalculation()
+    public async Task Diff_WithRecalculation()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -131,11 +131,11 @@ internal class ExcelDiffBuilderBasicTests
             ]);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[3, 3, 3, 4], DefaultCellStyles.ChangedCell);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public void Diff_WithEmptyWorksheet()
+    public async Task Diff_WithEmptyWorksheet()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = new();
@@ -161,6 +161,6 @@ internal class ExcelDiffBuilderBasicTests
             ]);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[2, 1, 4, 4], DefaultCellStyles.AddedRow);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 }

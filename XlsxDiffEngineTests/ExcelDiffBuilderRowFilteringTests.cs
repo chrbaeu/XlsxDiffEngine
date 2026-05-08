@@ -19,7 +19,7 @@ internal class ExcelDiffBuilderRowFilteringTests
     ];
 
     [Test]
-    public void Diff_WithoutUnchangedRows()
+    public async Task Diff_WithoutUnchangedRows()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -42,11 +42,11 @@ internal class ExcelDiffBuilderRowFilteringTests
             ["B", "B", 2, 4],
             ]);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult);
     }
 
     [Test]
-    public void Diff_SkipRemovedRows_WithoutKeyColumns()
+    public async Task Diff_SkipRemovedRows_WithoutKeyColumns()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -74,11 +74,11 @@ internal class ExcelDiffBuilderRowFilteringTests
             [null, "E", null, null],
             ]);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult);
     }
 
     [Test]
-    public void Diff_SkipRemovedRows_WithKeyColumns()
+    public async Task Diff_SkipRemovedRows_WithKeyColumns()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -107,11 +107,11 @@ internal class ExcelDiffBuilderRowFilteringTests
             [null, "E", null, null],
             ]);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult);
     }
 
     [Test]
-    public void Diff_WithSkippedRows()
+    public async Task Diff_WithSkippedRows()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -136,6 +136,6 @@ internal class ExcelDiffBuilderRowFilteringTests
             ]);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[2, 3, 2, 4], DefaultCellStyles.ChangedCell);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 }

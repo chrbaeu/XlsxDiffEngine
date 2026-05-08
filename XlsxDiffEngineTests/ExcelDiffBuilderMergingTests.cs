@@ -1,4 +1,4 @@
-﻿namespace XlsxDiffEngineTests;
+namespace XlsxDiffEngineTests;
 
 internal class ExcelDiffBuilderMergingTests
 {
@@ -19,7 +19,7 @@ internal class ExcelDiffBuilderMergingTests
     ];
 
     [Test]
-    public void Diff_MultipleWorksheets_WithoutMerging()
+    public async Task Diff_MultipleWorksheets_WithoutMerging()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(dataTab1, "Tab1");
@@ -54,11 +54,11 @@ internal class ExcelDiffBuilderMergingTests
         ], "Tab2");
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[1].Cells[3, 3, 3, 4], DefaultCellStyles.ChangedCell);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public void Diff_MultipleWorksheets_WithMerging()
+    public async Task Diff_MultipleWorksheets_WithMerging()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(dataTab1, "Tab1");
@@ -92,11 +92,11 @@ internal class ExcelDiffBuilderMergingTests
             ], "Merged");
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[6, 3, 6, 4], DefaultCellStyles.ChangedCell);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public void Diff_MultipleDocuments_WithMerging()
+    public async Task Diff_MultipleDocuments_WithMerging()
     {
         // Arrange
         using ExcelPackage oldExcelPackage1 = ExcelTestHelper.ConvertToExcelPackage(dataTab1);
@@ -135,11 +135,11 @@ internal class ExcelDiffBuilderMergingTests
             ]);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[6, 3, 6, 4], DefaultCellStyles.ChangedCell);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public void Diff_MultipleDocuments_WithoutMerging()
+    public async Task Diff_MultipleDocuments_WithoutMerging()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(dataTab1);
@@ -162,7 +162,7 @@ internal class ExcelDiffBuilderMergingTests
         void act() => builder.Build();
 
         // Assert
-        Assert.Throws<InvalidOperationException>(act);
+        await Assert.That(act).Throws<InvalidOperationException>();
     }
 
 }

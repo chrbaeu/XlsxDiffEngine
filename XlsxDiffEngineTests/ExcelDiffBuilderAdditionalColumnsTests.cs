@@ -19,7 +19,7 @@ internal class ExcelDiffBuilderAdditionalColumnsTests
     ];
 
     [Test]
-    public void Diff_WithRowNumber()
+    public async Task Diff_WithRowNumber()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -44,11 +44,11 @@ internal class ExcelDiffBuilderAdditionalColumnsTests
             [3, 3, "C", "C", 3, 3],
             ]);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult);
     }
 
     [Test]
-    public void Diff_WithAdditionalMetadataColumns()
+    public async Task Diff_WithAdditionalMetadataColumns()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -75,11 +75,11 @@ internal class ExcelDiffBuilderAdditionalColumnsTests
             [3, 3, "Table", "Table", "OldFile.xlsx", "NewFile.xlsx", "C", "C", 3, 3],
             ]);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult);
     }
 
     [Test]
-    public void Diff_WithCustomDocumentNameColumn()
+    public async Task Diff_WithCustomDocumentNameColumn()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -105,11 +105,11 @@ internal class ExcelDiffBuilderAdditionalColumnsTests
             ["ChangedDocumentName", "ChangedDocumentName", "C", "C", 3, 3],
             ]);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult);
     }
 
     [Test]
-    public void Diff_WithMergedWorksheetNameColumn()
+    public async Task Diff_WithMergedWorksheetNameColumn()
     {
         // Arrange
         using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFileContent);
@@ -136,6 +136,6 @@ internal class ExcelDiffBuilderAdditionalColumnsTests
             ["Test", "Test", "C", "C", 3, 3],
             ], "Test");
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult);
     }
 }

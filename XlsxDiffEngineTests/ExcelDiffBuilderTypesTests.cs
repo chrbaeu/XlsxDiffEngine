@@ -1,4 +1,4 @@
-﻿namespace XlsxDiffEngineTests;
+namespace XlsxDiffEngineTests;
 
 internal class ExcelDiffBuilderTypesTests
 {
@@ -17,7 +17,7 @@ internal class ExcelDiffBuilderTypesTests
     ];
 
     [Test]
-    public void Diff_DateTime()
+    public async Task Diff_DateTime()
     {
         // Arrange
         var a = oldFileContent[1][1] = newFileContent[1][1] = oldFileContent[2][1] = new DateTime(2026, 1, 25);
@@ -44,11 +44,11 @@ internal class ExcelDiffBuilderTypesTests
 
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[3, 3, 3, 4], DefaultCellStyles.ChangedCell);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
     [Test]
-    public void Diff_Bool()
+    public async Task Diff_Bool()
     {
         // Arrange
         var a = oldFileContent[1][1] = newFileContent[1][1] = oldFileContent[2][1] = true;
@@ -74,12 +74,12 @@ internal class ExcelDiffBuilderTypesTests
             ]);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[3, 3, 3, 4], DefaultCellStyles.ChangedCell);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
 
     [Test]
-    public void Diff_NumbersAsString()
+    public async Task Diff_NumbersAsString()
     {
         // Arrange
         var a = oldFileContent[1][1] = oldFileContent[2][1] = "55";
@@ -108,7 +108,7 @@ internal class ExcelDiffBuilderTypesTests
             ]);
         ExcelHelper.SetCellStyle(expectedResult.Workbook.Worksheets[0].Cells[3, 3, 3, 4], DefaultCellStyles.YellowValueChangedMarker);
 
-        ExcelTestHelper.CheckIfExcelPackagesIdentical(result, expectedResult, true);
+        await ExcelTestHelper.AssertExcelPackagesIdentical(result, expectedResult, true);
     }
 
 }
