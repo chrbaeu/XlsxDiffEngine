@@ -4,17 +4,9 @@ internal class ExcelDiffBuilderTypesTests
 {
     private readonly ExcelDiffBuilder excelDiffBuilder = new();
 
-    private readonly object?[][] oldFileContent = [
-        ["Title", "Value"],
-        ["A", null],
-        ["B", null],
-    ];
+    private readonly object?[][] oldFileContent = ExcelTestData.TypedValueTemplate();
 
-    private readonly object?[][] newFileContent = [
-        ["Title", "Value"],
-        ["A", null],
-        ["B", null],
-    ];
+    private readonly object?[][] newFileContent = ExcelTestData.TypedValueTemplate();
 
     [Test]
     public async Task Diff_DateTime()

@@ -4,19 +4,9 @@ internal class ExcelDiffBuilderBasicTests
 {
     private readonly ExcelDiffBuilder excelDiffBuilder = new();
 
-    private readonly object?[][] oldFileContent = [
-        ["Title", "Value"],
-        ["A", 1],
-        ["B", 2],
-        ["C", 3],
-    ];
+    private readonly object?[][] oldFileContent = ExcelTestData.StandardOld();
 
-    private readonly object?[][] newFileContent = [
-        ["Title", "Value"],
-        ["A", 1],
-        ["B", 4],
-        ["C", 3],
-    ];
+    private readonly object?[][] newFileContent = ExcelTestData.StandardNew();
 
     [Test]
     public async Task Diff_WithEmptyWorksheets()

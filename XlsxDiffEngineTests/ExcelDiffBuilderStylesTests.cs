@@ -13,18 +13,12 @@ internal class ExcelDiffBuilderStylesTests
     private readonly CellStyle myChangedRowKeyColumns = new() { Bold = true, FontColor = Color.FromArgb(150, 175, 255) };
 
     private readonly object?[][] oldFileContent = [
-        ["Title", "Value"],
-        ["A", 1],
-        ["B", 2],
-        ["C", 3],
+        .. ExcelTestData.StandardOld(),
         ["D", 4],
     ];
 
     private readonly object?[][] newFileContent = [
-        ["Title", "Value"],
-        ["A", 1],
-        ["B", 4],
-        ["C", 3],
+        .. ExcelTestData.StandardNew(),
         ["E", 5],
     ];
 

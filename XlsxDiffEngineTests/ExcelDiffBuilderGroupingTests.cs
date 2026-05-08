@@ -4,21 +4,9 @@ internal class ExcelDiffBuilderGroupingTests
 {
     private readonly ExcelDiffBuilder excelDiffBuilder = new();
 
-    private readonly object?[][] oldFileContent = [
-        ["Title", "Group", "Value"],
-        ["A", "1", 1],
-        ["B", "1", 2],
-        ["C", "2", 3],
-        ["D", "2", 4],
-    ];
+    private readonly object?[][] oldFileContent = ExcelTestData.GroupedOld();
 
-    private readonly object?[][] newFileContent = [
-        ["Title", "Group", "Value"],
-        ["A", "1", 1],
-        ["E", "1", 5],
-        ["C", "2", 3],
-        ["F", "2", 6],
-    ];
+    private readonly object?[][] newFileContent = ExcelTestData.GroupedNew();
 
     [Test]
     public async Task Diff_WithKeyAndGroupKey()

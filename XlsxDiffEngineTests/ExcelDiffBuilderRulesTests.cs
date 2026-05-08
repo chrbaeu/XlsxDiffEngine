@@ -4,28 +4,18 @@ internal class ExcelDiffBuilderRulesTests
 {
     private readonly ExcelDiffBuilder excelDiffBuilder = new();
 
-    private readonly object?[][] content1 = [
-        ["Title", "Value"],
-        ["A", 100.00],
-        ["B", 100.00],
-        ["C", 100.00],
-        ["D", 100.00],
-    ];
+    private readonly object?[][] content = ExcelTestData.NumericRuleBase();
 
-    private readonly object?[][] content2 = [
-        ["Title", "Value"],
-        ["A", 120.00],
-        ["B", 120.00],
-        ["C", 120.05],
-        ["D", 120.00],
-    ];
+    private readonly object?[][] transformedContent = ExcelTestData.NumericRuleBase()
+        .Select((row, index) => index == 0 ? row : [row[0], 120.00])
+        .ToArray();
 
     [Test]
     public async Task Diff_WithNumberFormatRule()
     {
         // Arrange
-        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content1);
-        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content1);
+        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content);
+        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content);
         newExcelPackage.Workbook.Worksheets[0].Cells[3, 2].Value = 100.04;
         newExcelPackage.Workbook.Worksheets[0].Cells[4, 2].Value = 100.06;
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
@@ -60,8 +50,8 @@ internal class ExcelDiffBuilderRulesTests
     public async Task Diff_WithNumberFormatRuleAndTextCompare()
     {
         // Arrange
-        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content1);
-        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content1);
+        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content);
+        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content);
         newExcelPackage.Workbook.Worksheets[0].Cells[3, 2].Value = 100.04;
         newExcelPackage.Workbook.Worksheets[0].Cells[4, 2].Value = 100.06;
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
@@ -97,8 +87,9 @@ internal class ExcelDiffBuilderRulesTests
     public async Task Diff_WithMultiplyRule()
     {
         // Arrange
-        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content1);
-        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content2);
+        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content);
+        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(transformedContent);
+        newExcelPackage.Workbook.Worksheets[0].Cells[4, 2].Value = 120.05;
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
@@ -130,10 +121,11 @@ internal class ExcelDiffBuilderRulesTests
     public async Task Diff_WithFormulaRule_AllCells()
     {
         // Arrange
-        content1[1][1] = null;
-        content2[1][1] = 0;
-        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content1);
-        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content2);
+        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content);
+        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(transformedContent);
+        oldExcelPackage.Workbook.Worksheets[0].Cells[2, 2].Value = null;
+        newExcelPackage.Workbook.Worksheets[0].Cells[2, 2].Value = 0;
+        newExcelPackage.Workbook.Worksheets[0].Cells[4, 2].Value = 120.05;
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
@@ -165,10 +157,11 @@ internal class ExcelDiffBuilderRulesTests
     public async Task Diff_WithFormulaRule_NonEmptyCells()
     {
         // Arrange
-        content1[1][1] = null;
-        content2[1][1] = null;
-        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content1);
-        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content2);
+        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content);
+        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(transformedContent);
+        oldExcelPackage.Workbook.Worksheets[0].Cells[2, 2].Value = null;
+        newExcelPackage.Workbook.Worksheets[0].Cells[2, 2].Value = null;
+        newExcelPackage.Workbook.Worksheets[0].Cells[4, 2].Value = 120.05;
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();
 
@@ -200,8 +193,8 @@ internal class ExcelDiffBuilderRulesTests
     public async Task Diff_WithRegexReplaceRule()
     {
         // Arrange
-        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content1);
-        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content1);
+        using ExcelPackage oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content);
+        using ExcelPackage newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(content);
         newExcelPackage.Workbook.Worksheets[0].Cells[4, 2].Value = 200.00;
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
         using var newFileStream = newExcelPackage.ToMemoryStream();

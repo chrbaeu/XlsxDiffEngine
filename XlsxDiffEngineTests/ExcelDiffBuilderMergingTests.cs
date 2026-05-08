@@ -4,19 +4,9 @@ internal class ExcelDiffBuilderMergingTests
 {
     private readonly ExcelDiffBuilder excelDiffBuilder = new();
 
-    private readonly object?[][] dataTab1 = [
-        ["Title", "Value"],
-        ["A", 1],
-        ["B", 2],
-        ["C", 3],
-    ];
+    private readonly object?[][] dataTab1 = ExcelTestData.StandardOld();
 
-    private readonly object?[][] dataTab2 = [
-        ["Title", "Value"],
-        ["D", 4],
-        ["E", 5],
-        ["F", 6],
-    ];
+    private readonly object?[][] dataTab2 = ExcelTestData.SecondWorksheet();
 
     [Test]
     public async Task Diff_MultipleWorksheets_WithoutMerging()

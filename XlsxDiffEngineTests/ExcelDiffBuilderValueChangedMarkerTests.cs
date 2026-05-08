@@ -4,21 +4,9 @@ internal class ExcelDiffBuilderValueChangedMarkerTests
 {
     private readonly ExcelDiffBuilder excelDiffBuilder = new();
 
-    private readonly object?[][] oldFileContent = [
-        ["Title", "Value"],
-        ["A", 100.0],
-        ["B", 100.0],
-        ["C", 100.0],
-        ["D", 100.0],
-    ];
+    private readonly object?[][] oldFileContent = ExcelTestData.NumericMarkerOld();
 
-    private readonly object?[][] newFileContent = [
-        ["Title", "Value"],
-        ["A", 100.5],
-        ["B", 111.0],
-        ["C", 130.0],
-        ["D", 100.0],
-    ];
+    private readonly object?[][] newFileContent = ExcelTestData.NumericMarkerNew();
 
     [Test]
     public async Task Diff_WithSingleAbsoluteMarker()

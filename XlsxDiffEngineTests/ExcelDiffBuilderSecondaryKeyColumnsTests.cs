@@ -8,16 +8,8 @@ internal class ExcelDiffBuilderSecondaryKeyColumnsTests
     public async Task Diff_WithSecondaryKeyColumns_MatchesOnSecondaryKey()
     {
         // Arrange
-        object?[][] oldFile = [
-            ["ID", "SecondaryID", "Value"],
-            ["1", "A", 100],
-            ["2", "B", 200],
-        ];
-        object?[][] newFile = [
-            ["ID", "SecondaryID", "Value"],
-            ["3", "A", 100],
-            ["4", "B", 250],
-        ];
+        object?[][] oldFile = ExcelTestData.SecondaryKeyOld();
+        object?[][] newFile = ExcelTestData.SecondaryKeyNew();
         using var oldExcelPackage = ExcelTestHelper.ConvertToExcelPackage(oldFile);
         using var newExcelPackage = ExcelTestHelper.ConvertToExcelPackage(newFile);
         using var oldFileStream = oldExcelPackage.ToMemoryStream();
