@@ -7,7 +7,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:s="clr-namespace:XlsxDiffTool.Common"
     xmlns:vm="clr-namespace:XlsxDiffTool.ViewModels"
-    d:DataContext="{d:DesignInstance Type=vm:MainViewModel, IsDesignTimeCreatable=False}"
+    d:DataContext="{d:DesignInstance Type=vm:MainViewModel,
+                                     IsDesignTimeCreatable=False}"
     d:DesignHeight="450"
     d:DesignWidth="800"
     IsEnabled="{Binding AppStateModel.IsBusy, Converter={StaticResource InverseBoolConverter}}"
@@ -30,15 +31,21 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <ContentControl Grid.Row="0" Grid.Column="0" Content="{Binding OldFile, Mode=OneTime, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ViewConverter}}">
+            <ContentControl
+                Grid.Row="0"
+                Grid.Column="0"
+                Content="{Binding OldFile, Mode=OneTime, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ViewConverter}}">
                 <d:ContentControl.Content>
-                    <local:FileSelectorView />
+                    <local:InputSelectorView />
                 </d:ContentControl.Content>
             </ContentControl>
 
-            <ContentControl Grid.Row="0" Grid.Column="2" Content="{Binding NewFile, Mode=OneTime, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ViewConverter}}">
+            <ContentControl
+                Grid.Row="0"
+                Grid.Column="2"
+                Content="{Binding NewFile, Mode=OneTime, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ViewConverter}}">
                 <d:ContentControl.Content>
-                    <local:FileSelectorView />
+                    <local:InputSelectorView />
                 </d:ContentControl.Content>
             </ContentControl>
 
@@ -52,13 +59,19 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <ContentControl Grid.Row="2" Grid.Column="0" Content="{Binding ColumnsConfig, Mode=OneTime, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ViewConverter}}">
+            <ContentControl
+                Grid.Row="2"
+                Grid.Column="0"
+                Content="{Binding ColumnsConfig, Mode=OneTime, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ViewConverter}}">
                 <d:ContentControl.Content>
                     <local:ColumnSelectorView />
                 </d:ContentControl.Content>
             </ContentControl>
 
-            <ContentControl Grid.Row="2" Grid.Column="2" Content="{Binding Options, Mode=OneTime, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ViewConverter}}">
+            <ContentControl
+                Grid.Row="2"
+                Grid.Column="2"
+                Content="{Binding Options, Mode=OneTime, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ViewConverter}}">
                 <d:ContentControl.Content>
                     <local:OptionsView />
                 </d:ContentControl.Content>
@@ -74,9 +87,12 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <ContentControl Grid.Row="0" Grid.Column="0" Content="{Binding OutputFile, Mode=OneTime, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ViewConverter}}">
+            <ContentControl
+                Grid.Row="0"
+                Grid.Column="0"
+                Content="{Binding OutputFile, Mode=OneTime, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ViewConverter}}">
                 <d:ContentControl.Content>
-                    <local:FileSelectorView />
+                    <local:OutputSelectorView />
                 </d:ContentControl.Content>
             </ContentControl>
 
@@ -87,10 +103,22 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <StackPanel Grid.Row="0" HorizontalAlignment="Center" Orientation="Horizontal">
-                    <Button Grid.Column="1" Command="{Binding LoadConfigCommand}" Content="{s:Translate ConfigLoad}" />
-                    <Button Grid.Column="2" Command="{Binding SaveConfigCommand}" Content="{s:Translate ConfigSave}" />
-                    <Button Grid.Column="3" Command="{Binding ResetConfigCommand}" Content="{s:Translate ConfigReset}" />
+                <StackPanel
+                    Grid.Row="0"
+                    HorizontalAlignment="Center"
+                    Orientation="Horizontal">
+                    <Button
+                        Grid.Column="1"
+                        Command="{Binding LoadConfigCommand}"
+                        Content="{s:Translate ConfigLoad}" />
+                    <Button
+                        Grid.Column="2"
+                        Command="{Binding SaveConfigCommand}"
+                        Content="{s:Translate ConfigSave}" />
+                    <Button
+                        Grid.Column="3"
+                        Command="{Binding ResetConfigCommand}"
+                        Content="{s:Translate ConfigReset}" />
                 </StackPanel>
 
                 <StackPanel
@@ -105,7 +133,10 @@
                         Orientation="Horizontal"
                         Visibility="{Binding AppStateModel.IsBusy, Converter={StaticResource BoolToVisibilityConverter}}">
                         <TextBlock VerticalAlignment="Center" Text="Processing " />
-                        <ProgressBar Width="100" VerticalAlignment="Center" IsIndeterminate="True" />
+                        <ProgressBar
+                            Width="100"
+                            VerticalAlignment="Center"
+                            IsIndeterminate="True" />
                     </StackPanel>
 
                     <Button
