@@ -24,6 +24,7 @@ internal sealed class ExcelDataSource : IExcelDataSource
         DataRows = (this.section?.Rows - 1) ?? 0;
         columnDict = new(this.config.StringComparer);
         dataRowsOffset = this.section?.Start?.Row ?? 1;
+        GetColumnNames();
     }
 
     public IReadOnlyCollection<string> GetColumnNames()
@@ -141,7 +142,11 @@ internal sealed class ExcelDataSource : IExcelDataSource
                 return Enumerable.Range(1, DataRows).Select(x => config.CustomColumnValue).ToArray();
             }
             if (section is null) { return Enumerable.Range(1, DataRows).Select(x => (object?)null).ToArray(); }
-            object?[] cellValues = worksheet.Cells[section.Start.Row + 1, column, section.End.Row, column].GetValue<object?[]>();
+            var cellValues = new object?[DataRows];
+            for (int i = 0; i < DataRows; i++)
+            {
+                cellValues[i] = worksheet.Cells[section.Start.Row + 1 + i, column].Value;
+            }
             return cellValues;
         }
         return Enumerable.Range(1, DataRows).Select(x => (object?)null).ToArray();

@@ -19,6 +19,7 @@ internal sealed class MergedExcelDataSource : IExcelDataSource
         Name = name;
         DataRows = excelDataSources.Sum(x => x.DataRows);
         columnDict = new(this.config.StringComparer);
+        GetColumnNames();
     }
 
     public IReadOnlyCollection<string> GetColumnNames()
