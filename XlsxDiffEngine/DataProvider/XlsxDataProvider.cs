@@ -71,7 +71,7 @@ public sealed class XlsxDataProvider : IDisposable
                 .Select(x => new MergedExcelDataSource(x.Key, [.. x], excelDataSourceConfig with { RowNumberColumnName = null }))
                 .ToList<IExcelDataSource>();
             if (!config.MergeWorksheets) { return dataSources; }
-            return [new MergedExcelDataSource(config.MergedDocumentName ?? "MergedDocument", dataSources,
+            return dataSources = [new MergedExcelDataSource(config.MergedDocumentName ?? "MergedDocument", dataSources,
                         excelDataSourceConfig with { MergedWorksheetNameColumnName = null, RowNumberColumnName = null })];
         }
         return dataSources;
