@@ -140,4 +140,9 @@ public sealed record XlsxWorksheetInfo
     /// The ending column for data extraction. If null, there is no limit.
     /// </summary>
     public int? ToColumn { get; init; }
+
+    /// <summary>
+    /// The name used for the worksheet. If null, the original worksheet name is used.
+    /// </summary>
+    public string AlternativeName { get; set; } = "";
 }

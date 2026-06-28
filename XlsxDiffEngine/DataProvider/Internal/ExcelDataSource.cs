@@ -15,12 +15,12 @@ internal sealed class ExcelDataSource : IExcelDataSource
     public string Name { get; }
     public int DataRows { get; }
 
-    public ExcelDataSource(ExcelWorksheet worksheet, ExcelDataSourceConfig? config = null, ExcelAddress? section = null)
+    public ExcelDataSource(ExcelWorksheet worksheet, ExcelDataSourceConfig? config = null, ExcelAddress? section = null, string? name = null)
     {
         this.worksheet = worksheet;
         this.section = section ?? worksheet.Dimension;
         this.config = config ?? new ExcelDataSourceConfig();
-        Name = worksheet.Name;
+        Name = name ?? worksheet.Name;
         DataRows = (this.section?.Rows - 1) ?? 0;
         columnDict = new(this.config.StringComparer);
         dataRowsOffset = this.section?.Start?.Row ?? 1;
