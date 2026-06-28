@@ -107,16 +107,27 @@ public sealed class XlsxDataProvider : IDisposable
                 CustomColumnValue = xlsxFileInfo.DocumentName
             };
         }
-        Dictionary<string, XlsxWorksheetInfo> wsInfoDict = xlsxFileInfo.WorksheetInfos.ToDictionary(x => x.Name, excelDataSourceConfig.StringComparer);
+        ILookup<string, XlsxWorksheetInfo> wsInfoLookup = xlsxFileInfo.WorksheetInfos.ToLookup(x => x.Name, excelDataSourceConfig.StringComparer);
         foreach (ExcelWorksheet excelWorksheet in excelPackage.Workbook.Worksheets)
         {
             if (workSheetNames is not null && !workSheetNames.Contains(excelWorksheet.Name)) { continue; }
             ExcelAddress? excelAddress = excelWorksheet.Dimension;
-            if (excelAddress is not null && wsInfoDict.TryGetValue(excelWorksheet.Name, out XlsxWorksheetInfo? xlsxWorksheetInfo))
+            List<XlsxWorksheetInfo> worksheetInfos = [.. wsInfoLookup[excelWorksheet.Name]];
+            if (worksheetInfos.Count > 0)
             {
-                excelAddress = new(xlsxWorksheetInfo.FromRow, xlsxWorksheetInfo.FromColumn,
-                    xlsxWorksheetInfo.ToRow ?? excelAddress.End.Row,
-                    xlsxWorksheetInfo.ToColumn ?? excelAddress.End.Column);
+                foreach (XlsxWorksheetInfo xlsxWorksheetInfo in worksheetInfos)
+                {
+                    ExcelAddress? section = null;
+                    if (excelAddress is not null)
+                    {
+                        section = new(xlsxWorksheetInfo.FromRow, xlsxWorksheetInfo.FromColumn,
+                            xlsxWorksheetInfo.ToRow ?? excelAddress.End.Row,
+                            xlsxWorksheetInfo.ToColumn ?? excelAddress.End.Column);
+                    }
+                    string name = string.IsNullOrWhiteSpace(xlsxWorksheetInfo.AlternativeName) ? excelWorksheet.Name : xlsxWorksheetInfo.AlternativeName;
+                    dataSources.Add(new ExcelDataSource(excelWorksheet, xlsxFileDataSourceConfig, section, name));
+                }
+                continue;
             }
             else if (excelAddress is not null && (xlsxFileInfo.FromRow != 1 || xlsxFileInfo.FromColumn != 1 || xlsxFileInfo.ToRow != null || xlsxFileInfo.ToColumn != null))
             {
